@@ -1,8 +1,14 @@
-{%- macro check_rust_call(func) -%}
-    check_rust_call(&status,
+{%- macro rust_call(func) -%}
+    rust_call(
+        {{ func.ffi_func().name() }},
 {%- match func.throws_type() -%}
-{% when Some with (e) %} {{ ci.namespace() }}::uniffi::{{ e|ffi_converter_name }}::lift);{% else %} nullptr);
+{% when Some with (e) %}
+        {{ ci.namespace() }}::uniffi::{{ e|ffi_converter_name }}::lift,
+{%- else %}
+        nullptr,
 {%- endmatch %}
+        {% call arg_list_lowered(func) %}
+    );
 {%- endmacro -%}
 
 {%- macro to_ffi_call_with_prefix(prefix, func) -%}
