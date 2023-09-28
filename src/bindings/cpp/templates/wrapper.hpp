@@ -4,6 +4,7 @@
 #include <exception>
 #include <functional>
 #include <iostream>
+#include <optional>
 #include <stdexcept>
 #include <streambuf>
 
@@ -29,41 +30,26 @@ namespace {{ ci.namespace() }}::uniffi {
     struct RustStream: std::basic_iostream<uint8_t> {
         RustStream(RustBuffer *buf):
             streambuf(RustStreamBuffer(buf)), std::basic_iostream<uint8_t>(&streambuf) { }
-
-        template<typename T,
-                 typename = std::enable_if_t<std::is_integral<T>::value>>
-        RustStream &operator>>(T &val) {
-            T var;
-
-            std::basic_iostream<uint8_t>::operator>>(var);
-
-            var = std::byteswap(var);
-            val = var;
-
-            return *this;
-        }
-
-        RustStream &operator>>(bool &val) {
-            std::basic_iostream<uint8_t>::operator>>(val);
-
-            return *this;
-        }
-
-        RustStream &operator>>(std::string &val) {
-            return *this;
-        }
-
     private:
         RustStreamBuffer streambuf;
     };
 
     RustBuffer rustbuffer_alloc(int32_t len);
+    RustBuffer rustbuffer_from_bytes(const ForeignBytes &bytes);
     void rustbuffer_free(RustBuffer buf);
 }
 
 {%- import "macros.cpp" as macros %}
 
 namespace {{ ci.namespace() }} {
+    {%- for typ in self.sorted_records(ci.iter_types()) %}
+    {%- match typ %}
+    {%- when Type::Record(name) %}
+    {% include "rec_tmpl.cpp" %}
+    {% else %}
+    {%- endmatch %}
+    {%- endfor %}
+
     {%- for func in ci.function_definitions() %}
     {%- match func.return_type() %}
     {%- when Some with (return_type) %}

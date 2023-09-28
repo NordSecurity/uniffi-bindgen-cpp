@@ -19,21 +19,21 @@ impl OptionalCodeType {
 impl CodeType for OptionalCodeType {
     fn type_label(&self) -> String {
         format!(
-            "std::vector<{}>",
+            "std::optional<{}>",
             CppCodeOracle.find(&self.inner).type_label()
         )
     }
 
     fn canonical_name(&self) -> String {
         format!(
-            "Sequence{}",
+            "Optional{}",
             CppCodeOracle.find(&self.inner).canonical_name(),
         )
     }
 
     fn literal(&self, literal: &Literal) -> String {
         match literal {
-            Literal::EmptySequence => "{}".into(),
+            Literal::Null => "nullptr".into(),
             _ => CppCodeOracle.find(&self.inner).literal(literal),
         }
     }
@@ -53,21 +53,21 @@ impl SequenceCodeType {
 impl CodeType for SequenceCodeType {
     fn type_label(&self) -> String {
         format!(
-            "std::optional<{}>",
+            "std::vector<{}>",
             CppCodeOracle.find(&self.inner).type_label()
         )
     }
 
     fn canonical_name(&self) -> String {
         format!(
-            "Optional{}",
+            "Sequence{}",
             CppCodeOracle.find(&self.inner).canonical_name(),
         )
     }
 
     fn literal(&self, literal: &Literal) -> String {
         match literal {
-            Literal::Null => "nullptr".into(),
+            Literal::EmptySequence => "{}".into(),
             _ => CppCodeOracle.find(&self.inner).literal(literal),
         }
     }

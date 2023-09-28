@@ -6,11 +6,7 @@ mod object;
 mod primitives;
 mod record;
 
-use std::{
-    borrow::Borrow,
-    cell::RefCell,
-    collections::{BTreeSet, HashMap}
-};
+use std::{borrow::Borrow, collections::HashMap};
 
 use anyhow::{Context, Result};
 use askama::Template;
@@ -64,6 +60,34 @@ impl<'a> CppWrapperHeader<'a> {
     fn new(ci: &'a ComponentInterface) -> Self {
         Self { ci }
     }
+
+    pub(crate) fn sorted_records(
+        &self,
+        types: impl Iterator<Item = &'a Type>,
+    ) -> impl Iterator<Item = &'a Type> {
+        let mut pod_types: Vec<&'a Type> = vec![];
+        let mut rest_types: Vec<&'a Type> = vec![];
+
+        for typ in types {
+            if let Type::Record(name) = typ {
+                if let Some(rec) = self.ci.get_record_definition(name) {
+                    let contains_recs = rec
+                        .fields()
+                        .iter()
+                        .any(|field| matches!(field.as_type(), Type::Record(_)));
+                    if contains_recs {
+                        rest_types.push(typ);
+                    } else {
+                        pod_types.push(typ);
+                    }
+                }
+            } else {
+                continue
+            }
+        }
+
+        pod_types.into_iter().chain(rest_types)
+    }
 }
 
 #[derive(Template)]
@@ -72,7 +96,6 @@ struct CppWrapper<'a> {
     ci: &'a ComponentInterface,
     config: Config,
     type_helper_code: String,
-    includes: RefCell<BTreeSet<String>>,
 }
 
 impl<'a> CppWrapper<'a> {
@@ -81,17 +104,7 @@ impl<'a> CppWrapper<'a> {
             ci,
             config,
             type_helper_code: TypeRenderer { ci }.render().unwrap(),
-            includes: RefCell::new(BTreeSet::new()),
         }
-    }
-    fn add_include(&self, include: &str) -> &str {
-        self.includes.borrow_mut().insert(include.to_string());
-
-        ""
-    }
-
-    fn includes(&self) -> Vec<String> {
-        self.includes.borrow().iter().cloned().collect()
     }
 }
 

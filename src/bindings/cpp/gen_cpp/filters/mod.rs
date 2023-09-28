@@ -107,6 +107,14 @@ pub(crate) fn read_fn(as_ct: &impl AsCodeType) -> Result<String> {
     Ok(format!("{}::read", as_ct.as_codetype().ffi_converter_name()))
 }
 
+pub(crate) fn write_fn(as_ct: &impl AsCodeType) -> Result<String> {
+    Ok(format!("{}::write", as_ct.as_codetype().ffi_converter_name()))
+}
+
+pub(crate) fn allocation_size_fn(as_ct: &impl AsCodeType) -> Result<String> {
+    Ok(format!("{}::allocation_size", as_ct.as_codetype().ffi_converter_name()))
+}
+
 pub(crate) fn variant_name(v: &Variant) -> Result<String> {
     Ok(CppCodeOracle.enum_variant_name(v.name()))
 }

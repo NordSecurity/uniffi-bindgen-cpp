@@ -1,11 +1,12 @@
+namespace {{ ci.namespace() }}::uniffi {
 {%- for type_ in ci.iter_types() %}
 {%- let type_name = type_|type_name %}
 {%- let ffi_converter_name = type_|ffi_converter_name %}
 {%- let canonical_type_name = type_|canonical_name %}
 {%- let contains_object_references = ci.item_contains_object_references(type_) %}
+{%- let namespace = ci.namespace() %}
 
 {%- match type_ %}
-
 {%- when Type::Boolean %}
 {% include "bool_helper.cpp" %}
 
@@ -54,7 +55,7 @@
 {% include "obj_tmpl.cpp" %}
 
 {%- when Type::Record(name) %}
-{% include "rec_tmpl.cpp" %}
+{% include "rec_conv.cpp" %}
 
 {%- when Type::Optional(inner_type) %}
 {% include "opt_tmpl.cpp" %}
@@ -82,4 +83,5 @@
 
 {%- else %}
 {%- endmatch %}
-{% endfor %}
+{%- endfor %}
+}
