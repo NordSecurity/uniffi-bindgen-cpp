@@ -1,8 +1,9 @@
 use askama;
 use heck::{ToShoutySnakeCase, ToSnakeCase, ToUpperCamelCase};
 use uniffi_bindgen::{
-    backend::CodeType, interface::{AsType, FfiType, Literal, Type, Variant},
+    backend::{CodeType}, interface::{AsType, FfiType, Literal, Type, Variant},
 };
+pub(crate) use uniffi_bindgen::backend::filters::*;
 
 use crate::bindings::cpp::gen_cpp::{
     compounds, enum_, miscellany, object, primitives, record,

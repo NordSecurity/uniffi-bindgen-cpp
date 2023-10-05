@@ -1,50 +1,42 @@
-namespace {{ ci.namespace() }}::uniffi {
-{%- for type_ in ci.iter_types() %}
-{%- let type_name = type_|type_name %}
-{%- let ffi_converter_name = type_|ffi_converter_name %}
-{%- let canonical_type_name = type_|canonical_name %}
-{%- let contains_object_references = ci.item_contains_object_references(type_) %}
+{%- import "macros.cpp" as macros -%}
+
+{%- for typ in ci.iter_types() %}
+{%- let type_name = typ|type_name %}
+{%- let ffi_converter_name = typ|ffi_converter_name %}
+{%- let canonical_type_name = typ|canonical_name %}
+{%- let contains_object_references = ci.item_contains_object_references(typ) %}
 {%- let namespace = ci.namespace() %}
 
-{%- match type_ %}
+{%- match typ %}
+
 {%- when Type::Boolean %}
-{% include "bool_helper.cpp" %}
-
+{% include "bool_conv.cpp" %}
 {%- when Type::UInt8 %}
-{% include "integral_helper.cpp" %}
-
+{% include "arith_conv.cpp" %}
 {%- when Type::Int8 %}
-{% include "integral_helper.cpp" %}
-
+{% include "arith_conv.cpp" %}
 {%- when Type::UInt16 %}
-{% include "integral_helper.cpp" %}
-
+{% include "arith_conv.cpp" %}
 {%- when Type::Int16 %}
-{% include "integral_helper.cpp" %}
-
+{% include "arith_conv.cpp" %}
 {%- when Type::UInt32 %}
-{% include "integral_helper.cpp" %}
-
+{% include "arith_conv.cpp" %}
 {%- when Type::Int32 %}
-{% include "integral_helper.cpp" %}
-
+{% include "arith_conv.cpp" %}
 {%- when Type::UInt64 %}
-{% include "integral_helper.cpp" %}
-
+{% include "arith_conv.cpp" %}
 {%- when Type::Int64 %}
-{% include "integral_helper.cpp" %}
-
+{% include "arith_conv.cpp" %}
 {%- when Type::Float32 %}
-{% include "integral_helper.cpp" %}
-
+{% include "arith_conv.cpp" %}
 {%- when Type::Float64 %}
-{% include "integral_helper.cpp" %}
+{% include "arith_conv.cpp" %}
 
 {%- when Type::String %}
-{% include "str_helper.cpp" %}
+{% include "str_conv.cpp" %}
 
 {%- when Type::Enum(name) %}
-{%- let e = ci.get_enum_definition(name).unwrap() %}
+{%- let e = ci|get_enum_definition(name) %}
 {%- if ci.is_name_used_as_error(name) %}
 {% include "err_tmpl.cpp" %}
 {%- else %}
@@ -52,10 +44,10 @@ namespace {{ ci.namespace() }}::uniffi {
 {%- endif %}
 
 {%- when Type::Object { name, imp } %}
-{% include "obj_tmpl.cpp" %}
+{% include "obj.cpp" %}
 
 {%- when Type::Record(name) %}
-{% include "rec_conv.cpp" %}
+{% include "rec.cpp" %}
 
 {%- when Type::Optional(inner_type) %}
 {% include "opt_tmpl.cpp" %}
@@ -84,4 +76,3 @@ namespace {{ ci.namespace() }}::uniffi {
 {%- else %}
 {%- endmatch %}
 {%- endfor %}
-}

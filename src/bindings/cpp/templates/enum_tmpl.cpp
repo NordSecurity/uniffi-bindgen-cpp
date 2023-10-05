@@ -9,21 +9,27 @@ enum class {{ type_name }}: int32_t {
 
 struct {{ ffi_converter_name }} {
     static {{ type_name }} lift(RustBuffer buf) {
+        auto stream = ::{{ namespace }}::uniffi::RustBuffer(&buf);
+        auto ret = {{ ffi_converter_name }}::read(stream);
 
+        ::{{ namespace }}::uniffi::rustbuffer_free(buf);
+
+        return std::move(ret);
     }
 
     static RustBuffer lower({{ type_name }} val) {
-        RustBuffer buf(sizeof({{ type_name }}));
+        auto buf = rustbuffer_alloc(allocation_size(val));
+        auto stream = ::{{ namespace }}::uniffi::RustStream(&buf);
 
-        {{ ffi_converter_name }}::write(buf.data, val);
+        {{ ffi_converter_name }}::write(stream, val);
+
+        return std::move(buf);
     }
 
-    static {{ type_name }} read(uint8_t *buf) {
-        auto variant = *reinterpret_cast<int32_t *>(buf);
+    static {{ type_name }} read(::{{ namespace }}::uniffi::RustStream &stream) {
+        int32_t variant;
 
-        if (std::endian::native != std::endian::big) {
-            variant = std::byteswap(variant);
-        }
+        stream >> variant;
 
         switch (variant) {
             {%- for variant in e.variants() %}
@@ -46,9 +52,13 @@ struct {{ ffi_converter_name }} {
 
         std::copy(bytes, bytes + sizeof({{ type_name }}), buf);
     }
+
+    static int32_t allocation_size(const {{ type_name|class_name }} &) {
+        return sizeof({{ type_name|class_name }});
+    }
 };
 {% else %}
-final struct {{ type_name }} {
+struct {{ type_name }} {
     {% for variant in e.variants() -%}
     class {{ variant|variant_name }} {
     };

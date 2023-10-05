@@ -1,2 +1,0 @@
-struct {{ type_name }} {
-};

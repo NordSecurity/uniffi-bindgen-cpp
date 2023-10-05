@@ -1,51 +1,49 @@
-struct {{ ffi_converter_name }} {
-    static {{ type_name }} lift(RustBuffer buf) {
-        auto stream = RustStream(&buf);
-        auto ret = {{ ffi_converter_name }}::read(stream);
+namespace {{ namespace }} {
+    {{ type_name }} {{ namespace }}::uniffi::{{ ffi_converter_name }}::lift(RustBuffer buf) {
+        auto stream = {{ namespace }}::uniffi::RustStream(&buf);
+        auto ret = {{ namespace }}::uniffi::{{ ffi_converter_name }}::read(stream);
 
-        rustbuffer_free(buf);
+        {{ namespace }}::uniffi::rustbuffer_free(buf);
 
         return ret;
     }
 
-    static RustBuffer lower({{ type_name }} val) {
-        auto buf = rustbuffer_alloc(allocation_size(val));
-        auto stream = RustStream(&buf);
+    RustBuffer {{ namespace }}::uniffi::{{ ffi_converter_name }}::lower({{ type_name }} val) {
+        auto buf = {{ namespace }}::uniffi::rustbuffer_alloc({{ namespace }}::uniffi::{{ ffi_converter_name }}::allocation_size(val));
+        auto stream = {{ namespace }}::uniffi::RustStream(&buf);
 
-        {{ ffi_converter_name }}::write(stream, val);
+        {{ namespace }}::uniffi::{{ ffi_converter_name }}::write(stream, val);
 
         return buf;
     }
 
-    static {{ type_name }} read(RustStream &stream) {
+    {{ type_name }} {{ namespace }}::uniffi::{{ ffi_converter_name }}::read({{ namespace }}::uniffi::RustStream &stream) {
         uint8_t has_value;
 
         stream.get(has_value);
 
         if (has_value) {
-            return std::make_optional({{ inner_type|read_fn }}(stream));
+            return std::make_optional({{ namespace }}::uniffi::{{ inner_type|read_fn }}(stream));
         }
-
-        std::cout << stream.good() << ' ' << stream.bad() << ' ' << stream.fail() << '\n';
 
         return std::nullopt;
     }
 
-    static void write(RustStream &stream, {{ type_name }} value) {
-        stream << static_cast<uint8_t>(!!value);
+    void {{ namespace }}::uniffi::{{ ffi_converter_name }}::write({{ namespace }}::uniffi::RustStream &stream, {{ type_name }} value) {
+        stream.put(static_cast<uint8_t>(!!value));
 
         if (value) {
-            {{ inner_type|write_fn }}(stream, value.value());
+            {{ namespace }}::uniffi::{{ inner_type|write_fn }}(stream, value.value());
         }
     }
 
-    static int32_t allocation_size(const {{ type_name }} &val) {
+    int32_t {{ namespace }}::uniffi::{{ ffi_converter_name }}::allocation_size(const {{ type_name }} &val) {
         int32_t ret = 1;
 
         if (val) {
-            ret += {{ inner_type|allocation_size_fn }}(val.value());
+            ret += {{ namespace }}::uniffi::{{ inner_type|allocation_size_fn }}(val.value());
         }
 
         return ret;
     }
-};
+}
