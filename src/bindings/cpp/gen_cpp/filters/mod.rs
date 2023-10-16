@@ -1,12 +1,14 @@
 use askama;
 use heck::{ToShoutySnakeCase, ToSnakeCase, ToUpperCamelCase};
 use uniffi_bindgen::{
-    backend::{CodeType}, interface::{AsType, FfiType, Literal, Type, Variant},
+    backend::{CodeType}, interface::{
+        Argument, AsType, FfiType, Literal, Type, Variant,
+    },
 };
 pub(crate) use uniffi_bindgen::backend::filters::*;
 
 use crate::bindings::cpp::gen_cpp::{
-    compounds, enum_, miscellany, object, primitives, record,
+    callback_interface, compounds, enum_, miscellany, object, primitives, record,
 };
 
 type Result<T> = std::result::Result<T, askama::Error>;
@@ -62,7 +64,7 @@ impl<T: AsType> AsCodeType for T {
             Type::ForeignExecutor => todo!(),
             Type::Record(id) => Box::new(record::RecordCodeType::new(id)),
             Type::Enum(id) => Box::new(enum_::EnumCodeType::new(id)),
-            Type::CallbackInterface(_) => todo!(),
+            Type::CallbackInterface(id) => Box::new(callback_interface::CallbackInterfaceCodeType::new(id)),
             Type::Optional(inner) => Box::new(compounds::OptionalCodeType::new(*inner)),
             Type::Sequence(inner) => Box::new(compounds::SequenceCodeType::new(*inner)),
             Type::Map(key, value) => Box::new(compounds::MapCodeType::new(*key, *value)),
@@ -138,11 +140,23 @@ pub(crate) fn ffi_type_name(ffi_type: &FfiType) -> Result<String> {
         FfiType::ForeignCallback => "ForeignCallback".into(),
         FfiType::ForeignExecutorCallback => "UniFfiForeignExecutorCallback".into(),
         FfiType::ForeignExecutorHandle => "std::size_t".into(),
-        FfiType::FutureCallback { return_type } => todo!(),
+        FfiType::FutureCallback { .. } => todo!(),
         FfiType::FutureCallbackData => todo!(),
     })
 }
 
 pub(crate) fn class_name(nm: &str) -> Result<String> {
     Ok(CppCodeOracle.class_name(nm))
+}
+
+pub(crate) fn parameter(arg: &Argument) -> Result<String> {
+    Ok(match arg.as_type() {
+        Type::Object { name, .. } => {
+            format!("const {} &{}", name, arg.name())
+        },
+        Type::CallbackInterface(name) => {
+            format!("std::shared_ptr<{}> {}", name, arg.name())
+        },
+        t => format!("{} {}", type_name(&t)?, arg.name())
+    })
 }

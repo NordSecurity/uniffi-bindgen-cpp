@@ -27,9 +27,9 @@
     )
 {%- endmacro -%}
 
-{%- macro arg_list_decl(func) %}
+{%- macro param_list(func) %}
 {%- for arg in func.arguments() -%}
-{{ arg|type_name }} {{ arg.name()|var_name }}
+{{ arg|parameter }}
 {%- match arg.default_value() %}
 {%- when Some with(literal) %} = {{ literal|literal_cpp(arg.as_type().borrow()) }}
 {%- else %}

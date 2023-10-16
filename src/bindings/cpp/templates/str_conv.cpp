@@ -1,8 +1,7 @@
 std::string {{ namespace }}::uniffi::{{ ffi_converter_name }}::lift(RustBuffer buf) {
-    auto stream = ::{{ namespace }}::uniffi::RustStream(&buf);
-    auto string = read(stream);
+    auto string = std::string(reinterpret_cast<char *>(buf.data));
 
-    ::{{ namespace }}::uniffi::rustbuffer_free(buf);
+    {{ namespace }}::uniffi::rustbuffer_free(buf);
 
     return string;
 }
@@ -28,7 +27,7 @@ std::string {{ namespace }}::uniffi::{{ ffi_converter_name }}::read({{ namespace
 
 void {{ namespace }}::uniffi::{{ ffi_converter_name }}::write({{ namespace }}::uniffi::RustStream &stream, const std::string &val) {
     stream << static_cast<int32_t>(val.length());
-    stream.write(reinterpret_cast<uint8_t *>(const_cast<char *>(val.data())), val.length());
+    stream.write(reinterpret_cast<const uint8_t *>(val.data()), val.length());
 }
 
 int32_t {{ namespace }}::uniffi::{{ ffi_converter_name }}::allocation_size(const std::string &val) {

@@ -20,6 +20,8 @@ struct RustCallStatus {
     RustBuffer error_buf;
 };
 
+typedef int ForeignCallback(uint64_t handle, uint32_t method, uint8_t *args_data, int32_t args_len, RustBuffer *buf_ptr);
+
 {% for func in ci.iter_ffi_function_definitions() %}
 {%- match func.return_type() -%}
 {% when Some with (return_type) %}{{ return_type|ffi_type_name }} {% when None %}void {% endmatch %}{{ func.name() }}(

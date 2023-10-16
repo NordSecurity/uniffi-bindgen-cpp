@@ -1,3 +1,4 @@
+mod callback_interface;
 mod compounds;
 mod enum_;
 mod filters;
@@ -6,7 +7,7 @@ mod object;
 mod primitives;
 mod record;
 
-use std::{borrow::Borrow, collections::HashMap};
+use std::{borrow::Borrow, cmp::Ordering, collections::HashMap};
 
 use anyhow::{Context, Result};
 use askama::Template;
@@ -61,32 +62,35 @@ impl<'a> CppWrapperHeader<'a> {
         Self { ci }
     }
 
-    pub(crate) fn sorted_records(
+    pub(crate) fn sorted_types(
         &self,
         types: impl Iterator<Item = &'a Type>,
     ) -> impl Iterator<Item = &'a Type> {
-        let mut pod_types: Vec<&'a Type> = vec![];
-        let mut rest_types: Vec<&'a Type> = vec![];
+        let (mut recs, rest): (Vec<&'a Type>, Vec<&'a Type>) = types
+            .partition(|t| matches!(t, Type::Record(_)));
+        let (cbs, rest): (Vec<&'a Type>, Vec<&'a Type>) = rest
+            .iter()
+            .partition(|t| matches!(t, Type::CallbackInterface(_)));
 
-        for typ in types {
-            if let Type::Record(name) = typ {
-                if let Some(rec) = self.ci.get_record_definition(name) {
-                    let contains_recs = rec
-                        .fields()
-                        .iter()
-                        .any(|field| matches!(field.as_type(), Type::Record(_)));
-                    if contains_recs {
-                        rest_types.push(typ);
-                    } else {
-                        pod_types.push(typ);
+        recs.sort_by(|a, _| {
+            match a {
+                Type::Record(name) => {
+                    match self.ci.get_record_definition(name) {
+                        Some(rec) => {
+                            if rec.fields().iter().any(|field| matches!(field.as_type(), Type::Record(_))) {
+                                return Ordering::Less;
+                            }
+                        },
+                        None => unreachable!()
                     }
-                }
-            } else {
-                continue
+                },
+                _ => unreachable!()
             }
-        }
 
-        pod_types.into_iter().chain(rest_types)
+            Ordering::Equal
+        });
+
+        recs.into_iter().chain(cbs).chain(rest)
     }
 }
 

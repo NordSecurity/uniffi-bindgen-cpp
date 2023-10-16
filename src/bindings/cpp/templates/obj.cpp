@@ -7,22 +7,22 @@
 namespace {{ namespace }} {
     {{ class_name }}::{{ class_name }}(void *ptr): instance(ptr) {}
 
-    {%- match obj.primary_constructor() %}
+    {% match obj.primary_constructor() %}
     {%- when Some with (ctor) %}
-    {{ class_name }} {{ class_name }}::init ({% call macros::arg_list_decl(ctor) %}) {
-        return {{ class_name }}({% call macros::rust_call(ctor) %});
+    std::unique_ptr<{{ class_name }}> {{ class_name }}::init ({% call macros::param_list(ctor) %}) {
+        return std::unique_ptr<{{ class_name }}>(new {{ class_name }}({% call macros::rust_call(ctor) %}));
     }
     {%- else %}
     {%- endmatch %}
     {%- for ctor in obj.alternate_constructors() %}
-    {{ class_name }} {{ class_name }}::init({% call macros::arg_list_decl(ctor) %}) {
-        return {{ class_name }}({% call macros::rust_call(ctor) %});
+    std::unique_ptr<{{ class_name }}> {{ class_name }}::init({% call macros::param_list(ctor) %}) {
+        return std::unique_ptr<{{ class_name }}>(new {{ class_name }}({% call macros::rust_call(ctor) %}));
     }
     {%- endfor %}
 
     {% for method in obj.methods() %}
     {%- match method.return_type() %}{% when Some with (return_type) %}{{ return_type|type_name }} {% else %}void {% endmatch -%}
-    {{ class_name }}::{{ method.name()|fn_name }}({% call macros::arg_list_decl(method) %}) {
+    {{ class_name }}::{{ method.name()|fn_name }}({% call macros::param_list(method) %}) {
         {% match method.return_type() %}
         {%- when Some with (return_type) %}
         return {{ namespace }}::uniffi::{{ return_type|lift_fn }}({% call macros::rust_call_with_prefix("this->instance", method) %});

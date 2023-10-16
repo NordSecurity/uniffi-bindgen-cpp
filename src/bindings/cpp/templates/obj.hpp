@@ -16,18 +16,18 @@ struct {{ class_name }} {
     {{ class_name }} &operator=({{ class_name }} &&) = default;
 
     {% match obj.primary_constructor() %}
-    {%- when Some with (ctor) %}
-    static {{ class_name }} init({% call macros::arg_list_decl(ctor) %});
+    {%- when Some with (ctor) -%}
+    static std::unique_ptr<{{ class_name }}> init({% call macros::param_list(ctor) %});
     {%- else %}
-    {%- endmatch %}
+    {%- endmatch -%}
 
     {% for ctor in obj.alternate_constructors() %}
-    static {{ class_name }} init({% call macros::arg_list_decl(ctor) %});
+    static std::unique_ptr<{{ class_name }}> init({% call macros::param_list(ctor) %});
     {%- endfor %}
 
     {% for method in obj.methods() %}
     {%- match method.return_type() %}{% when Some with (return_type) %}{{ return_type|type_name }} {% else %}void {% endmatch %}
-    {{- method.name()|fn_name }}({% call macros::arg_list_decl(method) %});
+    {{- method.name()|fn_name }}({% call macros::param_list(method) %});
     {% endfor %}
 private:
     {{ class_name }}(void *);

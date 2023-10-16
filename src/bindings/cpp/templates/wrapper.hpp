@@ -4,10 +4,13 @@
 #include <exception>
 #include <functional>
 #include <iostream>
+#include <map>
 #include <memory>
+#include <mutex>
 #include <optional>
 #include <stdexcept>
 #include <streambuf>
+#include <type_traits>
 
 {%- let namespace = ci.namespace() %}
 
@@ -16,17 +19,13 @@
 {%- import "macros.cpp" as macros %}
 
 namespace {{ namespace }} {
-    {%- for typ in self.sorted_records(ci.iter_types()) %}
+    {%- for typ in self.sorted_types(ci.iter_types()) %}
+    {%- let type_name = typ|type_name %}
     {%- match typ %}
     {%- when Type::Record(name) %}
     {% include "rec.hpp" %}
-    {% else %}
-    {%- endmatch %}
-    {%- endfor %}
-
-    {%- for typ in ci.iter_types() %}
-    {%- let type_name = typ|type_name %}
-    {%- match typ %}
+    {%- when Type::CallbackInterface(name) %}
+    {% include "callback.hpp" %}
     {%- when Type::Enum(name) %}
     {%- let e = ci|get_enum_definition(name) %}
     {%- if ci.is_name_used_as_error(name) %}
@@ -135,6 +134,8 @@ namespace {{ namespace }} {
         {% include "opt_conv.hpp" %}
         {%- when Type::Sequence(inner_type) %}
         {% include "seq_conv.hpp" %}
+        {%- when Type::CallbackInterface(name) %}
+        {% include "callback_conv.hpp" %}
         {%- else %}
         {%- endmatch %}
         {%- endfor %}
@@ -143,9 +144,9 @@ namespace {{ namespace }} {
     {% for func in ci.function_definitions() %}
     {%- match func.return_type() %}
     {%- when Some with (return_type) %}
-    {{ return_type|type_name }} {{ func.name()|fn_name }}({%- call macros::arg_list_decl(func) %});
+    {{ return_type|type_name }} {{ func.name()|fn_name }}({%- call macros::param_list(func) %});
     {%- when None %}
-    void {{ func.name()|fn_name }}({%- call macros::arg_list_decl(func) %});
+    void {{ func.name()|fn_name }}({%- call macros::param_list(func) %});
     {%- endmatch %}
     {%- endfor %}
 }
