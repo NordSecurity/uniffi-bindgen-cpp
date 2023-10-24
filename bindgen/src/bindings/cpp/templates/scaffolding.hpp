@@ -25,7 +25,9 @@ typedef int ForeignCallback(uint64_t handle, uint32_t method, uint8_t *args_data
 {% for func in ci.iter_ffi_function_definitions() %}
 {%- match func.return_type() -%}
 {% when Some with (return_type) %}{{ return_type|ffi_type_name }} {% when None %}void {% endmatch %}{{ func.name() }}(
-{%- for arg in func.arguments() %}{{- arg.type_().borrow()|ffi_type_name }} {{ arg.name() }}{% if !loop.last %}, {% endif %}{% endfor %}
+{%- for arg in func.arguments() %}
+{{- arg.type_().borrow()|ffi_type_name }} {{ arg.name() }}{% if !loop.last || func.has_rust_call_status_arg() %}, {% endif -%}
+{% endfor %}
 {%- if func.has_rust_call_status_arg() %}RustCallStatus *out_status{% endif -%}
 );
 {% endfor %}
