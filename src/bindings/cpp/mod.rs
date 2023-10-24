@@ -2,7 +2,7 @@ pub(crate) mod gen_cpp;
 
 use std::fs;
 
-use anyhow::Result;
+use anyhow::{Result, bail};
 use camino::Utf8Path;
 use uniffi_bindgen::{BindingGenerator, ComponentInterface};
 
@@ -15,8 +15,8 @@ impl BindingGenerator for CppBindingGenerator {
 
     fn write_bindings(
         &self,
-        ci: ComponentInterface,
-        config: Self::Config,
+        ci: &ComponentInterface,
+        config: &Self::Config,
         out_dir: &Utf8Path,
     ) -> Result<()> {
         let Bindings {
@@ -29,6 +29,14 @@ impl BindingGenerator for CppBindingGenerator {
         fs::write(&scaffolding_header_path, scaffolding_header)?;
         fs::write(&header_path, header)?;
         fs::write(&source_path, source)?;
+
+        Ok(())
+    }
+
+    fn check_library_path(&self, library_path: &Utf8Path, cdylib_name: Option<&str>) -> Result<()> {
+        if cdylib_name.is_none() {
+            bail!("A path to a library file is required to generate bindings");
+        }
 
         Ok(())
     }

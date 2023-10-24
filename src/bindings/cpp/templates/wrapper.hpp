@@ -22,17 +22,17 @@ namespace {{ namespace }} {
     {%- for typ in self.sorted_types(ci.iter_types()) %}
     {%- let type_name = typ|type_name %}
     {%- match typ %}
-    {%- when Type::Record(name) %}
+    {%- when Type::Record { module_path, name } %}
     {% include "rec.hpp" %}
-    {%- when Type::CallbackInterface(name) %}
+    {%- when Type::CallbackInterface { module_path, name } %}
     {% include "callback.hpp" %}
-    {%- when Type::Enum(name) %}
+    {%- when Type::Enum { module_path, name } %}
     {%- let e = ci|get_enum_definition(name) %}
     {%- if ci.is_name_used_as_error(name) %}
     {%- include "err.hpp" %}
     {%- else %}
     {%- endif %}
-    {%- when Type::Object { name, imp } %}
+    {%- when Type::Object { module_path, name, imp } %}
     {%- include "obj.hpp" %}
     {%- else %}
     {%- endmatch %}
@@ -120,21 +120,21 @@ namespace {{ namespace }} {
         {% include "arith_conv.hpp" %}
         {% when Type::String %}
         {% include "str_conv.hpp" %}
-        {%- when Type::Enum(name) %}
+        {%- when Type::Enum { module_path, name } %}
         {%- let e = ci|get_enum_definition(name) %}
         {%- if ci.is_name_used_as_error(name) %}
         {% include "err_conv.hpp" %}
         {%- else %}
         {%- endif %}
-        {% when Type::Object { name, imp } %}
+        {% when Type::Object { module_path, name, imp } %}
         {% include "obj_conv.hpp" %}
-        {% when Type::Record(name) %}
+        {% when Type::Record { module_path, name } %}
         {% include "rec_conv.hpp" %}
-        {%- when Type::Optional(inner_type) %}
+        {%- when Type::Optional { inner_type } %}
         {% include "opt_conv.hpp" %}
-        {%- when Type::Sequence(inner_type) %}
+        {%- when Type::Sequence { inner_type } %}
         {% include "seq_conv.hpp" %}
-        {%- when Type::CallbackInterface(name) %}
+        {%- when Type::CallbackInterface { module_path, name } %}
         {% include "callback_conv.hpp" %}
         {%- else %}
         {%- endmatch %}

@@ -20,8 +20,6 @@ pub(crate) struct Config {
 }
 
 impl BindingsConfig for Config {
-    const TOML_KEY: &'static str = "cpp";
-
     fn update_from_ci(&mut self, ci: &ComponentInterface) {
         self.cdylib_name.get_or_insert_with(|| format!("uniffi_{}", ci.namespace()));
     }
@@ -67,17 +65,17 @@ impl<'a> CppWrapperHeader<'a> {
         types: impl Iterator<Item = &'a Type>,
     ) -> impl Iterator<Item = &'a Type> {
         let (mut recs, rest): (Vec<&'a Type>, Vec<&'a Type>) = types
-            .partition(|t| matches!(t, Type::Record(_)));
+            .partition(|t| matches!(t, Type::Record { .. }));
         let (cbs, rest): (Vec<&'a Type>, Vec<&'a Type>) = rest
             .iter()
-            .partition(|t| matches!(t, Type::CallbackInterface(_)));
+            .partition(|t| matches!(t, Type::CallbackInterface { .. }));
 
         recs.sort_by(|a, _| {
             match a {
-                Type::Record(name) => {
+                Type::Record { name, .. } => {
                     match self.ci.get_record_definition(name) {
                         Some(rec) => {
-                            if rec.fields().iter().any(|field| matches!(field.as_type(), Type::Record(_))) {
+                            if rec.fields().iter().any(|field| matches!(field.as_type(), Type::Record{ .. })) {
                                 return Ordering::Less;
                             }
                         },
@@ -98,12 +96,12 @@ impl<'a> CppWrapperHeader<'a> {
 #[template(syntax = "cpp", escape = "none", path = "wrapper.cpp")]
 struct CppWrapper<'a> {
     ci: &'a ComponentInterface,
-    config: Config,
+    config: &'a Config,
     type_helper_code: String,
 }
 
 impl<'a> CppWrapper<'a> {
-    pub(crate) fn new(ci: &'a ComponentInterface, config: Config) -> Self {
+    pub(crate) fn new(ci: &'a ComponentInterface, config: &'a Config) -> Self {
         Self {
             ci,
             config,
@@ -120,7 +118,7 @@ pub(crate) struct Bindings {
 
 pub(crate) fn generate_cpp_bindings(
     ci: &ComponentInterface,
-    config: Config,
+    config: &Config,
 ) -> Result<Bindings> {
     let scaffolding_header = ScaffoldingHeader::new(ci)
         .render()

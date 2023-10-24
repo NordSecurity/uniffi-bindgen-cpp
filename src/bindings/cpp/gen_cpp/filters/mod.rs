@@ -62,12 +62,12 @@ impl<T: AsType> AsCodeType for T {
             Type::Duration => Box::new(miscellany::DurationCodeType),
             Type::Object { name, .. } => Box::new(object::ObjectCodeType::new(name)),
             Type::ForeignExecutor => todo!(),
-            Type::Record(id) => Box::new(record::RecordCodeType::new(id)),
-            Type::Enum(id) => Box::new(enum_::EnumCodeType::new(id)),
-            Type::CallbackInterface(id) => Box::new(callback_interface::CallbackInterfaceCodeType::new(id)),
-            Type::Optional(inner) => Box::new(compounds::OptionalCodeType::new(*inner)),
-            Type::Sequence(inner) => Box::new(compounds::SequenceCodeType::new(*inner)),
-            Type::Map(key, value) => Box::new(compounds::MapCodeType::new(*key, *value)),
+            Type::Record { name, .. } => Box::new(record::RecordCodeType::new(name)),
+            Type::Enum { name, .. } => Box::new(enum_::EnumCodeType::new(name)),
+            Type::CallbackInterface { name, .. } => Box::new(callback_interface::CallbackInterfaceCodeType::new(name)),
+            Type::Optional { inner_type } => Box::new(compounds::OptionalCodeType::new(*inner_type)),
+            Type::Sequence { inner_type } => Box::new(compounds::SequenceCodeType::new(*inner_type)),
+            Type::Map { key_type, value_type } => Box::new(compounds::MapCodeType::new(*key_type, *value_type)),
             Type::External { .. } => todo!(),
             Type::Custom { .. } => todo!(),
         }
@@ -138,10 +138,11 @@ pub(crate) fn ffi_type_name(ffi_type: &FfiType) -> Result<String> {
         FfiType::RustBuffer(_) => "RustBuffer".into(),
         FfiType::ForeignBytes => "ForeignBytes".into(),
         FfiType::ForeignCallback => "ForeignCallback".into(),
-        FfiType::ForeignExecutorCallback => "UniFfiForeignExecutorCallback".into(),
         FfiType::ForeignExecutorHandle => "std::size_t".into(),
-        FfiType::FutureCallback { .. } => todo!(),
-        FfiType::FutureCallbackData => todo!(),
+        FfiType::ForeignExecutorCallback => "UniFfiForeignExecutorCallback".into(),
+        FfiType::RustFutureHandle => "RustFutureHandle".into(),
+        FfiType::RustFutureContinuationCallback => "RustFutureContinuationCallback".into(),
+        FfiType::RustFutureContinuationData => "RustFutureContinuationData".into(),
     })
 }
 
@@ -154,7 +155,7 @@ pub(crate) fn parameter(arg: &Argument) -> Result<String> {
         Type::Object { name, .. } => {
             format!("const {} &{}", name, arg.name())
         },
-        Type::CallbackInterface(name) => {
+        Type::CallbackInterface { name, .. } => {
             format!("std::shared_ptr<{}> {}", name, arg.name())
         },
         t => format!("{} {}", type_name(&t)?, arg.name())
