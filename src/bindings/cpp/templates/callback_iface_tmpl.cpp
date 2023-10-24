@@ -34,6 +34,7 @@ namespace {{ namespace }} {
             break;
         {% for method in iface.methods() -%}
         case {{ loop.index }}:
+            {% if method.throws_type().is_some() %}{{ "try {" }}{% endif %}
             auto impl = lift(handle);
             {% if method.return_type().is_some() %}auto ret = {% endif -%}
             impl->{{ method.name() }}(
@@ -51,8 +52,16 @@ namespace {{ namespace }} {
             {{ return_type|write_fn }}(out_stream, ret);
             {% else %}
             {% endmatch %}
+            {%- match method.throws_type() %}
+            {% when Some with (e) -%}
+            } catch (const {{ e|type_name }} &ex) {
+                *buf_ptr = uniffi::{{ e|ffi_converter_name }}::lower(ex);
+                return 1;
+            }
+            {%- else %}
+            {%- endmatch %}
             break;
-        {% endfor %}
+        {%- endfor %}
         }
 
         return 0;
