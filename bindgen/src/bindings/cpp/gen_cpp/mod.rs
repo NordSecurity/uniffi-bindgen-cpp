@@ -1,5 +1,6 @@
 mod callback_interface;
 mod compounds;
+mod custom;
 mod enum_;
 mod filters;
 mod miscellany;
@@ -15,8 +16,14 @@ use serde::{Deserialize, Serialize};
 use uniffi_bindgen::{interface::{AsType, Type}, BindingsConfig, ComponentInterface};
 
 #[derive(Clone, Deserialize, Serialize)]
+struct CustomTypesConfig {
+}
+
+#[derive(Clone, Deserialize, Serialize)]
 pub(crate) struct Config {
     cdylib_name: Option<String>,
+    #[serde(default)]
+    custom_types: HashMap<String, CustomTypesConfig>,
 }
 
 impl BindingsConfig for Config {
@@ -53,11 +60,12 @@ impl<'a> ScaffoldingHeader<'a> {
 #[template(syntax = "cpp", escape = "none", path = "wrapper.hpp")]
 struct CppWrapperHeader<'a> {
     ci: &'a ComponentInterface,
+    config: &'a Config,
 }
 
 impl<'a> CppWrapperHeader<'a> {
-    fn new(ci: &'a ComponentInterface) -> Self {
-        Self { ci }
+    fn new(ci: &'a ComponentInterface, config: &'a Config) -> Self {
+        Self { ci, config }
     }
 
     pub(crate) fn sorted_types(
@@ -123,7 +131,7 @@ pub(crate) fn generate_cpp_bindings(
     let scaffolding_header = ScaffoldingHeader::new(ci)
         .render()
         .context("generating scaffolding header failed")?;
-    let header = CppWrapperHeader::new(ci)
+    let header = CppWrapperHeader::new(ci, config)
         .render()
         .context("generating C++ bindings header failed")?;
     let source = CppWrapper::new(ci, config)

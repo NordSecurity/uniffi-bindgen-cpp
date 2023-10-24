@@ -22,6 +22,8 @@ namespace {{ namespace }} {
     {%- for typ in self.sorted_types(ci.iter_types()) %}
     {%- let type_name = typ|type_name %}
     {%- match typ %}
+    {%- when Type::Custom { module_path, name, builtin } %}
+    {% include "custom.hpp" %}
     {%- when Type::Record { module_path, name } %}
     {% include "rec.hpp" %}
     {%- when Type::CallbackInterface { module_path, name } %}

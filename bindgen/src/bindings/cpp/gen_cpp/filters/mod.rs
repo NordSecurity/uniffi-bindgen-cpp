@@ -8,7 +8,14 @@ use uniffi_bindgen::{
 pub(crate) use uniffi_bindgen::backend::filters::*;
 
 use crate::bindings::cpp::gen_cpp::{
-    callback_interface, compounds, enum_, miscellany, object, primitives, record,
+    callback_interface,
+    compounds,
+    custom,
+    enum_,
+    miscellany,
+    object,
+    primitives,
+    record,
 };
 
 type Result<T> = std::result::Result<T, askama::Error>;
@@ -69,7 +76,7 @@ impl<T: AsType> AsCodeType for T {
             Type::Sequence { inner_type } => Box::new(compounds::SequenceCodeType::new(*inner_type)),
             Type::Map { key_type, value_type } => Box::new(compounds::MapCodeType::new(*key_type, *value_type)),
             Type::External { .. } => todo!(),
-            Type::Custom { .. } => todo!(),
+            Type::Custom { name, .. } => Box::new(custom::CustomCodeType::new(name)),
         }
     }
 }
