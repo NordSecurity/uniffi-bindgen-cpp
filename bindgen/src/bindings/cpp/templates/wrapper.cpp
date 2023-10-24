@@ -4,7 +4,6 @@
 
 {%- import "macros.cpp" as macros %}
 
-#include <bit>
 #include <string>
 
 #include "{{ ci.namespace() }}.hpp"
