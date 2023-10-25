@@ -21,7 +21,7 @@ namespace {{ namespace }} {
         stream.put(static_cast<uint8_t>(val));
     }
 
-    int32_t uniffi::{{ class_name }}::allocation_size(const bool &) {
+    int32_t uniffi::{{ class_name }}::allocation_size(bool) {
         return 1;
     }
 }
