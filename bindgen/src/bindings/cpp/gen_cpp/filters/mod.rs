@@ -145,11 +145,11 @@ pub(crate) fn ffi_type_name(ffi_type: &FfiType) -> Result<String> {
         FfiType::RustBuffer(_) => "RustBuffer".into(),
         FfiType::ForeignBytes => "ForeignBytes".into(),
         FfiType::ForeignCallback => "ForeignCallback".into(),
-        FfiType::ForeignExecutorHandle => "std::size_t".into(),
-        FfiType::ForeignExecutorCallback => "UniFfiForeignExecutorCallback".into(),
-        FfiType::RustFutureHandle => "RustFutureHandle".into(),
-        FfiType::RustFutureContinuationCallback => "RustFutureContinuationCallback".into(),
-        FfiType::RustFutureContinuationData => "RustFutureContinuationData".into(),
+        FfiType::ForeignExecutorHandle => unimplemented!("Async is not implemented"),
+        FfiType::ForeignExecutorCallback => unimplemented!("Async is not implemented"),
+        FfiType::RustFutureHandle => "void *".into(),
+        FfiType::RustFutureContinuationCallback => "void *".into(),
+        FfiType::RustFutureContinuationData => "void *".into(),
     })
 }
 
