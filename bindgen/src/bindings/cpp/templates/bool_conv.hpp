@@ -1,7 +1,7 @@
 {%- let type_name = typ|type_name %}
 
 struct {{ typ|ffi_converter_name }} {
-    static {{ type_name }} lift();
+    static {{ type_name }} lift(uint8_t);
     static uint8_t lower({{ type_name }});
     static {{ type_name }} read(::{{ namespace }}::uniffi::RustStream &);
     static void write(::{{ namespace }}::uniffi::RustStream &, {{ type_name }});
