@@ -123,6 +123,10 @@ namespace {{ namespace }} {
         {% include "arith_conv.hpp" %}
         {% when Type::String %}
         {% include "str_conv.hpp" %}
+        {% when Type::Timestamp %}
+        {% include "timestamp_conv.hpp" %}
+        {% when Type::Duration %}
+        {% include "duration_conv.hpp" %}
         {%- when Type::Enum { module_path, name } %}
         {%- let e = ci|get_enum_definition(name) %}
         {%- if ci.is_name_used_as_error(name) %}
