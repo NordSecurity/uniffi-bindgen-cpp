@@ -88,6 +88,9 @@ impl<'a> CppWrapperHeader<'a> {
         let (cbs, rest): (Vec<&'a Type>, Vec<&'a Type>) = rest
             .iter()
             .partition(|t| matches!(t, Type::CallbackInterface { .. }));
+        let (csts, rest): (Vec<&'a Type>, Vec<&'a Type>) = rest
+            .iter()
+            .partition(|t| matches!(t, Type::Custom { .. }));
 
         recs.sort_by(|a, _| {
             match a {
@@ -107,7 +110,7 @@ impl<'a> CppWrapperHeader<'a> {
             Ordering::Equal
         });
 
-        recs.into_iter().chain(cbs).chain(rest)
+        csts.into_iter().chain(recs).chain(cbs).chain(rest)
     }
 
     pub(crate) fn add_include(&self, include: &str) -> &str {

@@ -147,6 +147,8 @@ namespace {{ namespace }} {
         {% include "seq_conv.hpp" %}
         {%- when Type::CallbackInterface { module_path, name } %}
         {% include "callback_conv.hpp" %}
+        {%- when Type::Custom { module_path, name, builtin } %}
+        typedef struct {{ builtin|ffi_converter_name }} {{ typ|ffi_converter_name }};
         {%- else %}
         {%- endmatch %}
         {%- endfor %}
