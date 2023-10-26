@@ -8,7 +8,12 @@ mod object;
 mod primitives;
 mod record;
 
-use std::{borrow::Borrow, cmp::Ordering, collections::HashMap};
+use std::{
+    borrow::Borrow,
+    cell::RefCell,
+    cmp::Ordering,
+    collections::{BTreeSet, HashMap},
+};
 
 use anyhow::{Context, Result};
 use askama::Template;
@@ -17,6 +22,7 @@ use uniffi_bindgen::{interface::{AsType, Type}, BindingsConfig, ComponentInterfa
 
 #[derive(Clone, Deserialize, Serialize)]
 struct CustomTypesConfig {
+    imports: Option<Vec<String>>,
 }
 
 #[derive(Clone, Deserialize, Serialize)]
@@ -61,11 +67,16 @@ impl<'a> ScaffoldingHeader<'a> {
 struct CppWrapperHeader<'a> {
     ci: &'a ComponentInterface,
     config: &'a Config,
+    includes: RefCell<BTreeSet<String>>,
 }
 
 impl<'a> CppWrapperHeader<'a> {
     fn new(ci: &'a ComponentInterface, config: &'a Config) -> Self {
-        Self { ci, config }
+        Self {
+            ci,
+            config,
+            includes: RefCell::new(BTreeSet::new()),
+        }
     }
 
     pub(crate) fn sorted_types(
@@ -97,6 +108,16 @@ impl<'a> CppWrapperHeader<'a> {
         });
 
         recs.into_iter().chain(cbs).chain(rest)
+    }
+
+    pub(crate) fn add_include(&self, include: &str) -> &str {
+        self.includes.borrow_mut().insert(include.to_string());
+
+        ""
+    }
+
+    pub(crate) fn includes(&self) -> Vec<String> {
+        self.includes.borrow().iter().cloned().collect()
     }
 }
 

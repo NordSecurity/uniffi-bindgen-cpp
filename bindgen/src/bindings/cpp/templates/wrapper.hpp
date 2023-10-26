@@ -13,6 +13,10 @@
 #include <streambuf>
 #include <type_traits>
 
+{% for include in self.includes() %}
+#include <{{ include }}>
+{% endfor %}
+
 {%- let namespace = ci.namespace() %}
 
 #include "{{ namespace }}_scaffolding.hpp"
