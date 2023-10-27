@@ -22,7 +22,7 @@ struct {{ class_name }} {
     {%- endmatch -%}
 
     {% for ctor in obj.alternate_constructors() %}
-    static std::unique_ptr<{{ class_name }}> init({% call macros::param_list(ctor) %});
+    static std::unique_ptr<{{ class_name }}> {{ ctor.name() }}({% call macros::param_list(ctor) %});
     {%- endfor %}
 
     {% for method in obj.methods() %}
