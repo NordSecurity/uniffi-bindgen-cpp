@@ -9,6 +9,9 @@ struct {{ class_name }}: std::runtime_error {
     friend uniffi::{{ ffi_converter_name }};
 
     {{ class_name }}(const std::string &what_arg) : std::runtime_error(what_arg) {}
+
+    virtual void throw_underlying() = 0;
+
 protected:
     virtual int32_t get_variant_idx() {
         return 0;
@@ -18,6 +21,10 @@ protected:
 {% for variant in e.variants() %}
 struct {{ variant.name()|class_name }}: {{ class_name }} {
     {{ variant.name() }}(const std::string &what_arg) : {{ class_name }}(what_arg) {}
+
+    void throw_underlying() override {
+        throw *this;
+    }
 
     int32_t get_variant_idx() override {
         return {{ loop.index }};

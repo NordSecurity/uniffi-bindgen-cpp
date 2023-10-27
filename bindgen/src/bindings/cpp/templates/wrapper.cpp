@@ -21,7 +21,7 @@ namespace {{ namespace }} {
 
             case 1:
                 if constexpr (!std::is_null_pointer_v<F>) {
-                    throw error_cb(status.error_buf);
+                    error_cb(status.error_buf)->throw_underlying();
                 }
                 break;
 

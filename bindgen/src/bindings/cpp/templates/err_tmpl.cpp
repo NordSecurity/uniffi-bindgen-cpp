@@ -2,7 +2,7 @@
 {%- let class_name = type_name|class_name %}
 
 namespace {{ namespace }} {
-    {{ class_name }} uniffi::{{ ffi_converter_name }}::lift(RustBuffer buf) {
+    std::unique_ptr<{{ class_name }}> uniffi::{{ ffi_converter_name }}::lift(RustBuffer buf) {
         auto stream = uniffi::RustStream(&buf);
         auto ret = {{ ffi_converter_name }}::read(stream);
 
@@ -20,7 +20,7 @@ namespace {{ namespace }} {
         return std::move(buf);
     }
 
-    {{ class_name }} uniffi::{{ ffi_converter_name }}::read(uniffi::RustStream &stream) {
+    std::unique_ptr<{{ class_name }}> uniffi::{{ ffi_converter_name }}::read(uniffi::RustStream &stream) {
         int32_t v;
 
         stream >> v;
@@ -29,7 +29,7 @@ namespace {{ namespace }} {
         {%- if e.is_flat() %}
         {%- for variant in e.variants() %}
         case {{ loop.index }}:
-            return {{ variant.name()|class_name }}(uniffi::{{ Type::String.borrow()|read_fn }}(stream));
+            return std::make_unique<{{ variant.name()|class_name }}>(uniffi::{{ Type::String.borrow()|read_fn }}(stream));
         {%- endfor %}
         default:
             throw std::runtime_error("Unexpected error variant");
