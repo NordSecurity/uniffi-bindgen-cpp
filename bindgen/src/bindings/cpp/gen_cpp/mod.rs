@@ -79,6 +79,13 @@ impl<'a> CppWrapperHeader<'a> {
         }
     }
 
+    // XXX: This is somewhat evil, but necessary.
+    //      Context: C++.
+    //
+    //      Certain types (e.g. records or objects) may depend on other types
+    //      defined within the same interface definition, yet they have to be
+    //      defined so in a specific order. This here method sorts types in
+    //      different ways as required by different types.
     pub(crate) fn sorted_types(
         &self,
         types: impl Iterator<Item = &'a Type>,
@@ -92,6 +99,9 @@ impl<'a> CppWrapperHeader<'a> {
             .iter()
             .partition(|t| matches!(t, Type::Custom { .. }));
 
+        // Records are sorted by checking their fields. If any of them are
+        // records, then they are sorted after the ones that only contain POD
+        // types.
         recs.sort_by(|a, _| {
             match a {
                 Type::Record { name, .. } => {
@@ -110,6 +120,10 @@ impl<'a> CppWrapperHeader<'a> {
             Ordering::Equal
         });
 
+        // Custom types come first, because they can alias built-in types that
+        // are then used in, say, record fields, which come immediately afterwards.
+        // Callbacks are sorted before everything else, because objects might
+        // take them as parameters.
         csts.into_iter().chain(recs).chain(cbs).chain(rest)
     }
 
