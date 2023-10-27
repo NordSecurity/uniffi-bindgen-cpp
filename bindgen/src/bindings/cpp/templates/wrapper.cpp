@@ -11,7 +11,7 @@
 namespace {{ namespace }} {
     namespace uniffi {
         template<typename F>
-        void {{ namespace }}::uniffi::check_rust_call(
+        void check_rust_call(
             const RustCallStatus &status,
             F error_cb
         ) {
