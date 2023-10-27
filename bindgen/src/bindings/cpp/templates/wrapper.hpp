@@ -99,8 +99,6 @@ namespace {{ namespace }} {
         RustBuffer rustbuffer_from_bytes(const ForeignBytes &);
         void rustbuffer_free(RustBuffer);
 
-        void check_rust_call(const RustCallStatus &, std::function<std::exception(RustBuffer)>);
-
         {% for typ in ci.iter_types() %}
         {% match typ %}
         {% when Type::Boolean %}
