@@ -25,17 +25,21 @@ RustBuffer {{ namespace }}::uniffi::{{ ffi_converter_name }}::lower(const {{ typ
     stream >> secs;
     stream >> nanos;
 
-    auto duration = std::chrono::seconds(secs) + std::chrono::nanoseconds(nanos);
+    auto sign = secs < 0 ? -1 : 1;
+
+    auto duration = std::chrono::seconds(secs) + (sign * std::chrono::nanoseconds(nanos));
 
     return {{ type_name }}(duration);
 }
 
 void {{ namespace }}::uniffi::{{ ffi_converter_name }}::write({{ namespace }}::uniffi::RustStream &stream, const {{ type_name }} &val) {
     auto duration = val.time_since_epoch();
-    auto secs =  std::chrono::duration_cast<std::chrono::seconds>(duration);
+    auto secs =  std::chrono::duration_cast<std::chrono::duration<int64_t>>(duration);
     auto nanos = (duration - secs).count();
 
-    stream << secs.count() << static_cast<uint32_t>(nanos);
+    auto sign = secs.count() < 0 ? -1 : 1;
+
+    stream << secs.count() << static_cast<uint32_t>(sign * nanos);
 }
 
 int32_t {{ namespace }}::uniffi::{{ ffi_converter_name }}::allocation_size(const {{ type_name }} &) {
