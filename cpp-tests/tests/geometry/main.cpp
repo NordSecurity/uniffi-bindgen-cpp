@@ -23,7 +23,6 @@ int main() {
     ASSERT_EQ(intersection_value.coord_x, 0);
     ASSERT_EQ(intersection_value.coord_y, 0);
 
-    // ASSERT_EQ(point, geometry::intersection(line1, line2).value());
     ASSERT_EQ(std::nullopt, geometry::intersection(line1, line1));
 
     return 0;

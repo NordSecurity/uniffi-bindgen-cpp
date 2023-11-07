@@ -12,3 +12,7 @@ link_libraries(uniffi_bindgen_cpp_fixtures)
 
 add_subdirectory(arithmetic)
 add_subdirectory(geometry)
+add_subdirectory(sprites)
+add_subdirectory(callback)
+add_subdirectory(chronological)
+add_subdirectory(todolist)
