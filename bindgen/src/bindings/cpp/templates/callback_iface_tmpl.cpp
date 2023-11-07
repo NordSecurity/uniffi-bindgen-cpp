@@ -57,6 +57,9 @@ namespace {{ namespace }} {
             } catch (const {{ e|type_name }} &ex) {
                 *buf_ptr = uniffi::{{ e|ffi_converter_name }}::lower(ex);
                 return 1;
+            } catch (std::exception &ex) {
+                *buf_ptr = {{ Type::String.borrow()|lower_fn }}(ex.what());
+                return 1;
             }
             {%- else %}
             {%- endmatch %}
