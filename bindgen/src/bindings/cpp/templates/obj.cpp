@@ -15,7 +15,7 @@ namespace {{ namespace }} {
     {%- else %}
     {%- endmatch %}
     {%- for ctor in obj.alternate_constructors() %}
-    std::unique_ptr<{{ class_name }}> {{ class_name }}::init({% call macros::param_list(ctor) %}) {
+    std::unique_ptr<{{ class_name }}> {{ class_name }}::{{ ctor.name() }}({% call macros::param_list(ctor) %}) {
         return std::unique_ptr<{{ class_name }}>(new {{ class_name }}({% call macros::rust_call(ctor) %}));
     }
     {%- endfor %}
