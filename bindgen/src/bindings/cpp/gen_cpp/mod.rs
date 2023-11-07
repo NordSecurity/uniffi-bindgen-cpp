@@ -102,22 +102,31 @@ impl<'a> CppWrapperHeader<'a> {
         // Records are sorted by checking their fields. If any of them are
         // records, then they are sorted after the ones that only contain POD
         // types.
-        recs.sort_by(|a, _| {
-            match a {
-                Type::Record { name, .. } => {
-                    match self.ci.get_record_definition(name) {
-                        Some(rec) => {
-                            if rec.fields().iter().any(|field| matches!(field.as_type(), Type::Record{ .. })) {
-                                return Ordering::Less;
-                            }
-                        },
-                        None => unreachable!()
+        let comp_func = |name,  b: &&Type| {
+            match self.ci.get_record_definition(name) {
+                Some(rec) => {
+                    if rec.fields().iter().any(|field| matches!(field.as_type(), Type::Record{ .. }) && field.as_type() == **b) {
+                        return Ordering::Less;
                     }
                 },
-                _ => unreachable!()
+                None => unreachable!()
             }
 
             Ordering::Equal
+        };
+
+        recs.sort_by(|a, b| {
+            match (a, b) {
+                (Type::Record { name, .. }, Type::Record { name: other_name, .. }) => {
+                    let ordering = comp_func(name, b);
+                    if ordering != Ordering::Equal {
+                        return ordering;
+                    }
+
+                    return comp_func(other_name, a);
+                },
+                _ => unreachable!()
+            }
         });
 
         // Custom types come first, because they can alias built-in types that
