@@ -38,6 +38,9 @@ namespace {{ namespace }} {
     }
 
     void uniffi::{{ ffi_converter_name }}::write(uniffi::RustStream &stream, const {{ class_name }} &val) {
+        {% if e.is_flat() -%}
+        stream << val.get_variant_idx();
+        {% endif %}
     }
 
     int32_t uniffi::{{ ffi_converter_name }}::allocation_size(const {{ class_name }} &val) {

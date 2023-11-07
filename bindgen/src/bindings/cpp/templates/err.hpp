@@ -13,7 +13,7 @@ struct {{ class_name }}: std::runtime_error {
     virtual void throw_underlying() = 0;
 
 protected:
-    virtual int32_t get_variant_idx() {
+    virtual int32_t get_variant_idx() const {
         return 0;
     };
 };
@@ -26,7 +26,7 @@ struct {{ variant.name()|class_name }}: {{ class_name }} {
         throw *this;
     }
 
-    int32_t get_variant_idx() override {
+    int32_t get_variant_idx() const override {
         return {{ loop.index }};
     }
 };
