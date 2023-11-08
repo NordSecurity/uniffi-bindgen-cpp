@@ -8,4 +8,5 @@ mod uniffi_fixtures {
     uniffi_todolist::uniffi_reexport_scaffolding!();
     uniffi_traits::uniffi_reexport_scaffolding!();
     uniffi_chronological::uniffi_reexport_scaffolding!();
+    uniffi_trait_methods::uniffi_reexport_scaffolding!();
 }

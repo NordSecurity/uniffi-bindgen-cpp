@@ -19,3 +19,5 @@ uniffi-fixture-callbacks = { git = "https://github.com/NordSecurity/uniffi-rs.gi
 uniffi-fixture-coverall = { git = "https://github.com/NordSecurity/uniffi-rs.git", branch = "nordsec.0.25.0" }
 uniffi-fixture-docstring = { git = "https://github.com/NordSecurity/uniffi-rs.git", branch = "nordsec.0.25.0" }
 uniffi-fixture-time = { git = "https://github.com/NordSecurity/uniffi-rs.git", branch = "nordsec.0.25.0" }
+uniffi-fixture-trait-methods = { git = "https://github.com/NordSecurity/uniffi-rs.git", branch = "nordsec.0.25.0" }
+
