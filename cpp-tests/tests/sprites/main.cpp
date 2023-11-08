@@ -19,8 +19,9 @@ int main() {
     ASSERT_EQ(s->get_position().x, -1.0);
     ASSERT_EQ(s->get_position().y, 6.0);
 
-    // Custom constructors
-    // auto rel = sprites::Sprite
+    auto rel = sprites::Sprite::new_relative_to(sprites::Point {0.0, 1.0}, sprites::Vector { 1.0, 1.5});
+    ASSERT_EQ(rel->get_position().x, 1.0);
+    ASSERT_EQ(rel->get_position().y, 2.5);
 
     return 0;
 }
