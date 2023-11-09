@@ -98,6 +98,9 @@ impl<'a> CppWrapperHeader<'a> {
         let (csts, rest): (Vec<&'a Type>, Vec<&'a Type>) = rest
             .iter()
             .partition(|t| matches!(t, Type::Custom { .. }));
+        let (enums, rest): (Vec<&'a Type>, Vec<&'a Type>) = rest
+            .iter()
+            .partition(|t| matches!(t, Type::Enum { .. }));
 
         // Records are sorted by checking their fields. If any of them are
         // records, then they are sorted after the ones that only contain POD
@@ -129,11 +132,11 @@ impl<'a> CppWrapperHeader<'a> {
             }
         });
 
-        // Custom types come first, because they can alias built-in types that
+        // Enums come first, then custom types, because they can alias built-in types that
         // are then used in, say, record fields, which come immediately afterwards.
         // Callbacks are sorted before everything else, because objects might
         // take them as parameters.
-        csts.into_iter().chain(recs).chain(cbs).chain(rest)
+        enums.into_iter().chain(csts).chain(recs).chain(cbs).chain(rest)
     }
 
     pub(crate) fn add_include(&self, include: &str) -> &str {
