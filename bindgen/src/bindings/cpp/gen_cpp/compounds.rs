@@ -33,7 +33,7 @@ impl CodeType for OptionalCodeType {
 
     fn literal(&self, literal: &Literal) -> String {
         match literal {
-            Literal::Null => "nullptr".into(),
+            Literal::Null => "std::nullopt".into(),
             _ => CppCodeOracle.find(&self.inner).literal(literal),
         }
     }
