@@ -8,6 +8,6 @@ struct {{ class_name }} {
     virtual
     {%- match method.return_type() -%}
     {% when Some with (return_type) %} {{ return_type|type_name }} {% else %} {% endmatch -%}
-    {{ method.name()|fn_name }}({% call macros::param_list(method) %}) = 0;
+    {{ method.name()|fn_name }}({% call macros::param_list_with_default(method) %}) = 0;
     {%- endfor %}
 };

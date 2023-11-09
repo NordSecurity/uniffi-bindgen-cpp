@@ -17,17 +17,17 @@ struct {{ class_name }} {
 
     {% match obj.primary_constructor() %}
     {%- when Some with (ctor) -%}
-    static std::unique_ptr<{{ class_name }}> init({% call macros::param_list(ctor) %});
+    static std::unique_ptr<{{ class_name }}> init({% call macros::param_list_with_default(ctor) %});
     {%- else %}
     {%- endmatch -%}
 
     {% for ctor in obj.alternate_constructors() %}
-    static std::unique_ptr<{{ class_name }}> {{ ctor.name() }}({% call macros::param_list(ctor) %});
+    static std::unique_ptr<{{ class_name }}> {{ ctor.name() }}({% call macros::param_list_with_default(ctor) %});
     {%- endfor %}
 
     {% for method in obj.methods() %}
     {%- match method.return_type() %}{% when Some with (return_type) %}{{ return_type|type_name }} {% else %}void {% endmatch %}
-    {{- method.name()|fn_name }}({% call macros::param_list(method) %});
+    {{- method.name()|fn_name }}({% call macros::param_list_with_default(method) %});
     {% endfor %}
 private:
     {{ class_name }}(void *);

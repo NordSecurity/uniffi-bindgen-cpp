@@ -27,18 +27,19 @@ namespace {{ namespace }} {
     {%- for typ in self.sorted_types(ci.iter_types()) %}
     {%- let type_name = typ|type_name %}
     {%- match typ %}
+    {%- when Type::Enum { module_path, name } %}
+    {%- let e = ci|get_enum_definition(name) %}
+    {%- if ci.is_name_used_as_error(name) %}
+    {%- include "err.hpp" %}
+    {%- else %}
+    {%- include "enum.hpp" %}
+    {%- endif %}
     {%- when Type::Custom { module_path, name, builtin } %}
     {% include "custom.hpp" %}
     {%- when Type::Record { module_path, name } %}
     {% include "rec.hpp" %}
     {%- when Type::CallbackInterface { module_path, name } %}
     {% include "callback.hpp" %}
-    {%- when Type::Enum { module_path, name } %}
-    {%- let e = ci|get_enum_definition(name) %}
-    {%- if ci.is_name_used_as_error(name) %}
-    {%- include "err.hpp" %}
-    {%- else %}
-    {%- endif %}
     {%- when Type::Object { module_path, name, imp } %}
     {%- include "obj.hpp" %}
     {%- else %}
@@ -134,6 +135,7 @@ namespace {{ namespace }} {
         {%- if ci.is_name_used_as_error(name) %}
         {% include "err_conv.hpp" %}
         {%- else %}
+        {% include "enum_conv.hpp" %}
         {%- endif %}
         {% when Type::Object { module_path, name, imp } %}
         {% include "obj_conv.hpp" %}
@@ -143,6 +145,8 @@ namespace {{ namespace }} {
         {% include "opt_conv.hpp" %}
         {%- when Type::Sequence { inner_type } %}
         {% include "seq_conv.hpp" %}
+        {%- when Type::Map { key_type, value_type } %}
+        {% include "map_conv.hpp" %}
         {%- when Type::CallbackInterface { module_path, name } %}
         {% include "callback_conv.hpp" %}
         {%- when Type::Custom { module_path, name, builtin } %}
@@ -155,9 +159,9 @@ namespace {{ namespace }} {
     {% for func in ci.function_definitions() %}
     {%- match func.return_type() %}
     {%- when Some with (return_type) %}
-    {{ return_type|type_name }} {{ func.name()|fn_name }}({%- call macros::param_list(func) %});
+    {{ return_type|type_name }} {{ func.name()|fn_name }}({%- call macros::param_list_with_default(func) %});
     {%- when None %}
-    void {{ func.name()|fn_name }}({%- call macros::param_list(func) %});
+    void {{ func.name()|fn_name }}({%- call macros::param_list_with_default(func) %});
     {%- endmatch %}
     {%- endfor %}
 }
