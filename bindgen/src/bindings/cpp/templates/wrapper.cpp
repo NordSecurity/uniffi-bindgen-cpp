@@ -10,6 +10,8 @@
 
 namespace {{ namespace }} {
     namespace uniffi {
+        template<class> inline constexpr bool always_false_v = false;
+
         template<typename F>
         void check_rust_call(
             const RustCallStatus &status,

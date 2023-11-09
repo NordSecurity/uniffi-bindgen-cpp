@@ -1,32 +1,24 @@
 {%- if e.is_flat() %}
-enum class {{ type_name }}: int32_t {
-    {% for variant in e.variants() -%}
-    {{ variant|variant_name }} = {{ loop.index }}
-    {%- if !loop.last %},
-    {% endif -%}
-    {% endfor %}
-};
+namespace {{ namespace }} {
+    {{ namespace }}::{{ type_name }} uniffi::{{ ffi_converter_name }}::lift(RustBuffer buf) {
+        auto stream = ::{{ namespace }}::uniffi::RustStream(&buf);
+        auto ret = {{ namespace }}::uniffi::{{ ffi_converter_name }}::read(stream);
 
-struct {{ ffi_converter_name }} {
-    static {{ type_name }} lift(RustBuffer buf) {
-        auto stream = ::{{ namespace }}::uniffi::RustBuffer(&buf);
-        auto ret = {{ ffi_converter_name }}::read(stream);
-
-        ::{{ namespace }}::uniffi::rustbuffer_free(buf);
+        {{ namespace }}::uniffi::rustbuffer_free(buf);
 
         return std::move(ret);
     }
 
-    static RustBuffer lower({{ type_name }} val) {
-        auto buf = rustbuffer_alloc(allocation_size(val));
-        auto stream = ::{{ namespace }}::uniffi::RustStream(&buf);
+    RustBuffer uniffi::{{ ffi_converter_name }}::lower(const {{ namespace }}::{{ type_name }} &val) {
+        auto buf = {{ namespace }}::uniffi::rustbuffer_alloc({{ namespace }}::uniffi::{{ ffi_converter_name }}::allocation_size(val));
+        auto stream = {{ namespace }}::uniffi::RustStream(&buf);
 
-        {{ ffi_converter_name }}::write(stream, val);
+        {{ namespace }}::uniffi::{{ ffi_converter_name }}::write(stream, val);
 
         return std::move(buf);
     }
 
-    static {{ type_name }} read(::{{ namespace }}::uniffi::RustStream &stream) {
+    {{ type_name }} uniffi::{{ ffi_converter_name }}::read(::{{ namespace }}::uniffi::RustStream &stream) {
         int32_t variant;
 
         stream >> variant;
@@ -41,33 +33,100 @@ struct {{ ffi_converter_name }} {
         }
     }
 
-    static void write(uint8_t *buf, {{ type_name }} val) {
-        auto ser = static_cast<int32_t>(val);
+    void uniffi::{{ ffi_converter_name }}::write(uniffi::RustStream &stream, const {{ namespace }}::{{ type_name }} &val) {
+        stream << static_cast<int32_t>(val);
+    }
 
-        if (std::endian::native != std::endian::big) {
-            ser = std::byteswap(ser);
+    int32_t uniffi::{{ ffi_converter_name }}::allocation_size(const {{ namespace }}::{{ type_name|class_name }} &) {
+        return sizeof(int32_t);
+    }
+}
+{%- else %}
+namespace {{ namespace }} {
+    {{ namespace }}::{{ type_name }} uniffi::{{ ffi_converter_name }}::lift(RustBuffer buf) {
+        auto stream = ::{{ namespace }}::uniffi::RustStream(&buf);
+        auto ret = {{ namespace }}::uniffi::{{ ffi_converter_name }}::read(stream);
+
+        {{ namespace }}::uniffi::rustbuffer_free(buf);
+
+        return std::move(ret);
+    }
+
+    RustBuffer uniffi::{{ ffi_converter_name }}::lower(const {{ namespace }}::{{ type_name }} &val) {
+        auto buf = {{ namespace }}::uniffi::rustbuffer_alloc({{ namespace }}::uniffi::{{ ffi_converter_name }}::allocation_size(val));
+        auto stream = {{ namespace }}::uniffi::RustStream(&buf);
+
+        {{ namespace }}::uniffi::{{ ffi_converter_name }}::write(stream, val);
+
+        return std::move(buf);
+    }
+
+    {{ type_name }} uniffi::{{ ffi_converter_name }}::read(::{{ namespace }}::uniffi::RustStream &stream) {
+        int32_t variant_id;
+
+        stream >> variant_id;
+        
+        using Variant = std::variant<{% for variant in e.variants() -%} {{ type_name }}::{{ variant|variant_name }} {%- if !loop.last %}, {% endif -%} {% endfor %}>;
+        switch (variant_id) {
+            {%- for variant in e.variants() %}
+        case {{ loop.index }}:
+            return {Variant({{ type_name }}::{{ variant|variant_name }} {
+                {%- for field in variant.fields() %}
+                .{{field.name()|var_name}} = {{ field|read_fn }}(stream),
+                {%- endfor %}
+            })};
+            {%- endfor %}
+        default:
+            throw std::runtime_error("No matching {{ type_name }} variant");
         }
-
-        auto bytes = std::bit_cast<uint8_t *>(&ser);
-
-        std::copy(bytes, bytes + sizeof({{ type_name }}), buf);
     }
 
-    static int32_t allocation_size(const {{ type_name|class_name }} &) {
-        return sizeof({{ type_name|class_name }});
+    void uniffi::{{ ffi_converter_name }}::write(uniffi::RustStream &stream, const {{ namespace }}::{{ type_name }} &val) {
+        int32_t variant_id = val.variant.index() + 1;
+
+        stream << variant_id;
+
+        std::visit([&](auto &&arg) {
+            using T = std::decay_t<decltype(arg)>;
+            {% for variant in e.variants() %}
+            {%- if !loop.first %} else {% endif -%} if constexpr (std::is_same_v<T, {{ type_name }}::{{ variant|variant_name }}>) {
+                {%- for field in variant.fields() %}
+                {{ field|write_fn }}(stream, arg.{{ field.name()|var_name }});
+                {%- endfor %}
+            }
+            {%- endfor %}
+            {%- if e.variants().len() != 0 %}
+            else {
+                static_assert(always_false_v<T>, "non-exhaustive {{ type_name }} visitor");
+            }
+            {%- endif %}
+        }, val.variant); 
     }
-};
-{% else %}
-struct {{ type_name }} {
-    {% for variant in e.variants() -%}
-    class {{ variant|variant_name }} {
-    };
-    {% endfor %}
-private:
-    {{ type_name }}() = delete;
-    {{ type_name }}(const {{ type_name }} &) = delete;
-    {{ type_name }}({{ type_name }} &&) = delete;
-    {{ type_name }} &operator=(const {{ type_name }} &) = delete;
-    {{ type_name }} &operator=({{ type_name }} &&) = delete;
-};
+
+    int32_t uniffi::{{ ffi_converter_name }}::allocation_size(const {{ namespace }}::{{ type_name|class_name }} &val) {
+        int32_t size = sizeof(int32_t);
+
+        size += std::visit([&](auto &&arg) {
+            using T = std::decay_t<decltype(arg)>;
+            {% for variant in e.variants() %}
+            {%- if !loop.first %} else {% endif -%} if constexpr (std::is_same_v<T, {{ type_name }}::{{ variant|variant_name }}>) {
+                int32_t size = 0;
+                {%- for field in variant.fields() %}
+                size += {{ field|allocation_size_fn }}(arg.{{ field.name()|var_name }});
+                {%- endfor %}
+                return size;
+            }
+            {%- endfor %}
+            {%- if e.variants().len() != 0 %}
+            else {
+                static_assert(always_false_v<T>, "non-exhaustive {{ type_name }} visitor");
+            }
+            {%- endif %}
+
+            return 0;
+        }, val.variant);
+
+        return size;
+    }
+}
 {% endif %}
