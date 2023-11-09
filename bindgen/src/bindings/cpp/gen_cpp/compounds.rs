@@ -96,7 +96,7 @@ impl MapCodeType {
 impl CodeType for MapCodeType {
     fn type_label(&self) -> String {
         format!(
-            "std::map<{}, {}>",
+            "std::unordered_map<{}, {}>",
             CppCodeOracle.find(self.key()).type_label(),
             CppCodeOracle.find(self.value()).type_label(),
         )
