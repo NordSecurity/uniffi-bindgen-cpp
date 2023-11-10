@@ -15,9 +15,8 @@ namespace uniffi {
 struct {{ type_name }} {
     friend uniffi::{{ ffi_converter_name }};
 
-    {% for variant in e.variants() -%}
-    class {{ variant|variant_name }} {
-        public:
+    {% for variant in e.variants() %}
+    struct {{ variant|variant_name }} {
         {%- for field in variant.fields() %}
         {{ field|type_name }} {{ field.name()|var_name }}
         {%- match field.default_value() %}
@@ -28,11 +27,25 @@ struct {{ type_name }} {
     {% endfor %}
 
     std::variant<{% for variant in e.variants() -%} {{ variant|variant_name }} {%- if !loop.last %}, {% endif -%} {% endfor %}> variant;
+
+    {% for variant in e.variants() %}
+    {{ type_name }}({{ variant|variant_name }} variant): variant(variant) {}
+    {%- endfor %}
+
+    {{ type_name }}(const {{ type_name }} &other): variant(other.variant) {}
+    {{ type_name }}({{ type_name }} &&other): variant(std::move(other.variant)) {}
+
+    {{ type_name }} &operator=(const {{ type_name }} &other) {
+        variant = other.variant;
+        return *this;
+    }
+
+    {{ type_name }} &operator=({{ type_name }} &&other) {
+        variant = std::move(other.variant);
+        return *this;
+    }
+
 private:
-    // {{ type_name }}();
-    // {{ type_name }}(const {{ type_name }} &);
-    // {{ type_name }}({{ type_name }} &&);
-    // {{ type_name }} &operator=(const {{ type_name }} &);
-    // {{ type_name }} &operator=({{ type_name }} &&);
+    {{ type_name }}();
 };
 {% endif %}

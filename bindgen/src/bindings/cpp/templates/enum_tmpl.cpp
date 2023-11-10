@@ -66,15 +66,14 @@ namespace {{ namespace }} {
 
         stream >> variant_id;
         
-        using Variant = std::variant<{% for variant in e.variants() -%} {{ type_name }}::{{ variant|variant_name }} {%- if !loop.last %}, {% endif -%} {% endfor %}>;
         switch (variant_id) {
             {%- for variant in e.variants() %}
         case {{ loop.index }}:
-            return {Variant({{ type_name }}::{{ variant|variant_name }} {
+            return {{ type_name }}::{{ variant|variant_name }} {
                 {%- for field in variant.fields() %}
                 .{{field.name()|var_name}} = {{ field|read_fn }}(stream),
                 {%- endfor %}
-            })};
+            };
             {%- endfor %}
         default:
             throw std::runtime_error("No matching {{ type_name }} variant");
