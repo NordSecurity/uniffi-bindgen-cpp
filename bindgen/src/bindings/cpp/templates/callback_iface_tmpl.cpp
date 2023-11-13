@@ -39,7 +39,7 @@ namespace {{ namespace }} {
             {% if method.return_type().is_some() %}auto ret = {% endif -%}
             impl->{{ method.name() }}(
                 {%- for arg in method.arguments() %}
-                {{- arg|read_fn }}{%- if !loop.last %}, {% else %}{% endif %}
+                {{- arg|read_fn }}(stream){%- if !loop.last %}, {% else %}{% endif %}
                 {% endfor -%}
             );
             {%- match method.return_type() %}
