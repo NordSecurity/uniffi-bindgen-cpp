@@ -79,6 +79,10 @@ impl<'a> CppWrapperHeader<'a> {
         }
     }
 
+    pub(crate) fn contains_callbacks(&self, types: impl Iterator<Item = &'a Type>) -> bool {
+        types.into_iter().any(|t| matches!(t, Type::CallbackInterface { .. }))
+    }
+
     // XXX: This is somewhat evil, but necessary.
     //      Context: C++.
     //
