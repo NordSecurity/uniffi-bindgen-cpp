@@ -43,7 +43,7 @@ add_custom_target(libs ALL
 
 add_custom_target(bindings ALL
     DEPENDS libs 
-    COMMAND ./bindgen --library libuniffi_bindgen_cpp_fixtures.so --out-dir bindings
+    COMMAND ./uniffi-bindgen-cpp --library libuniffi_bindgen_cpp_fixtures.so --out-dir bindings
     WORKING_DIRECTORY ${BINDINGS_BUILD_DIR}
     COMMENT "Generating bindings"
 )
