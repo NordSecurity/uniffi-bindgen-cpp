@@ -164,6 +164,8 @@ namespace {{ namespace }} {
         {% include "arith_conv.hpp" %}
         {% when Type::Float64 %}
         {% include "arith_conv.hpp" %}
+        {% when Type::Bytes %}
+        {% include "bytes_conv.hpp" %}
         {% when Type::String %}
         {% include "str_conv.hpp" %}
         {% when Type::Timestamp %}
