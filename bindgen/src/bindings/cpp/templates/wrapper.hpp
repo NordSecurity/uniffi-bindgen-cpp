@@ -25,6 +25,28 @@
 {%- import "macros.cpp" as macros %}
 
 namespace {{ namespace }} {
+    {%- for typ in ci.iter_types() %}
+    {%- let type_name = typ|type_name %}
+    {%- match typ %}
+    {%- when Type::Enum { module_path, name } %}
+    {%- let e = ci|get_enum_definition(name) %}
+    {%- if ci.is_name_used_as_error(name) %}
+    struct {{ name }};
+    {%- else %}
+    {% if e.is_flat() %}
+    enum class {{ name }};
+    {% endif %}
+    {% endif %}
+    {%- when Type::Record { module_path, name } %} 
+    struct {{ name }};
+    {%- when Type::Object { module_path, name, imp } %}
+    struct {{ name }};
+    {%- when Type::CallbackInterface { module_path, name } %}
+    struct {{ name }};
+    {%- else %}
+    {%- endmatch %}
+    {%- endfor %}
+
     {%- for typ in self.sorted_types(ci.iter_types()) %}
     {%- let type_name = typ|type_name %}
     {%- match typ %}
