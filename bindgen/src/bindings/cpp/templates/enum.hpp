@@ -26,7 +26,6 @@ struct {{ type_name }} {
     };
     {% endfor %}
 
-    std::variant<{% for variant in e.variants() -%} {{ variant|variant_name }} {%- if !loop.last %}, {% endif -%} {% endfor %}> variant;
 
     {% for variant in e.variants() %}
     {{ type_name }}({{ variant|variant_name }} variant): variant(variant) {}
@@ -46,6 +45,8 @@ struct {{ type_name }} {
     }
 
 private:
+    std::variant<{% for variant in e.variants() -%} {{ variant|variant_name }} {%- if !loop.last %}, {% endif -%} {% endfor %}> variant;
+
     {{ type_name }}();
 };
 {% endif %}
