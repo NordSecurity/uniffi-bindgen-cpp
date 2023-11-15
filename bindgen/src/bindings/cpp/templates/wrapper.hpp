@@ -223,9 +223,9 @@ namespace {{ namespace }} {
     {% for func in ci.function_definitions() %}
     {%- match func.return_type() %}
     {%- when Some with (return_type) %}
-    {{ return_type|type_name }} {{ func.name()|fn_name }}({%- call macros::param_list_with_default(func) %});
+    {{ return_type|type_name }} {{ func.name()|fn_name }}({%- call macros::param_list(func) %});
     {%- when None %}
-    void {{ func.name()|fn_name }}({%- call macros::param_list_with_default(func) %});
+    void {{ func.name()|fn_name }}({%- call macros::param_list(func) %});
     {%- endmatch %}
     {%- endfor %}
 }
