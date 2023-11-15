@@ -12,7 +12,7 @@ public:
         if (mode.compare("normal") == 0) {
             return "Hello";
         } else if (mode.compare("busy") == 0) {
-            throw callbacks::Busy("I'm busy");
+            throw callbacks::telephone_error::Busy("I'm busy");
         } else {
             throw std::runtime_error("Unknown mode");
         }
@@ -22,8 +22,8 @@ public:
 int main() {
     auto telephone = callbacks::Telephone::init();
     ASSERT_EQ(telephone->call(std::make_shared<CallAnswererImpl>("normal")), "Hello");
-    EXPECT_EXCEPTION(telephone->call(std::make_shared<CallAnswererImpl>("busy")), callbacks::Busy);
-    EXPECT_EXCEPTION(telephone->call(std::make_shared<CallAnswererImpl>("unknown")), callbacks::InternalTelephoneError);    
+    EXPECT_EXCEPTION(telephone->call(std::make_shared<CallAnswererImpl>("busy")), callbacks::telephone_error::Busy);
+    EXPECT_EXCEPTION(telephone->call(std::make_shared<CallAnswererImpl>("unknown")), callbacks::telephone_error::InternalTelephoneError);    
 
     return 0;
 }

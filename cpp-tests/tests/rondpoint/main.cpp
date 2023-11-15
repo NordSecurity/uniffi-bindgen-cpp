@@ -24,25 +24,23 @@ int main() {
     ASSERT_EQ(vec.size(), copied_vec.size());
     ASSERT_TRUE(std::equal(vec.begin(), vec.end(), copied_vec.begin()));
 
-    ASSERT_TRUE(rondpoint::switcheroo(false));
-
-    using Variant = std::variant<rondpoint::EnumerationAvecDonnees::ZERO, rondpoint::EnumerationAvecDonnees::UN, rondpoint::EnumerationAvecDonnees::DEUX>;
-    auto z = rondpoint::EnumerationAvecDonnees::ZERO {};
-    auto u = rondpoint::EnumerationAvecDonnees::UN {.premier = 2};
-    auto d = rondpoint::EnumerationAvecDonnees::DEUX {.premier= 1, .second = "test"};
-
     auto map = std::unordered_map<std::string, rondpoint::EnumerationAvecDonnees> {
-        { "zero",  {Variant(z)}},
-        { "un",  {Variant(u)}},
-        { "deux", {Variant(d)} }
+        { "zero",  rondpoint::EnumerationAvecDonnees::ZERO {}},
+        { "un",  rondpoint::EnumerationAvecDonnees::UN {.premier = 2}},
+        { "deux", rondpoint::EnumerationAvecDonnees::DEUX {.premier= 1, .second = "test"}}
     };
     auto copied_map = rondpoint::copie_carte(map);
     ASSERT_EQ(map.size(), copied_map.size());
+    // TODO: Compare maps
+
+    ASSERT_TRUE(rondpoint::switcheroo(false));
 
     auto stringifier = rondpoint::Stringifier::init();
     auto meanValue = 0x1234'5678'9123'4567;
     
     ASSERT_EQ("uniffi 💚 cpp!", stringifier->well_known_string("cpp")) ;
+
+
 
     return 0;
 }

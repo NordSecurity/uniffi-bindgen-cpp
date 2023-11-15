@@ -20,7 +20,7 @@ int main() {
     auto todo = todolist::TodoList::init();
 
     EXPECT_EXCEPTION(todo->get_last(), todolist::TodoError);
-    EXPECT_EXCEPTION(todolist::create_entry_with(""), todolist::EmptyString);
+    EXPECT_EXCEPTION(todolist::create_entry_with(""), todolist::todo_error::EmptyString);
 
     todo->add_item("Write test");
     ASSERT_EQ("Write test", todo->get_last());

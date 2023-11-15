@@ -81,6 +81,10 @@ impl<T: AsType> AsCodeType for T {
     }
 }
 
+pub(crate) fn to_lower_snake_case(s: &str) -> Result<String> {
+    Ok(s.to_string().to_snake_case())
+}
+
 pub(crate) fn type_name(as_ct: &impl AsCodeType) -> Result<String> {
     Ok(as_ct.as_codetype().type_label())
 }

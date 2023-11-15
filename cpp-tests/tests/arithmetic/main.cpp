@@ -9,7 +9,7 @@ int main() {
     ASSERT_EQ(2ul, arithmetic::sub(4, 2));
     ASSERT_EQ(4ul, arithmetic::sub(8, 4));
 
-    EXPECT_EXCEPTION(arithmetic::sub(2, 4), arithmetic::IntegerOverflow);
+    EXPECT_EXCEPTION(arithmetic::sub(2, 4), arithmetic::arithmetic_error::IntegerOverflow);
 
     ASSERT_EQ(4ul, arithmetic::div(8, 2));
 
