@@ -8,20 +8,42 @@ enable_testing()
 set(BINDINGS_BUILD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../target/debug)
 set(BINDINGS_SRC_DIR ${BINDINGS_BUILD_DIR}/bindings)
 
-add_custom_target(build-wrappers ALL
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    COMMENT "Wrapper build target"    
-)
-add_custom_command(
-    TARGET build-wrappers
+macro(test_case TEST_NAME)
+add_executable(${TEST_NAME}-test tests/${TEST_NAME}/main.cpp ${BINDINGS_SRC_DIR}/${TEST_NAME}.cpp)
+
+target_include_directories(${TEST_NAME}-test PRIVATE ${BINDINGS_SRC_DIR} tests/include)
+target_link_directories(${TEST_NAME}-test PRIVATE ${BINDINGS_BUILD_DIR})
+target_link_libraries(${TEST_NAME}-test uniffi_bindgen_cpp_fixtures)
+
+add_test(NAME ${TEST_NAME}-test COMMAND ${TEST_NAME}-test)
+
+add_dependencies(${TEST_NAME}-test bindings)
+
+list(APPEND BINDING_FILES ${BINDINGS_SRC_DIR}/${TEST_NAME}.cpp)
+
+endmacro(test_case)
+
+test_case(arithmetic)
+test_case(callbacks)
+test_case(chronological)
+test_case(custom_types)
+test_case(geometry)
+test_case(rondpoint)
+test_case(sprites)
+test_case(todolist)
+test_case(traits)
+test_case(coverall)
+
+add_custom_target(libs ALL
+    BYPRODUCTS ${BINDING_FILES}
     COMMAND cargo build
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../
-    COMMENT "Building generator and libs"
+    COMMENT "Generating libs"
 )
-add_custom_command(
-    TARGET build-wrappers
+
+add_custom_target(bindings ALL
+    DEPENDS bindings
     COMMAND ./bindgen --library libuniffi_bindgen_cpp_fixtures.so --out-dir bindings
     WORKING_DIRECTORY ${BINDINGS_BUILD_DIR}
     COMMENT "Generating bindings"
 )
-add_subdirectory(tests)
