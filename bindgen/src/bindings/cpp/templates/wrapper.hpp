@@ -12,6 +12,7 @@
 #include <stdexcept>
 #include <streambuf>
 #include <type_traits>
+#include <variant>
 
 {% for include in self.includes() %}
 #include <{{ include }}>
@@ -24,21 +25,44 @@
 {%- import "macros.cpp" as macros %}
 
 namespace {{ namespace }} {
+    {%- for typ in ci.iter_types() %}
+    {%- let type_name = typ|type_name %}
+    {%- match typ %}
+    {%- when Type::Enum { module_path, name } %}
+    {%- let e = ci|get_enum_definition(name) %}
+    {%- if ci.is_name_used_as_error(name) %}
+    struct {{ name }};
+    {%- else %}
+    {% if e.is_flat() %}
+    enum class {{ name }};
+    {% endif %}
+    {% endif %}
+    {%- when Type::Record { module_path, name } %} 
+    struct {{ name }};
+    {%- when Type::Object { module_path, name, imp } %}
+    struct {{ name }};
+    {%- when Type::CallbackInterface { module_path, name } %}
+    struct {{ name }};
+    {%- else %}
+    {%- endmatch %}
+    {%- endfor %}
+
     {%- for typ in self.sorted_types(ci.iter_types()) %}
     {%- let type_name = typ|type_name %}
     {%- match typ %}
+    {%- when Type::Enum { module_path, name } %}
+    {%- let e = ci|get_enum_definition(name) %}
+    {%- if ci.is_name_used_as_error(name) %}
+    {%- include "err.hpp" %}
+    {%- else %}
+    {%- include "enum.hpp" %}
+    {%- endif %}
     {%- when Type::Custom { module_path, name, builtin } %}
     {% include "custom.hpp" %}
     {%- when Type::Record { module_path, name } %}
     {% include "rec.hpp" %}
     {%- when Type::CallbackInterface { module_path, name } %}
     {% include "callback.hpp" %}
-    {%- when Type::Enum { module_path, name } %}
-    {%- let e = ci|get_enum_definition(name) %}
-    {%- if ci.is_name_used_as_error(name) %}
-    {%- include "err.hpp" %}
-    {%- else %}
-    {%- endif %}
     {%- when Type::Object { module_path, name, imp } %}
     {%- include "obj.hpp" %}
     {%- else %}
@@ -99,6 +123,45 @@ namespace {{ namespace }} {
         RustBuffer rustbuffer_from_bytes(const ForeignBytes &);
         void rustbuffer_free(RustBuffer);
 
+        {% if self.contains_callbacks(ci.iter_types()) %}
+        template<typename T> struct HandleMap {
+            HandleMap() = default;
+
+            std::shared_ptr<T> at(uint64_t handle) {
+                std::lock_guard<std::mutex> guard(this->mutex);
+
+                return this->map.at(handle);
+            }
+
+            uint64_t insert(std::shared_ptr<T> impl) {
+                std::lock_guard<std::mutex> guard(this->mutex);
+
+                auto handle = this->cur_handle;
+
+                this->map.insert({ handle, impl });
+                this->cur_handle += 1;
+
+                return handle;
+            }
+
+            void erase(uint64_t handle) {
+                std::lock_guard<std::mutex> guard(this->mutex);
+
+                this->map.erase(handle);
+            }
+            private:
+                HandleMap(const HandleMap<T> &) = delete;
+                HandleMap(HandleMap<T> &&) = delete;
+
+                HandleMap<T> &operator=(const HandleMap<T> &) = delete;
+                HandleMap<T> &operator=(HandleMap<T> &&) = delete;
+
+                std::mutex mutex;
+                uint64_t cur_handle = 0;
+                std::map<uint64_t, std::shared_ptr<T>> map;
+        };
+        {% endif %}
+
         {% for typ in ci.iter_types() %}
         {% match typ %}
         {% when Type::Boolean %}
@@ -123,6 +186,8 @@ namespace {{ namespace }} {
         {% include "arith_conv.hpp" %}
         {% when Type::Float64 %}
         {% include "arith_conv.hpp" %}
+        {% when Type::Bytes %}
+        {% include "bytes_conv.hpp" %}
         {% when Type::String %}
         {% include "str_conv.hpp" %}
         {% when Type::Timestamp %}
@@ -134,6 +199,7 @@ namespace {{ namespace }} {
         {%- if ci.is_name_used_as_error(name) %}
         {% include "err_conv.hpp" %}
         {%- else %}
+        {% include "enum_conv.hpp" %}
         {%- endif %}
         {% when Type::Object { module_path, name, imp } %}
         {% include "obj_conv.hpp" %}
@@ -143,6 +209,8 @@ namespace {{ namespace }} {
         {% include "opt_conv.hpp" %}
         {%- when Type::Sequence { inner_type } %}
         {% include "seq_conv.hpp" %}
+        {%- when Type::Map { key_type, value_type } %}
+        {% include "map_conv.hpp" %}
         {%- when Type::CallbackInterface { module_path, name } %}
         {% include "callback_conv.hpp" %}
         {%- when Type::Custom { module_path, name, builtin } %}

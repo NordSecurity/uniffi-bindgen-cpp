@@ -1,5 +1,5 @@
 std::string {{ namespace }}::uniffi::{{ ffi_converter_name }}::lift(RustBuffer buf) {
-    auto string = std::string(reinterpret_cast<char *>(buf.data));
+    auto string = std::string(reinterpret_cast<char *>(buf.data), buf.len);
 
     {{ namespace }}::uniffi::rustbuffer_free(buf);
 

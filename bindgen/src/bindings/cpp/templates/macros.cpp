@@ -27,13 +27,20 @@
     )
 {%- endmacro -%}
 
-{%- macro param_list(func) %}
+{%- macro param_list_with_default(func) %}
 {%- for arg in func.arguments() -%}
 {{ arg|parameter }}
 {%- match arg.default_value() %}
 {%- when Some with(literal) %} = {{ literal|literal_cpp(arg.as_type().borrow()) }}
 {%- else %}
 {%- endmatch %}
+{%- if !loop.last -%}, {% endif %}
+{%- endfor %}
+{%- endmacro %}
+
+{%- macro param_list(func) %}
+{%- for arg in func.arguments() -%}
+{{ arg|parameter }}
 {%- if !loop.last -%}, {% endif %}
 {%- endfor %}
 {%- endmacro %}

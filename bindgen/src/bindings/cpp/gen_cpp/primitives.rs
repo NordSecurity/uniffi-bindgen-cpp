@@ -54,7 +54,7 @@ macro_rules! impl_code_type_for_primitive {
 
 impl_code_type_for_primitive!(BooleanCodeType, "bool", "Bool");
 impl_code_type_for_primitive!(StringCodeType, "std::string", "String");
-impl_code_type_for_primitive!(BytesCodeType, "uint8_t[]", "Bytes");
+impl_code_type_for_primitive!(BytesCodeType, "std::vector<uint8_t>", "Bytes");
 impl_code_type_for_primitive!(Int8CodeType, "int8_t", "Int8");
 impl_code_type_for_primitive!(Int16CodeType, "int16_t", "Int16");
 impl_code_type_for_primitive!(Int32CodeType, "int32_t", "Int32");

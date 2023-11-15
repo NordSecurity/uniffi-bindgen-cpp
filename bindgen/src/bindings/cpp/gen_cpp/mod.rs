@@ -11,13 +11,13 @@ mod record;
 use std::{
     borrow::Borrow,
     cell::RefCell,
-    cmp::Ordering,
     collections::{BTreeSet, HashMap},
 };
 
 use anyhow::{Context, Result};
 use askama::Template;
 use serde::{Deserialize, Serialize};
+use topological_sort::TopologicalSort;
 use uniffi_bindgen::{interface::{AsType, Type}, BindingsConfig, ComponentInterface};
 
 #[derive(Clone, Deserialize, Serialize)]
@@ -79,6 +79,10 @@ impl<'a> CppWrapperHeader<'a> {
         }
     }
 
+    pub(crate) fn contains_callbacks(&self, types: impl Iterator<Item = &'a Type>) -> bool {
+        types.into_iter().any(|t| matches!(t, Type::CallbackInterface { .. }))
+    }
+
     // XXX: This is somewhat evil, but necessary.
     //      Context: C++.
     //
@@ -89,42 +93,71 @@ impl<'a> CppWrapperHeader<'a> {
     pub(crate) fn sorted_types(
         &self,
         types: impl Iterator<Item = &'a Type>,
-    ) -> impl Iterator<Item = &'a Type> {
-        let (mut recs, rest): (Vec<&'a Type>, Vec<&'a Type>) = types
-            .partition(|t| matches!(t, Type::Record { .. }));
-        let (cbs, rest): (Vec<&'a Type>, Vec<&'a Type>) = rest
-            .iter()
-            .partition(|t| matches!(t, Type::CallbackInterface { .. }));
-        let (csts, rest): (Vec<&'a Type>, Vec<&'a Type>) = rest
-            .iter()
-            .partition(|t| matches!(t, Type::Custom { .. }));
+    ) -> impl Iterator<Item = Type> {
+        let mut definition_topology = TopologicalSort::<String>::new();
 
-        // Records are sorted by checking their fields. If any of them are
-        // records, then they are sorted after the ones that only contain POD
-        // types.
-        recs.sort_by(|a, _| {
-            match a {
+        // We take into account only the Record and Enum types, as they are the
+        // only types that can have member variables that reference other structures
+        for type_ in self.ci.iter_types() {
+            match type_ {
                 Type::Record { name, .. } => {
-                    match self.ci.get_record_definition(name) {
-                        Some(rec) => {
-                            if rec.fields().iter().any(|field| matches!(field.as_type(), Type::Record{ .. })) {
-                                return Ordering::Less;
+                    if let Some(record) = self.ci.get_record_definition(name) {
+                        for field in record.iter_types() {
+                            match field.as_type() {
+                                Type::Record { name: field_name, .. } |
+                                Type::Enum { name: field_name, .. } |
+                                Type::Object { name: field_name, .. } |
+                                Type::Custom { name: field_name, .. } => {
+                                    definition_topology.add_dependency(field_name, name);
+                                },
+                                _ => {}
+
                             }
-                        },
-                        None => unreachable!()
+                        }
                     }
                 },
-                _ => unreachable!()
+                Type::Enum { name, .. } => {
+                    if let Some(enum_) = self.ci.get_enum_definition(name) {
+                        enum_.variants().iter().for_each(|v| {
+                            v.fields().iter().for_each(|f| {
+                                match f.as_type() {
+                                    Type::Record { name: field_name, .. } |
+                                    Type::Enum { name: field_name, .. } |
+                                    Type::Object { name: field_name, .. } |
+                                    Type::Custom { name: field_name, .. } => {
+                                        definition_topology.add_dependency(field_name, name);
+                                    },
+                                    _ => {}
+                                }
+                            });
+                        });
+                    }
+
+                },
+                _ => {}
             }
+        }
 
-            Ordering::Equal
-        });
+        let mut sorted: Vec<Type> = Vec::new();
+        while !definition_topology.peek_all().is_empty() {
+            let list = definition_topology.pop_all();
+            for name in list {
+                match self.ci.get_type(&name) {
+                    Some(type_) => sorted.push(type_.clone()),
+                    None => {
+                        panic!("Type {} not found", name)
+                    }
+                }
+            }
+        }
 
-        // Custom types come first, because they can alias built-in types that
-        // are then used in, say, record fields, which come immediately afterwards.
-        // Callbacks are sorted before everything else, because objects might
-        // take them as parameters.
-        csts.into_iter().chain(recs).chain(cbs).chain(rest)
+        if definition_topology.len() != 0 {
+            panic!("Cyclic dependency detected");
+        }
+
+        let rest = types.cloned().filter(|t| !sorted.contains(t)).collect::<BTreeSet<_>>();
+
+        sorted.into_iter().chain(rest)
     }
 
     pub(crate) fn add_include(&self, include: &str) -> &str {

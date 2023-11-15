@@ -30,7 +30,9 @@ namespace {{ namespace }} {
         ret.reserve(count);
 
         for (decltype(count) i = 0; i < count; i++) {
-            ret.insert({ {{ key_type|read_fn }}(stream), {{ value_type|read_fn }}(stream) });
+            uint8_t elem;
+            stream >> elem;
+            ret.push_back(elem);
         }
 
         return ret;
@@ -39,20 +41,12 @@ namespace {{ namespace }} {
     void uniffi::{{ class_name }}::write(uniffi::RustStream &stream, const {{ type_name }} &val) {
         stream << static_cast<int32_t>(val.size());
 
-        for (auto &entry : val) {
-            {{ key_type|write_fn }}(stream, entry.first);
-            {{ value_type|write_fn }}(stream, entry.second);
+        for (auto &elem : val) {
+            stream << elem;
         }
     }
 
     int32_t uniffi::{{ class_name }}::allocation_size(const {{ type_name }} &val) {
-        int32_t size = sizeof(int32_t);
-
-        for (auto &entry : val) {
-            size += {{ key_type|allocation_size_fn }}(entry.first);
-            size += {{ value_type|allocation_size_fn }}(entry.second);
-        }
-
-        return size;
+        return sizeof(int32_t) + sizeof(uint8_t) * val.size();
     }
 }

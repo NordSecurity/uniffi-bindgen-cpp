@@ -39,7 +39,7 @@ namespace {{ namespace }} {
             {% if method.return_type().is_some() %}auto ret = {% endif -%}
             impl->{{ method.name() }}(
                 {%- for arg in method.arguments() %}
-                {{- arg|read_fn }}{%- if !loop.last %}, {% else %}{% endif %}
+                {{- arg|read_fn }}(stream){%- if !loop.last %}, {% else %}{% endif %}
                 {% endfor -%}
             );
             {%- match method.return_type() %}
@@ -56,6 +56,9 @@ namespace {{ namespace }} {
             {% when Some with (e) -%}
             } catch (const {{ e|type_name }} &ex) {
                 *buf_ptr = uniffi::{{ e|ffi_converter_name }}::lower(ex);
+                return 1;
+            } catch (std::exception &ex) {
+                *buf_ptr = {{ Type::String.borrow()|lower_fn }}(ex.what());
                 return 1;
             }
             {%- else %}

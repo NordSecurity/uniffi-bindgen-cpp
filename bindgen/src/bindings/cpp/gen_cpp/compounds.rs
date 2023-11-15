@@ -33,7 +33,7 @@ impl CodeType for OptionalCodeType {
 
     fn literal(&self, literal: &Literal) -> String {
         match literal {
-            Literal::Null => "nullptr".into(),
+            Literal::Null => "std::nullopt".into(),
             _ => CppCodeOracle.find(&self.inner).literal(literal),
         }
     }
@@ -96,7 +96,7 @@ impl MapCodeType {
 impl CodeType for MapCodeType {
     fn type_label(&self) -> String {
         format!(
-            "std::map<{}, {}>",
+            "std::unordered_map<{}, {}>",
             CppCodeOracle.find(self.key()).type_label(),
             CppCodeOracle.find(self.value()).type_label(),
         )

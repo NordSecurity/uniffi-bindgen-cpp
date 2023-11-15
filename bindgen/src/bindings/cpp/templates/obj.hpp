@@ -2,10 +2,7 @@
 {%- let class_name = type_name|class_name %}
 {%- let ffi_converter_name = typ|ffi_converter_name %}
 
-namespace uniffi {
-    struct {{ ffi_converter_name|class_name }};
-}
-
+namespace uniffi { struct {{ ffi_converter_name|class_name }}; }
 struct {{ class_name }} {
     friend uniffi::{{ ffi_converter_name|class_name }};
 

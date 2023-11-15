@@ -31,6 +31,8 @@
 {% include "arith_conv.cpp" %}
 {%- when Type::Float64 %}
 {% include "arith_conv.cpp" %}
+{%- when Type::Bytes %}
+{% include "bytes_conv.cpp" %}
 
 {%- when Type::String %}
 {% include "str_conv.cpp" %}

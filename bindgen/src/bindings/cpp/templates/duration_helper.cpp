@@ -29,7 +29,7 @@ RustBuffer {{ namespace }}::uniffi::{{ ffi_converter_name }}::lower(const {{ typ
 }
 
 void {{ namespace }}::uniffi::{{ ffi_converter_name }}::write({{ namespace }}::uniffi::RustStream &stream, const {{ type_name }} &val) {
-    auto secs =  std::chrono::duration_cast<std::chrono::seconds>(val);
+    auto secs =  std::chrono::duration_cast<std::chrono::duration<int64_t>>(val);
     auto nanos = (val - secs).count();
 
     stream << secs.count() << static_cast<uint32_t>(nanos);

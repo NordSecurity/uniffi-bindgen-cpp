@@ -45,7 +45,7 @@ namespace {{ namespace }} {
     }
 
     int32_t uniffi::{{ class_name }}::allocation_size(const {{ type_name }} &val) {
-        int32_t size = 0;
+        int32_t size = sizeof(int32_t);
 
         for (auto &elem : val) {
             size += {{ inner_type|allocation_size_fn }}(elem);
