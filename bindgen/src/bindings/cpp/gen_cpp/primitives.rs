@@ -1,8 +1,8 @@
+use paste::paste;
 use uniffi_bindgen::{
     backend::{CodeType, Literal},
     interface::Radix,
 };
-use paste::paste;
 
 fn render_literal(literal: &Literal) -> String {
     match literal {

@@ -1,13 +1,13 @@
 pub(crate) mod gen_cpp;
 
-use std::{fs, collections::HashMap};
+use std::{collections::HashMap, fs};
 
-use anyhow::{Result, bail};
+use anyhow::{bail, Result};
 use camino::Utf8Path;
-use uniffi_bindgen::{BindingGenerator, ComponentInterface, BindingsConfig};
 use serde::{Deserialize, Serialize};
+use uniffi_bindgen::{BindingGenerator, BindingsConfig, ComponentInterface};
 
-use self::gen_cpp::{Bindings, generate_cpp_bindings};
+use self::gen_cpp::{generate_cpp_bindings, Bindings};
 
 pub(crate) struct CppBindingGenerator {}
 
@@ -52,7 +52,9 @@ impl BindingGenerator for CppBindingGenerator {
         out_dir: &Utf8Path,
     ) -> Result<()> {
         let Bindings {
-            scaffolding_header, header, source
+            scaffolding_header,
+            header,
+            source,
         } = generate_cpp_bindings(&ci, &config.bindings.cpp)?;
         let scaffolding_header_path = out_dir.join(format!("{}_scaffolding.hpp", ci.namespace()));
         let header_path = out_dir.join(format!("{}.hpp", ci.namespace()));

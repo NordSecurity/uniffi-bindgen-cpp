@@ -18,7 +18,10 @@ use anyhow::{Context, Result};
 use askama::Template;
 use serde::{Deserialize, Serialize};
 use topological_sort::TopologicalSort;
-use uniffi_bindgen::{interface::{AsType, Type}, BindingsConfig, ComponentInterface};
+use uniffi_bindgen::{
+    interface::{AsType, Type},
+    BindingsConfig, ComponentInterface,
+};
 
 #[derive(Clone, Deserialize, Serialize, Debug, Default)]
 struct CustomTypesConfig {
@@ -34,11 +37,13 @@ pub(crate) struct Config {
 
 impl BindingsConfig for Config {
     fn update_from_ci(&mut self, ci: &ComponentInterface) {
-        self.cdylib_name.get_or_insert_with(|| format!("uniffi_{}", ci.namespace()));
+        self.cdylib_name
+            .get_or_insert_with(|| format!("uniffi_{}", ci.namespace()));
     }
 
     fn update_from_cdylib_name(&mut self, cdylib_name: &str) {
-        self.cdylib_name.get_or_insert_with(|| cdylib_name.to_string());
+        self.cdylib_name
+            .get_or_insert_with(|| cdylib_name.to_string());
     }
 
     fn update_from_dependency_configs(&mut self, _config_map: HashMap<&str, &Self>) {}
@@ -80,7 +85,9 @@ impl<'a> CppWrapperHeader<'a> {
     }
 
     pub(crate) fn contains_callbacks(&self, types: impl Iterator<Item = &'a Type>) -> bool {
-        types.into_iter().any(|t| matches!(t, Type::CallbackInterface { .. }))
+        types
+            .into_iter()
+            .any(|t| matches!(t, Type::CallbackInterface { .. }))
     }
 
     // XXX: This is somewhat evil, but necessary.
@@ -104,36 +111,48 @@ impl<'a> CppWrapperHeader<'a> {
                     if let Some(record) = self.ci.get_record_definition(name) {
                         for field in record.iter_types() {
                             match field.as_type() {
-                                Type::Record { name: field_name, .. } |
-                                Type::Enum { name: field_name, .. } |
-                                Type::Object { name: field_name, .. } |
-                                Type::Custom { name: field_name, .. } => {
+                                Type::Record {
+                                    name: field_name, ..
+                                }
+                                | Type::Enum {
+                                    name: field_name, ..
+                                }
+                                | Type::Object {
+                                    name: field_name, ..
+                                }
+                                | Type::Custom {
+                                    name: field_name, ..
+                                } => {
                                     definition_topology.add_dependency(field_name, name);
-                                },
+                                }
                                 _ => {}
-
                             }
                         }
                     }
-                },
+                }
                 Type::Enum { name, .. } => {
                     if let Some(enum_) = self.ci.get_enum_definition(name) {
                         enum_.variants().iter().for_each(|v| {
-                            v.fields().iter().for_each(|f| {
-                                match f.as_type() {
-                                    Type::Record { name: field_name, .. } |
-                                    Type::Enum { name: field_name, .. } |
-                                    Type::Object { name: field_name, .. } |
-                                    Type::Custom { name: field_name, .. } => {
-                                        definition_topology.add_dependency(field_name, name);
-                                    },
-                                    _ => {}
+                            v.fields().iter().for_each(|f| match f.as_type() {
+                                Type::Record {
+                                    name: field_name, ..
                                 }
+                                | Type::Enum {
+                                    name: field_name, ..
+                                }
+                                | Type::Object {
+                                    name: field_name, ..
+                                }
+                                | Type::Custom {
+                                    name: field_name, ..
+                                } => {
+                                    definition_topology.add_dependency(field_name, name);
+                                }
+                                _ => {}
                             });
                         });
                     }
-
-                },
+                }
                 _ => {}
             }
         }
@@ -155,7 +174,10 @@ impl<'a> CppWrapperHeader<'a> {
             panic!("Cyclic dependency detected");
         }
 
-        let rest = types.cloned().filter(|t| !sorted.contains(t)).collect::<BTreeSet<_>>();
+        let rest = types
+            .cloned()
+            .filter(|t| !sorted.contains(t))
+            .collect::<BTreeSet<_>>();
 
         sorted.into_iter().chain(rest)
     }
@@ -195,10 +217,7 @@ pub(crate) struct Bindings {
     pub(crate) source: String,
 }
 
-pub(crate) fn generate_cpp_bindings(
-    ci: &ComponentInterface,
-    config: &Config,
-) -> Result<Bindings> {
+pub(crate) fn generate_cpp_bindings(ci: &ComponentInterface, config: &Config) -> Result<Bindings> {
     let scaffolding_header = ScaffoldingHeader::new(ci)
         .render()
         .context("generating scaffolding header failed")?;
@@ -209,5 +228,9 @@ pub(crate) fn generate_cpp_bindings(
         .render()
         .context("generating C++ bindings failed")?;
 
-    Ok(Bindings { scaffolding_header, header, source })
+    Ok(Bindings {
+        scaffolding_header,
+        header,
+        source,
+    })
 }

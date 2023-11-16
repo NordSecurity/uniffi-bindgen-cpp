@@ -1,21 +1,13 @@
 use askama;
 use heck::{ToShoutySnakeCase, ToSnakeCase, ToUpperCamelCase};
-use uniffi_bindgen::{
-    backend::{CodeType}, interface::{
-        Argument, AsType, FfiType, Literal, Type, Variant,
-    },
-};
 pub(crate) use uniffi_bindgen::backend::filters::*;
+use uniffi_bindgen::{
+    backend::CodeType,
+    interface::{Argument, AsType, FfiType, Literal, Type, Variant},
+};
 
 use crate::bindings::cpp::gen_cpp::{
-    callback_interface,
-    compounds,
-    custom,
-    enum_,
-    miscellany,
-    object,
-    primitives,
-    record,
+    callback_interface, compounds, custom, enum_, miscellany, object, primitives, record,
 };
 
 type Result<T> = std::result::Result<T, askama::Error>;
@@ -71,10 +63,19 @@ impl<T: AsType> AsCodeType for T {
             Type::ForeignExecutor => todo!(),
             Type::Record { name, .. } => Box::new(record::RecordCodeType::new(name)),
             Type::Enum { name, .. } => Box::new(enum_::EnumCodeType::new(name)),
-            Type::CallbackInterface { name, .. } => Box::new(callback_interface::CallbackInterfaceCodeType::new(name)),
-            Type::Optional { inner_type } => Box::new(compounds::OptionalCodeType::new(*inner_type)),
-            Type::Sequence { inner_type } => Box::new(compounds::SequenceCodeType::new(*inner_type)),
-            Type::Map { key_type, value_type } => Box::new(compounds::MapCodeType::new(*key_type, *value_type)),
+            Type::CallbackInterface { name, .. } => {
+                Box::new(callback_interface::CallbackInterfaceCodeType::new(name))
+            }
+            Type::Optional { inner_type } => {
+                Box::new(compounds::OptionalCodeType::new(*inner_type))
+            }
+            Type::Sequence { inner_type } => {
+                Box::new(compounds::SequenceCodeType::new(*inner_type))
+            }
+            Type::Map {
+                key_type,
+                value_type,
+            } => Box::new(compounds::MapCodeType::new(*key_type, *value_type)),
             Type::External { .. } => todo!(),
             Type::Custom { name, .. } => Box::new(custom::CustomCodeType::new(name)),
         }
@@ -110,23 +111,38 @@ pub(crate) fn literal_cpp(literal: &Literal, as_ct: &impl AsCodeType) -> Result<
 }
 
 pub(crate) fn lift_fn(as_ct: &impl AsCodeType) -> Result<String> {
-    Ok(format!("{}::lift", as_ct.as_codetype().ffi_converter_name()))
+    Ok(format!(
+        "{}::lift",
+        as_ct.as_codetype().ffi_converter_name()
+    ))
 }
 
 pub(crate) fn lower_fn(as_ct: &impl AsCodeType) -> Result<String> {
-    Ok(format!("{}::lower", as_ct.as_codetype().ffi_converter_name()))
+    Ok(format!(
+        "{}::lower",
+        as_ct.as_codetype().ffi_converter_name()
+    ))
 }
 
 pub(crate) fn read_fn(as_ct: &impl AsCodeType) -> Result<String> {
-    Ok(format!("{}::read", as_ct.as_codetype().ffi_converter_name()))
+    Ok(format!(
+        "{}::read",
+        as_ct.as_codetype().ffi_converter_name()
+    ))
 }
 
 pub(crate) fn write_fn(as_ct: &impl AsCodeType) -> Result<String> {
-    Ok(format!("{}::write", as_ct.as_codetype().ffi_converter_name()))
+    Ok(format!(
+        "{}::write",
+        as_ct.as_codetype().ffi_converter_name()
+    ))
 }
 
 pub(crate) fn allocation_size_fn(as_ct: &impl AsCodeType) -> Result<String> {
-    Ok(format!("{}::allocation_size", as_ct.as_codetype().ffi_converter_name()))
+    Ok(format!(
+        "{}::allocation_size",
+        as_ct.as_codetype().ffi_converter_name()
+    ))
 }
 
 pub(crate) fn variant_name(v: &Variant) -> Result<String> {
@@ -165,10 +181,10 @@ pub(crate) fn parameter(arg: &Argument) -> Result<String> {
     Ok(match arg.as_type() {
         Type::Object { name, .. } => {
             format!("const {} &{}", name, arg.name())
-        },
+        }
         Type::CallbackInterface { name, .. } => {
             format!("std::shared_ptr<{}> {}", name, arg.name())
-        },
-        t => format!("{} {}", type_name(&t)?, arg.name())
+        }
+        t => format!("{} {}", type_name(&t)?, arg.name()),
     })
 }
