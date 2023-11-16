@@ -20,12 +20,12 @@ use serde::{Deserialize, Serialize};
 use topological_sort::TopologicalSort;
 use uniffi_bindgen::{interface::{AsType, Type}, BindingsConfig, ComponentInterface};
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize, Debug, Default)]
 struct CustomTypesConfig {
     imports: Option<Vec<String>>,
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize, Debug, Default)]
 pub(crate) struct Config {
     cdylib_name: Option<String>,
     #[serde(default)]
