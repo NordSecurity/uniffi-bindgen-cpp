@@ -13,6 +13,7 @@ struct {{ class_name }}: std::runtime_error {
 
     virtual void throw_underlying() = 0;
 
+    virtual ~{{ class_name }}() = default;
 protected:
     virtual int32_t get_variant_idx() const {
         return 0;

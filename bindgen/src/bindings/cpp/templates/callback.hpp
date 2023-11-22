@@ -10,4 +10,6 @@ struct {{ class_name }} {
     {% when Some with (return_type) %} {{ return_type|type_name }} {% else %} void {% endmatch -%}
     {{ method.name()|fn_name }}({% call macros::param_list(method) %}) = 0;
     {%- endfor %}
+
+    virtual ~{{ class_name }}() = default;
 };
