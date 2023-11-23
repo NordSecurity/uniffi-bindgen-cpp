@@ -8,7 +8,7 @@ namespace {{ namespace }} {
         return ret;
     }
 
-    RustBuffer {{ namespace }}::uniffi::{{ ffi_converter_name }}::lower({{ type_name }} val) {
+    RustBuffer {{ namespace }}::uniffi::{{ ffi_converter_name }}::lower(const {{ type_name }}& val) {
         auto buf = {{ namespace }}::uniffi::rustbuffer_alloc({{ namespace }}::uniffi::{{ ffi_converter_name }}::allocation_size(val));
         auto stream = {{ namespace }}::uniffi::RustStream(&buf);
 
@@ -29,7 +29,7 @@ namespace {{ namespace }} {
         return std::nullopt;
     }
 
-    void {{ namespace }}::uniffi::{{ ffi_converter_name }}::write({{ namespace }}::uniffi::RustStream &stream, {{ type_name }} value) {
+    void {{ namespace }}::uniffi::{{ ffi_converter_name }}::write({{ namespace }}::uniffi::RustStream &stream, const {{ type_name }}& value) {
         stream.put(static_cast<uint8_t>(!!value));
 
         if (value) {

@@ -15,11 +15,11 @@ impl ObjectCodeType {
 
 impl CodeType for ObjectCodeType {
     fn type_label(&self) -> String {
-        CppCodeOracle.class_name(&self.id)
+        format!("std::shared_ptr<{}>", self.canonical_name())
     }
 
     fn canonical_name(&self) -> String {
-        format!("Type{}", self.id)
+        CppCodeOracle.class_name(&self.id)
     }
 
     fn literal(&self, _literal: &Literal) -> String {
