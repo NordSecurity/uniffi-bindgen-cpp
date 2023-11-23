@@ -53,28 +53,28 @@ int main() {
 
     auto todo2 = todolist::TodoList::init();
     {
-        todolist::set_default_list(*todo.get());
+        todolist::set_default_list(todo);
         auto default_list_opt = todolist::get_default_list();
         ASSERT_TRUE(default_list_opt.has_value());
         auto default_list = default_list_opt.value();
 
-        ASSERT_TRUE(compare_lists(todo->get_entries(), default_list.get_entries()));    
-        ASSERT_FALSE(compare_lists(todo2->get_entries(), default_list.get_entries()));
+        ASSERT_TRUE(compare_lists(todo->get_entries(), default_list->get_entries()));    
+        ASSERT_FALSE(compare_lists(todo2->get_entries(), default_list->get_entries()));
     }
 
     {
         todo2->make_default();
         auto default_list = todolist::get_default_list().value();
 
-        ASSERT_FALSE(compare_lists(todo->get_entries(), default_list.get_entries()));
-        ASSERT_TRUE(compare_lists(todo2->get_entries(), default_list.get_entries()));
+        ASSERT_FALSE(compare_lists(todo->get_entries(), default_list->get_entries()));
+        ASSERT_TRUE(compare_lists(todo2->get_entries(), default_list->get_entries()));
     }
 
     todo->add_item("Entry after default list change");
     ASSERT_EQ("Entry after default list change", todo->get_last());
 
     todo2->add_item("New default entry");
-    ASSERT_EQ("New default entry", todolist::get_default_list().value().get_last());
+    ASSERT_EQ("New default entry", todolist::get_default_list().value()->get_last());
 
     return 0;
 }

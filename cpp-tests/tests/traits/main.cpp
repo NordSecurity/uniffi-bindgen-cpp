@@ -7,10 +7,10 @@ int main() {
     auto expected_names = {"go", "stop"};
 
     for (auto button : buttons) {
-        auto name = button.name();
+        auto name = button->name();
 
         ASSERT_TRUE(std::find(expected_names.begin(), expected_names.end(), name) != expected_names.end());
-        ASSERT_EQ(traits::press(button).name(), name);
+        ASSERT_EQ(traits::press(button)->name(), name);
     }
 
     return 0;
