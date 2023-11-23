@@ -1,0 +1,37 @@
+name: C++
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: rust:1.72-bullseye
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build
+      run: |
+        cargo build --release --package uniffi-bindgen-cpp
+
+  test-bindings:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/nordsecurity/uniffi-bindgen-cpp-test-runner:v0.1.0
+    steps:
+    - uses: actions/checkout@v3
+    - name: Test bindings
+      shell: bash
+      env:
+        # Github sets HOME to /github/home and breaks dependencies in Docker image..
+        # https://github.com/actions/runner/issues/863
+        HOME: /root
+      run: |
+        source ~/.bashrc
+        ./test_bindings.sh
