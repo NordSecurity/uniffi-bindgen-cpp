@@ -44,6 +44,10 @@ struct {{ type_name }} {
         return *this;
     }
 
+    const std::variant<{% for variant in e.variants() -%} {{ variant|variant_name }} {%- if !loop.last %}, {% endif -%} {% endfor %}> &get_variant() const {
+        return variant;
+    }
+
 private:
     std::variant<{% for variant in e.variants() -%} {{ variant|variant_name }} {%- if !loop.last %}, {% endif -%} {% endfor %}> variant;
 
