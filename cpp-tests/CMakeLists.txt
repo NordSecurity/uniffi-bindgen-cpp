@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD 20)
 include(CTest)
 enable_testing()
 
+find_package(Threads REQUIRED)
+
 set(BINDINGS_BUILD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../target/debug)
 set(BINDINGS_SRC_DIR ${BINDINGS_BUILD_DIR}/bindings)
 
@@ -13,7 +15,7 @@ add_executable(${TEST_NAME}-test tests/${TEST_NAME}/main.cpp ${BINDINGS_SRC_DIR}
 
 target_include_directories(${TEST_NAME}-test PRIVATE ${BINDINGS_SRC_DIR} tests/include)
 target_link_directories(${TEST_NAME}-test PRIVATE ${BINDINGS_BUILD_DIR})
-target_link_libraries(${TEST_NAME}-test uniffi_bindgen_cpp_fixtures)
+target_link_libraries(${TEST_NAME}-test uniffi_bindgen_cpp_fixtures Threads::Threads)
 
 add_test(NAME ${TEST_NAME}-test COMMAND ${TEST_NAME}-test)
 
