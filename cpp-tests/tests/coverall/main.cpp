@@ -143,6 +143,12 @@ void test_multithread_calls() {
     ASSERT_TRUE(count > 0);
 }
 
+void test_bytes() {
+    auto coveralls = coverall::Coveralls::init("test_bytes");
+
+    ASSERT_EQ(std::vector<uint8_t>({1, 2, 3}), coveralls->reverse(std::vector<uint8_t>({3, 2, 1})));
+}
+
 int main() {
     test_some_dict();
     test_arcs();
@@ -151,6 +157,7 @@ int main() {
     test_complex_errors();
     test_interface_in_dicts();
     test_multithread_calls();
+    test_bytes();
 
     return 0;
 }
