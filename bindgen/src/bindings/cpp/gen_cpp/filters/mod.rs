@@ -188,3 +188,10 @@ pub(crate) fn parameter(arg: &Argument) -> Result<String> {
         t => format!("{} {}", type_name(&t)?, arg.name()),
     })
 }
+
+pub(crate) fn docstring(docstring: &str, spaces: &i32) -> Result<String> {
+    let middle = textwrap::indent(&textwrap::dedent(docstring), " * ");
+    let wrapped = format!("/**\n{middle}\n */");
+
+    Ok(textwrap::indent(&wrapped, &" ".repeat(*spaces as usize)))
+}

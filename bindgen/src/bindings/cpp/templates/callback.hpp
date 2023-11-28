@@ -3,8 +3,10 @@
 {%- let class_name = type_name|class_name %}
 {%- let ffi_converter_name = typ|ffi_converter_name %}
 
+{%- call macros::docstring(iface, 0) %}
 struct {{ class_name }} {
     {% for method in iface.methods() -%}
+    {%- call macros::docstring(method, 4) %}
     virtual
     {%- match method.return_type() -%}
     {% when Some with (return_type) %} {{ return_type|type_name }} {% else %} void {% endmatch -%}

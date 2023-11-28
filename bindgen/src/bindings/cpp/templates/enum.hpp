@@ -1,6 +1,8 @@
 {%- if e.is_flat() %}
+{%- call macros::docstring(e, 0) %}
 enum class {{ type_name }}: int32_t {
     {% for variant in e.variants() -%}
+    {%- call macros::docstring(variant, 4) %}
     {{ variant|variant_name }} = {{ loop.index }}
     {%- if !loop.last %},
     {% endif -%}
@@ -12,12 +14,16 @@ namespace uniffi {
 }
 
 {%- let ffi_converter_name = typ|ffi_converter_name|class_name %}
+
+{%- call macros::docstring(e, 0) %}
 struct {{ type_name }} {
     friend uniffi::{{ ffi_converter_name }};
 
     {% for variant in e.variants() %}
+    {%- call macros::docstring(variant, 4) %}
     struct {{ variant|variant_name }} {
         {%- for field in variant.fields() %}
+        {%- call macros::docstring(field, 8) %}
         {{ field|type_name }} {{ field.name()|var_name }}
         {%- match field.default_value() %}
         {%- when Some with (literal) %} = {{ literal|literal_cpp(field) }};{%- else -%};
@@ -44,6 +50,9 @@ struct {{ type_name }} {
         return *this;
     }
 
+    /**
+     * Returns the variant of this enum
+     */
     const std::variant<{% for variant in e.variants() -%} {{ variant|variant_name }} {%- if !loop.last %}, {% endif -%} {% endfor %}> &get_variant() const {
         return variant;
     }

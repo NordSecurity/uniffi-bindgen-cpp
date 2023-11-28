@@ -24,6 +24,7 @@
 
 {%- import "macros.cpp" as macros %}
 
+{%- call macros::docstring(ci.namespace_definition(), 0) %}
 namespace {{ namespace }} {
     {%- for typ in ci.iter_types() %}
     {%- let type_name = typ|type_name %}
@@ -221,6 +222,7 @@ namespace {{ namespace }} {
     }
 
     {% for func in ci.function_definitions() %}
+    {%- call macros::docstring(func, 4) %}
     {%- match func.return_type() %}
     {%- when Some with (return_type) %}
     {{ return_type|type_name }} {{ func.name()|fn_name }}({%- call macros::param_list(func) %});

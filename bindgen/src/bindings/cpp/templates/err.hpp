@@ -5,6 +5,7 @@ namespace uniffi {
     struct {{ ffi_converter_name }};
 }
 
+{% call macros::docstring(e, 0) %}
 struct {{ class_name }}: std::runtime_error {
     friend uniffi::{{ ffi_converter_name }};
 
@@ -21,8 +22,12 @@ protected:
 };
 
 {% if e.variants().len() != 0 %}
+/**
+ * Contains variants of {{ type_name }}
+ */
 namespace {{ class_name|to_lower_snake_case }} {
 {% for variant in e.variants() %}
+    {%- call macros::docstring(variant, 4) %}
     struct {{ variant.name()|class_name }}: {{ class_name }} {
         {%- for field in variant.fields() %}
         {{ field|type_name }} {{ field.name()|var_name }}

@@ -5,6 +5,8 @@
 {%- let type_name = typ|type_name %}
 
 namespace uniffi { struct {{ ffi_converter_name|class_name }}; }
+
+{%- call macros::docstring(obj, 0) %}
 struct {{ canonical_type_name }} {
     friend uniffi::{{ ffi_converter_name|class_name }};
 
@@ -16,25 +18,27 @@ struct {{ canonical_type_name }} {
 
     {% match obj.primary_constructor() %}
     {%- when Some with (ctor) -%}
+    {%- call macros::docstring(ctor, 4) %}
     static {{ type_name }} init({% call macros::param_list(ctor) %});
     {%- else %}
     {%- endmatch -%}
 
     {% for ctor in obj.alternate_constructors() %}
+    {%- call macros::docstring(ctor, 4) %}
     static {{ type_name }} {{ ctor.name() }}({% call macros::param_list(ctor) %});
     {%- endfor %}
 
     ~{{ canonical_type_name }}();
 
     {% for method in obj.methods() %}
-    {%- match method.return_type() %}{% when Some with (return_type) %}{{ return_type|type_name }} {% else %}void {% endmatch %}
+    {%- call macros::docstring(method, 4) %}
+    {% match method.return_type() %}{% when Some with (return_type) %}{{ return_type|type_name }} {% else %}void {% endmatch %}
     {{- method.name()|fn_name }}({% call macros::param_list(method) %});
     {% endfor %}
 
 private:
     {{ canonical_type_name }}(void *);
     {{ canonical_type_name }}() = delete;
-
 
     void *instance;
 };
