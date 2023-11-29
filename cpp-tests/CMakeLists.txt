@@ -16,6 +16,7 @@ add_executable(${TEST_NAME}-test tests/${TEST_NAME}/main.cpp ${BINDINGS_SRC_DIR}
 target_include_directories(${TEST_NAME}-test PRIVATE ${BINDINGS_SRC_DIR} tests/include)
 target_link_directories(${TEST_NAME}-test PRIVATE ${BINDINGS_BUILD_DIR})
 target_link_libraries(${TEST_NAME}-test uniffi_bindgen_cpp_fixtures Threads::Threads)
+target_compile_definitions(${TEST_NAME}-test PRIVATE UNIFFI_BINDING_DIR="${BINDINGS_SRC_DIR}")
 
 add_test(NAME ${TEST_NAME}-test COMMAND ${TEST_NAME}-test)
 
@@ -35,6 +36,7 @@ test_case(sprites)
 test_case(todolist)
 test_case(traits)
 test_case(coverall)
+test_case(uniffi_docstring)
 
 add_custom_target(libs ALL
     BYPRODUCTS ${BINDING_FILES}
