@@ -1,6 +1,7 @@
 #include "test_common.hpp"
 
 #include <fstream>
+#include <regex>
 
 #include <uniffi_docstring.hpp>
 
@@ -36,10 +37,25 @@ int main() {
     auto source = std::string(std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>());
     ASSERT_FALSE(source.empty());
 
+    std::regex docstring_reg("\\<docstring-(.*?)\\>");
+    std::smatch match;
+    std::vector<std::string> extracted_docstrings;
+
+    while (std::regex_search(source, match, docstring_reg)) {
+        extracted_docstrings.push_back(match[0].str());
+        source = match.suffix().str();
+    }
+
     for (const auto& docstring : expected_docstrings) {
-        auto found = source.find(docstring);
-        if (found == std::string::npos) {
-            std::cerr << "Could not find docstring: " << docstring << std::endl;
+        if (std::find(extracted_docstrings.begin(), extracted_docstrings.end(), docstring) == extracted_docstrings.end()) {
+            std::cerr << "Could not find expected docstring: " << docstring << std::endl;
+            ASSERT_TRUE(false);
+        }
+    }
+
+    for (const auto& docstring : extracted_docstrings) {
+        if (std::find(expected_docstrings.begin(), expected_docstrings.end(), docstring) == expected_docstrings.end()) {
+            std::cerr << "Unexpected docstring found: " << docstring << std::endl;
             ASSERT_TRUE(false);
         }
     }
