@@ -861,6 +861,7 @@ dependencies = [
  "heck",
  "paste",
  "serde",
+ "textwrap",
  "topological-sort",
  "uniffi_bindgen",
 ]

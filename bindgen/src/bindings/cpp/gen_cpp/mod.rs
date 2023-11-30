@@ -19,7 +19,7 @@ use askama::Template;
 use serde::{Deserialize, Serialize};
 use topological_sort::TopologicalSort;
 use uniffi_bindgen::{
-    interface::{AsType, Type},
+    interface::{AsType, Type, UniffiTrait},
     BindingsConfig, ComponentInterface,
 };
 

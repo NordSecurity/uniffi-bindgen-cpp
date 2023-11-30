@@ -37,6 +37,7 @@ test_case(todolist)
 test_case(traits)
 test_case(coverall)
 test_case(uniffi_docstring)
+test_case(trait_methods)
 
 add_custom_target(libs ALL
     BYPRODUCTS ${BINDING_FILES}
