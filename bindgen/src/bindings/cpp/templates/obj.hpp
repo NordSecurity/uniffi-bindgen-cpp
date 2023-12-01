@@ -57,7 +57,7 @@ struct {{ canonical_type_name }} {
     bool eq(const {{ type_name }} &other) const;
 
     /**
-     * Inequality check, internally calls Rust's `Eq` trait. 
+     * Inequality check, internally calls Rust's `Ne` trait. 
      */
     bool ne(const {{ type_name }} &other) const;
     {% when UniffiTrait::Hash { hash } %}
