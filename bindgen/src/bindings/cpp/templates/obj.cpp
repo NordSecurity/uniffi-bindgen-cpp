@@ -41,6 +41,31 @@ namespace {{ namespace }} {
         );
     }
 
+    {% for method in obj.uniffi_traits() %}
+    {% match method %}
+    {%- when UniffiTrait::Display { fmt } %}
+    std::string {{ canonical_type_name }}::to_string() const {
+        return {{ namespace }}::uniffi::{{ Type::String.borrow()|lift_fn }}({% call macros::rust_call_with_prefix("this->instance", fmt) %});
+    }
+    {%- when UniffiTrait::Debug { fmt } %}
+    std::string {{ canonical_type_name }}::to_debug_string() const {
+        return {{ namespace }}::uniffi::{{ Type::String.borrow()|lift_fn }}({% call macros::rust_call_with_prefix("this->instance", fmt) %});
+    }
+    {%- when UniffiTrait::Eq { eq, ne } %}
+    bool {{ canonical_type_name }}::eq(const {{ type_name }} &other) const {
+        return {{ namespace }}::uniffi::{{ Type::Boolean.borrow()|lift_fn }}({% call macros::rust_call_with_prefix("this->instance", eq, "other.instance") %});
+    }
+
+    bool {{ canonical_type_name }}::ne(const {{ type_name }} &other) const {
+        return {{ namespace }}::uniffi::{{ Type::Boolean.borrow()|lift_fn }}({% call macros::rust_call_with_prefix("this->instance", ne, "other.instance") %});
+    }
+    {% when UniffiTrait::Hash { hash } %}
+    uint64_t {{ canonical_type_name }}::hash() const {
+        return {{ namespace }}::uniffi::{{ Type::UInt64.borrow()|lift_fn }}({% call macros::rust_call_with_prefix("this->instance", hash) %});
+    }
+    {% endmatch %}
+    {% endfor %}
+
     {{ type_name }} uniffi::{{ ffi_converter_name }}::lift(void *ptr) {
         return {{ type_name }}(new {{ canonical_type_name }}(ptr));
     }
