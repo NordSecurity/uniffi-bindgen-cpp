@@ -12,7 +12,7 @@ struct {{ canonical_type_name }} {
 
     {{ canonical_type_name }}() = delete;
 
-    {{ canonical_type_name }}(const {{ canonical_type_name }} &) = default;
+    {{ canonical_type_name }}(const {{ canonical_type_name }} &) = delete;
     {{ canonical_type_name }}({{ canonical_type_name }} &&) = delete;
 
     {{ canonical_type_name }} &operator=(const {{ canonical_type_name }} &) = delete;
