@@ -50,6 +50,12 @@ impl BindingsConfig for Config {
 }
 
 #[derive(Template)]
+#[template(syntax = "cpp", escape = "none", path = "internal_types.cpp")]
+struct InternalTypeRenderer<'a> {
+    ci: &'a ComponentInterface,
+}
+
+#[derive(Template)]
 #[template(syntax = "cpp", escape = "none", path = "types.cpp")]
 struct TypeRenderer<'a> {
     ci: &'a ComponentInterface,
@@ -198,6 +204,7 @@ impl<'a> CppWrapperHeader<'a> {
 struct CppWrapper<'a> {
     ci: &'a ComponentInterface,
     config: &'a Config,
+    internal_type_helper_code: String,
     type_helper_code: String,
 }
 
@@ -206,6 +213,7 @@ impl<'a> CppWrapper<'a> {
         Self {
             ci,
             config,
+            internal_type_helper_code: InternalTypeRenderer { ci }.render().unwrap(),
             type_helper_code: TypeRenderer { ci }.render().unwrap(),
         }
     }

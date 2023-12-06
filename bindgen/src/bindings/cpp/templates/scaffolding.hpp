@@ -31,7 +31,6 @@ typedef int ForeignCallback(uint64_t handle, uint32_t method, uint8_t *args_data
 {%- if func.has_rust_call_status_arg() %}RustCallStatus *out_status{% endif -%}
 );
 {% endfor %}
-
 #ifdef __cplusplus
 }
 #endif

@@ -1,24 +1,23 @@
 {%- let type_name = typ|type_name %}
-
-{{ type_name }} {{ namespace }}::uniffi::{{ ffi_converter_name }}::lift(RustBuffer buf) {
-    auto stream = uniffi::RustStream(&buf);
+{{ type_name }} uniffi::{{ ffi_converter_name }}::lift(RustBuffer buf) {
+    auto stream = RustStream(&buf);
     auto val = {{ ffi_converter_name }}::read(stream);
 
-    uniffi::rustbuffer_free(buf);
+    rustbuffer_free(buf);
 
     return val;
 }
 
-RustBuffer {{ namespace }}::uniffi::{{ ffi_converter_name }}::lower(const {{ type_name }} &val) {
+RustBuffer uniffi::{{ ffi_converter_name }}::lower(const {{ type_name }} &val) {
     auto buf = rustbuffer_alloc(allocation_size(val));
-    auto stream = uniffi::RustStream(&buf);
+    auto stream = RustStream(&buf);
 
     {{ ffi_converter_name }}::write(stream, val);
 
     return std::move(buf);
 }
 
-{{ type_name }} {{ namespace }}::uniffi::{{ ffi_converter_name }}::read({{ namespace }}::uniffi::RustStream &stream) {
+{{ type_name }} uniffi::{{ ffi_converter_name }}::read(RustStream &stream) {
     int64_t secs;
     uint32_t nanos;
 
@@ -32,7 +31,7 @@ RustBuffer {{ namespace }}::uniffi::{{ ffi_converter_name }}::lower(const {{ typ
     return {{ type_name }}(duration);
 }
 
-void {{ namespace }}::uniffi::{{ ffi_converter_name }}::write({{ namespace }}::uniffi::RustStream &stream, const {{ type_name }} &val) {
+void uniffi::{{ ffi_converter_name }}::write(RustStream &stream, const {{ type_name }} &val) {
     auto duration = val.time_since_epoch();
     auto secs =  std::chrono::duration_cast<std::chrono::duration<int64_t>>(duration);
     auto nanos = (duration - secs).count();
@@ -42,6 +41,6 @@ void {{ namespace }}::uniffi::{{ ffi_converter_name }}::write({{ namespace }}::u
     stream << secs.count() << static_cast<uint32_t>(sign * nanos);
 }
 
-int32_t {{ namespace }}::uniffi::{{ ffi_converter_name }}::allocation_size(const {{ type_name }} &) {
+int32_t uniffi::{{ ffi_converter_name }}::allocation_size(const {{ type_name }} &) {
     return sizeof(int64_t) + sizeof(uint32_t);
 }
