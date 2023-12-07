@@ -1,14 +1,12 @@
-{%- let namespace = ci.namespace() %}
-
-{%- match func.return_type() -%}
+{%- match func.return_type() %}
 {%- when Some with (return_type) %}
-{{ return_type|type_name }} {{ func.name()|fn_name }}({%- call macros::param_list(func) %}) {
+{{ return_type|type_name }} {{ func.name()|fn_name }}({% call macros::param_list(func) %}) {
     auto ret = {% call macros::rust_call(func) %};
 
-    return {{ namespace }}::uniffi::{{ return_type|lift_fn }}(ret);
+    return uniffi::{{ return_type|lift_fn }}(ret);
 }
-{%- when None %}
-void {{ func.name()|fn_name }}({%- call macros::param_list(func) %}) {
+{%- when None -%}
+void {{ func.name()|fn_name }}({% call macros::param_list(func) %}) {
     {% call macros::rust_call(func) %};
 }
-{%- endmatch %}
+{%- endmatch -%}

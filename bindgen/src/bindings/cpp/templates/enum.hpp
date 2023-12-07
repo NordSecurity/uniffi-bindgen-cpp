@@ -1,25 +1,24 @@
+{%- let ffi_converter_name = typ|ffi_converter_name|class_name %}
 {%- if e.is_flat() %}
-{%- call macros::docstring(e, 0) %}
+{% call macros::docstring(e, 0) %}
 enum class {{ type_name }}: int32_t {
-    {% for variant in e.variants() -%}
+    {%- for variant in e.variants() %}
     {%- call macros::docstring(variant, 4) %}
     {{ variant|variant_name }} = {{ loop.index }}
     {%- if !loop.last %},
-    {% endif -%}
-    {% endfor %}
+    {%- endif %}
+    {%- endfor %}
 };
-{% else %}
+{%- else %}
 namespace uniffi {
-    struct {{ ffi_converter_name }};
-}
+struct {{ ffi_converter_name }};
+} // namespace uniffi
 
-{%- let ffi_converter_name = typ|ffi_converter_name|class_name %}
-
-{%- call macros::docstring(e, 0) %}
+{%~ call macros::docstring(e, 0) %}
 struct {{ type_name }} {
     friend uniffi::{{ ffi_converter_name }};
 
-    {% for variant in e.variants() %}
+    {%- for variant in e.variants() %}
     {%- call macros::docstring(variant, 4) %}
     struct {{ variant|variant_name }} {
         {%- for field in variant.fields() %}
@@ -30,10 +29,9 @@ struct {{ type_name }} {
         {%- endmatch %}
         {%- endfor %}
     };
-    {% endfor %}
+    {%- endfor %}
 
-
-    {% for variant in e.variants() %}
+    {%- for variant in e.variants() %}
     {{ type_name }}({{ variant|variant_name }} variant): variant(variant) {}
     {%- endfor %}
 
@@ -53,13 +51,13 @@ struct {{ type_name }} {
     /**
      * Returns the variant of this enum
      */
-    const std::variant<{% for variant in e.variants() -%} {{ variant|variant_name }} {%- if !loop.last %}, {% endif -%} {% endfor %}> &get_variant() const {
+    const std::variant<{% for variant in e.variants() %}{{ variant|variant_name }}{% if !loop.last %}, {% endif %}{% endfor %}> &get_variant() const {
         return variant;
     }
 
 private:
-    std::variant<{% for variant in e.variants() -%} {{ variant|variant_name }} {%- if !loop.last %}, {% endif -%} {% endfor %}> variant;
+    std::variant<{% for variant in e.variants() %}{{ variant|variant_name }}{% if !loop.last %}, {% endif %}{% endfor %}> variant;
 
     {{ type_name }}();
 };
-{% endif %}
+{%- endif %}
