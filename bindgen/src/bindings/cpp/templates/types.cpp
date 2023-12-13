@@ -34,6 +34,8 @@
 {% include "duration_helper.cpp" %}
 {%- when Type::External { module_path, name, namespace, kind, tagged } %}
 {% include "ext_typ_tmpl.cpp" %}
+{%- when Type::Custom { module_path, name, builtin } %}
+{%- include "custom.cpp" %}
 {%- else %}
 {%- endmatch %}
 {%- endfor %}

@@ -18,6 +18,7 @@
 #include <{{ include }}>
 {%- endfor %}
 
+
 {%~ let namespace = ci.namespace() %}
 #include "{{ namespace }}_scaffolding.hpp"
 
@@ -42,6 +43,17 @@ struct {{ name }};
 struct {{ name }};
 {%- when Type::CallbackInterface { module_path, name } %}
 struct {{ name }};
+{%- when Type::Custom { module_path, name, builtin } %}
+{%- match config.custom_types.get(name.as_str()) %}
+{%- when None %}
+typedef {{ builtin|type_name }} {{ name }};
+{%- when Some with (type_config) %}
+{%- match type_config.type_name %}
+{%- when Some with (type_name) %}
+typedef {{ type_name }} {{ name }};
+{%- else %}
+{%- endmatch %}
+{%- endmatch %}
 {%- else %}
 {%- endmatch %}
 {%- endfor %}
@@ -56,8 +68,6 @@ struct {{ name }};
 {%- else %}
 {% include "enum.hpp" %}
 {%- endif %}
-{%- when Type::Custom { module_path, name, builtin } %}
-{%- include "custom.hpp" %}
 {%- when Type::Record { module_path, name } %}
 {% include "rec.hpp" %}
 {%- when Type::CallbackInterface { module_path, name } %}
@@ -213,7 +223,7 @@ template <typename T> struct HandleMap {
 {%- when Type::CallbackInterface { module_path, name } %}
 {% include "callback_conv.hpp" %}
 {%- when Type::Custom { module_path, name, builtin } %}
-typedef struct {{ builtin|ffi_converter_name }} {{ typ|ffi_converter_name }};
+{% include "custom.hpp" %}
 {%- else %}
 {%- endmatch %}
 {%- endfor %}

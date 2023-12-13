@@ -20,12 +20,15 @@ use serde::{Deserialize, Serialize};
 use topological_sort::TopologicalSort;
 use uniffi_bindgen::{
     interface::{AsType, Type, UniffiTrait},
-    BindingsConfig, ComponentInterface,
+    BindingsConfig, ComponentInterface, backend::TemplateExpression,
 };
 
 #[derive(Clone, Deserialize, Serialize, Debug, Default)]
 struct CustomTypesConfig {
     imports: Option<Vec<String>>,
+    type_name: Option<String>,
+    into_custom: TemplateExpression,
+    from_custom: TemplateExpression,
 }
 
 #[derive(Clone, Deserialize, Serialize, Debug, Default)]
@@ -59,6 +62,7 @@ struct InternalTypeRenderer<'a> {
 #[template(syntax = "cpp", escape = "none", path = "types.cpp")]
 struct TypeRenderer<'a> {
     ci: &'a ComponentInterface,
+    config: &'a Config,
 }
 
 #[derive(Template)]
@@ -83,10 +87,20 @@ struct CppWrapperHeader<'a> {
 
 impl<'a> CppWrapperHeader<'a> {
     fn new(ci: &'a ComponentInterface, config: &'a Config) -> Self {
+        let includes = config.custom_types.values().fold(
+            BTreeSet::new(),
+            |mut acc: BTreeSet<String>, custom_type| {
+                if let Some(imports) = &custom_type.imports {
+                    acc.extend(imports.iter().cloned());
+                }
+                acc
+            },
+        );
+
         Self {
             ci,
             config,
-            includes: RefCell::new(BTreeSet::new()),
+            includes: includes.into(),
         }
     }
 
@@ -188,17 +202,12 @@ impl<'a> CppWrapperHeader<'a> {
         sorted.into_iter().chain(rest)
     }
 
-    pub(crate) fn add_include(&self, include: &str) -> &str {
-        self.includes.borrow_mut().insert(include.to_string());
-
-        ""
-    }
-
     pub(crate) fn includes(&self) -> Vec<String> {
         self.includes.borrow().iter().cloned().collect()
     }
 }
 
+#[allow(dead_code)]
 #[derive(Template)]
 #[template(syntax = "cpp", escape = "none", path = "wrapper.cpp")]
 struct CppWrapper<'a> {
@@ -214,7 +223,7 @@ impl<'a> CppWrapper<'a> {
             ci,
             config,
             internal_type_helper_code: InternalTypeRenderer { ci }.render().unwrap(),
-            type_helper_code: TypeRenderer { ci }.render().unwrap(),
+            type_helper_code: TypeRenderer { ci, config }.render().unwrap(),
         }
     }
 }

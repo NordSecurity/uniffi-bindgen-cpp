@@ -1,0 +1,5 @@
+[bindings.cpp.custom_types.CustomString]
+imports = ["custom_string.hpp"]
+type_name = "CustomString"
+into_custom = "CustomString({})"
+from_custom = "{}.to_string()"

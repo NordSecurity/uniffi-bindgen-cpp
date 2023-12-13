@@ -38,6 +38,7 @@ test_case(traits)
 test_case(coverall)
 test_case(uniffi_docstring)
 test_case(trait_methods)
+test_case(custom_types_builtin)
 
 add_custom_target(libs ALL
     BYPRODUCTS ${BINDING_FILES}
