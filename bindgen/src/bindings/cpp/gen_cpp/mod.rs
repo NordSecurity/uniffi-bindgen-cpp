@@ -202,12 +202,6 @@ impl<'a> CppWrapperHeader<'a> {
         sorted.into_iter().chain(rest)
     }
 
-    pub(crate) fn add_include(&self, include: &str) -> &str {
-        self.includes.borrow_mut().insert(include.to_string());
-
-        ""
-    }
-
     pub(crate) fn includes(&self) -> Vec<String> {
         self.includes.borrow().iter().cloned().collect()
     }
