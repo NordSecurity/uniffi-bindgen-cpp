@@ -19,8 +19,9 @@ use askama::Template;
 use serde::{Deserialize, Serialize};
 use topological_sort::TopologicalSort;
 use uniffi_bindgen::{
+    backend::TemplateExpression,
     interface::{AsType, Type, UniffiTrait},
-    BindingsConfig, ComponentInterface, backend::TemplateExpression,
+    BindingsConfig, ComponentInterface,
 };
 
 #[derive(Clone, Deserialize, Serialize, Debug, Default)]
@@ -33,21 +34,14 @@ struct CustomTypesConfig {
 
 #[derive(Clone, Deserialize, Serialize, Debug, Default)]
 pub(crate) struct Config {
-    cdylib_name: Option<String>,
     #[serde(default)]
     custom_types: HashMap<String, CustomTypesConfig>,
 }
 
 impl BindingsConfig for Config {
-    fn update_from_ci(&mut self, ci: &ComponentInterface) {
-        self.cdylib_name
-            .get_or_insert_with(|| format!("uniffi_{}", ci.namespace()));
-    }
+    fn update_from_ci(&mut self, _ci: &ComponentInterface) {}
 
-    fn update_from_cdylib_name(&mut self, cdylib_name: &str) {
-        self.cdylib_name
-            .get_or_insert_with(|| cdylib_name.to_string());
-    }
+    fn update_from_cdylib_name(&mut self, _cdylib_name: &str) {}
 
     fn update_from_dependency_configs(&mut self, _config_map: HashMap<&str, &Self>) {}
 }

@@ -7,16 +7,6 @@ configuration keys are defined in `bindings.cpp` section.
 uniffi-bindgen-cpp path/to/definitions.udl --config path/to/uniffi.toml
 ```
 
-- `cdylib_name` - override the dynamic library name linked by generated bindings, excluding `lib`
-    prefix and `.dll` file extension. When using `--library` mode, defaults to library's name.
-    In standalone mode this value is required, and error will be produced if its missing.
-
-    ```toml
-    # For library `libgreeter.dll`
-    [bindings.cpp]
-    cdylib_name = "greeter"
-    ```
-
 - `custom_types` - properties for custom type defined in UDL with `[Custom] typedef string Url;`.
 
     ```toml
