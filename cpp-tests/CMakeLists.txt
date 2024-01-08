@@ -20,6 +20,14 @@ target_compile_definitions(${TEST_NAME}-test PRIVATE UNIFFI_BINDING_DIR="${BINDI
 
 add_test(NAME ${TEST_NAME}-test COMMAND ${TEST_NAME}-test)
 
+add_test(NAME ${TEST_NAME}-test-memcheck
+  COMMAND valgrind
+    --error-exitcode=1
+    --tool=memcheck
+    --leak-check=full
+    --errors-for-leak-kinds=definite
+    --show-leak-kinds=definite $<TARGET_FILE:${TEST_NAME}-test>)
+
 add_dependencies(${TEST_NAME}-test bindings)
 
 list(APPEND BINDING_FILES ${BINDINGS_SRC_DIR}/${TEST_NAME}.cpp)

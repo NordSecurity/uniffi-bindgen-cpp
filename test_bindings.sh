@@ -3,6 +3,6 @@ set -euxo pipefail
 
 mkdir -p cpp-tests/build
 cd cpp-tests/build
-cmake ..
+cmake -DCMAKE_BUILD_TYPE=Debug ..
 make
-make test
+CTEST_OUTPUT_ON_FAILURE=1 make test
