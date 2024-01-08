@@ -72,6 +72,7 @@ The table shows `uniffi-rs` version history for tags that were published before 
 | uniffi-bindgen-cpp version                | uniffi-rs version                                |
 |------------------------------------------|--------------------------------------------------|
 | v0.1.0                                   | v0.25.0                                          |
+| v0.2.0                                   | v0.25.0                                          |
 
 # Documentation
 
