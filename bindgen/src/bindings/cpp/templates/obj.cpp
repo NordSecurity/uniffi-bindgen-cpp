@@ -53,10 +53,10 @@ std::string {{ canonical_type_name }}::to_debug_string() const {
 }
 {% when UniffiTrait::Eq { eq, ne } %}
 bool {{ canonical_type_name }}::eq(const {{ type_name }} &other) const {
-    return uniffi::{{ Type::Boolean.borrow()|lift_fn }}({% call macros::rust_call_with_prefix("this->instance", eq, "other.instance") %});
+    return uniffi::{{ Type::Boolean.borrow()|lift_fn }}({% call macros::rust_call_with_prefix("this->instance", eq) %});
 }
 bool {{ canonical_type_name }}::ne(const {{ type_name }} &other) const {
-    return uniffi::{{ Type::Boolean.borrow()|lift_fn }}({% call macros::rust_call_with_prefix("this->instance", ne, "other.instance") %});
+    return uniffi::{{ Type::Boolean.borrow()|lift_fn }}({% call macros::rust_call_with_prefix("this->instance", ne) %});
 }
 {% when UniffiTrait::Hash { hash } %}
 uint64_t {{ canonical_type_name }}::hash() const {
