@@ -73,6 +73,7 @@ The table shows `uniffi-rs` version history for tags that were published before 
 |------------------------------------------|--------------------------------------------------|
 | v0.1.0                                   | v0.25.0                                          |
 | v0.2.0                                   | v0.25.0                                          |
+| v0.2.1                                   | v0.25.0                                          |
 
 # Documentation
 

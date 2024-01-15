@@ -1,4 +1,8 @@
-### v0.2.0+v0.25.0
+#### v0.2.1+v0.25.0
+
+----
+
+- Fix incorrect macro invocation in object bindings.
 
 ----
 

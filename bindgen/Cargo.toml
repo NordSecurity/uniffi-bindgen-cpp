@@ -1,6 +1,6 @@
 [package]
 name = "uniffi-bindgen-cpp"
-version = "0.1.0+v.0.25.0"
+version = "0.2.1+v.0.25.0"
 edition = "2021"
 
 [dependencies]
