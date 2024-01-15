@@ -8,7 +8,21 @@
 {%- let namespace = ci.namespace() %}
 
 {%- match typ %}
+{%- when Type::Object { module_path, name, imp } %}
+{% include "obj.cpp" %}
+{%- else %}
+{%- endmatch %}
+{% endfor ~%}
 
+namespace uniffi {
+{%- for typ in ci.iter_types() %}
+{%- let type_name = typ|type_name %}
+{%- let ffi_converter_name = typ|ffi_converter_name %}
+{%- let canonical_type_name = typ|canonical_name %}
+{%- let contains_object_references = ci.item_contains_object_references(typ) %}
+{%- let namespace = ci.namespace() %}
+
+{%- match typ %}
 {%- when Type::Enum { name, module_path } %}
 {%- let e = ci|get_enum_definition(name) %}
 {%- if ci.is_name_used_as_error(name) %}
@@ -17,7 +31,7 @@
 {% include "enum_tmpl.cpp" %}
 {%- endif %}
 {%- when Type::Object { module_path, name, imp } %}
-{% include "obj.cpp" %}
+{% include "obj_conv.cpp" %}
 {%- when Type::Record { module_path, name } %}
 {% include "rec.cpp" %}
 {%- when Type::Optional { inner_type } %}
@@ -38,4 +52,6 @@
 {%- include "custom.cpp" %}
 {%- else %}
 {%- endmatch %}
-{%- endfor %}
+{% endfor ~%}
+
+}
