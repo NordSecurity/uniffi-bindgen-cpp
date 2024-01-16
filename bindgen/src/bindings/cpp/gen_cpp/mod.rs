@@ -38,12 +38,31 @@ pub(crate) struct Config {
     custom_types: HashMap<String, CustomTypesConfig>,
 }
 
+#[derive(Clone, Deserialize, Serialize, Debug, Default)]
+pub(crate) struct ScaffoldingConfig {
+    #[serde(default)]
+    namespace: Option<String>,
+}
+
 impl BindingsConfig for Config {
     fn update_from_ci(&mut self, _ci: &ComponentInterface) {}
 
     fn update_from_cdylib_name(&mut self, _cdylib_name: &str) {}
 
     fn update_from_dependency_configs(&mut self, _config_map: HashMap<&str, &Self>) {}
+}
+
+#[derive(Template)]
+#[template(syntax = "cpp", escape = "none", path = "cpp_scaffolding.cpp")]
+struct CppScaffoldingHeader<'a> {
+    ci: &'a ComponentInterface,
+    config: &'a ScaffoldingConfig,
+}
+
+impl<'a> CppScaffoldingHeader<'a> {
+    fn new(ci: &'a ComponentInterface, config: &'a ScaffoldingConfig) -> Self {
+        Self { ci, config }
+    }
 }
 
 #[derive(Template)]
@@ -226,9 +245,10 @@ pub(crate) struct Bindings {
     pub(crate) scaffolding_header: String,
     pub(crate) header: String,
     pub(crate) source: String,
+    pub(crate) cpp_scaffolding_header: String,
 }
 
-pub(crate) fn generate_cpp_bindings(ci: &ComponentInterface, config: &Config) -> Result<Bindings> {
+pub(crate) fn generate_cpp_bindings(ci: &ComponentInterface, config: &Config, scaffolding_config: &ScaffoldingConfig) -> Result<Bindings> {
     let scaffolding_header = ScaffoldingHeader::new(ci)
         .render()
         .context("generating scaffolding header failed")?;
@@ -238,10 +258,14 @@ pub(crate) fn generate_cpp_bindings(ci: &ComponentInterface, config: &Config) ->
     let source = CppWrapper::new(ci, config)
         .render()
         .context("generating C++ bindings failed")?;
+    let cpp_scaffolding_header = CppScaffoldingHeader::new(ci, scaffolding_config)
+        .render()
+        .context("generating C++ scaffolding header failed")?;
 
     Ok(Bindings {
         scaffolding_header,
         header,
         source,
+        cpp_scaffolding_header,
     })
 }

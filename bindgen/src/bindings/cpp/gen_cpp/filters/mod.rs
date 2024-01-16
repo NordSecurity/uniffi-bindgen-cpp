@@ -161,15 +161,15 @@ pub(crate) fn ffi_type_name(ffi_type: &FfiType) -> Result<String> {
         FfiType::Int64 => "int64_t".into(),
         FfiType::Float32 => "float".into(),
         FfiType::Float64 => "double".into(),
-        FfiType::RustArcPtr(_) => "void *".into(),
+        FfiType::RustArcPtr(_) => "intptr_t".into(),
         FfiType::RustBuffer(_) => "RustBuffer".into(),
         FfiType::ForeignBytes => "ForeignBytes".into(),
         FfiType::ForeignCallback => "ForeignCallback".into(),
         FfiType::ForeignExecutorHandle => unimplemented!("Async is not implemented"),
         FfiType::ForeignExecutorCallback => unimplemented!("Async is not implemented"),
-        FfiType::RustFutureHandle => "void *".into(),
-        FfiType::RustFutureContinuationCallback => "void *".into(),
-        FfiType::RustFutureContinuationData => "void *".into(),
+        FfiType::RustFutureHandle => "intptr_t".into(),
+        FfiType::RustFutureContinuationCallback => "intptr_t".into(),
+        FfiType::RustFutureContinuationData => "intptr_t".into(),
     })
 }
 

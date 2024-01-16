@@ -15,12 +15,20 @@ pub(crate) struct CppBindingGenerator {}
 pub struct ConfigRoot {
     #[serde(default)]
     bindings: ConfigBindings,
+    #[serde(default)]
+    scaffolding: ConfigScaffolding,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ConfigBindings {
     #[serde(default)]
     cpp: gen_cpp::Config,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct ConfigScaffolding {
+    #[serde(default)]
+    cpp: gen_cpp::ScaffoldingConfig,
 }
 
 impl BindingsConfig for ConfigRoot {
@@ -55,14 +63,17 @@ impl BindingGenerator for CppBindingGenerator {
             scaffolding_header,
             header,
             source,
-        } = generate_cpp_bindings(&ci, &config.bindings.cpp)?;
+            cpp_scaffolding_header,
+        } = generate_cpp_bindings(&ci, &config.bindings.cpp, &config.scaffolding.cpp)?;
         let scaffolding_header_path = out_dir.join(format!("{}_scaffolding.hpp", ci.namespace()));
         let header_path = out_dir.join(format!("{}.hpp", ci.namespace()));
         let source_path = out_dir.join(format!("{}.cpp", ci.namespace()));
+        let cpp_scaffolding_header_path = out_dir.join(format!("{}_cpp_scaffolding.cpp", ci.namespace()));
 
         fs::write(&scaffolding_header_path, scaffolding_header)?;
         fs::write(&header_path, header)?;
         fs::write(&source_path, source)?;
+        fs::write(&cpp_scaffolding_header_path, cpp_scaffolding_header)?;
 
         Ok(())
     }
