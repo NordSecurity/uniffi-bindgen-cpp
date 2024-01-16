@@ -13,7 +13,7 @@ set(BINDINGS_SRC_DIR ${BINDINGS_BUILD_DIR}/bindings)
 macro(test_case TEST_NAME)
 add_executable(${TEST_NAME}-test tests/${TEST_NAME}/main.cpp ${BINDINGS_SRC_DIR}/${TEST_NAME}.cpp)
 
-target_include_directories(${TEST_NAME}-test PRIVATE ${BINDINGS_SRC_DIR} tests/include)
+target_include_directories(${TEST_NAME}-test PRIVATE ${BINDINGS_SRC_DIR} include)
 target_link_directories(${TEST_NAME}-test PRIVATE ${BINDINGS_BUILD_DIR})
 target_link_libraries(${TEST_NAME}-test uniffi_bindgen_cpp_fixtures Threads::Threads)
 target_compile_definitions(${TEST_NAME}-test PRIVATE UNIFFI_BINDING_DIR="${BINDINGS_SRC_DIR}")
@@ -34,6 +34,33 @@ list(APPEND BINDING_FILES ${BINDINGS_SRC_DIR}/${TEST_NAME}.cpp)
 
 endmacro(test_case)
 
+macro(scaffolding_test_case TEST_NAME)
+add_library(uniffi_${TEST_NAME} SHARED
+    scaffolding_tests/${TEST_NAME}/lib_${TEST_NAME}.cpp
+    ${BINDINGS_SRC_DIR}/${TEST_NAME}_cpp_scaffolding.cpp)
+target_include_directories(uniffi_${TEST_NAME} PRIVATE scaffolding_tests/${TEST_NAME})
+
+add_executable(${TEST_NAME}-scaffolding-test scaffolding_tests/${TEST_NAME}/main.cpp ${BINDINGS_SRC_DIR}/${TEST_NAME}.cpp)
+target_include_directories(${TEST_NAME}-scaffolding-test PRIVATE ${BINDINGS_SRC_DIR} include)
+target_link_libraries(${TEST_NAME}-scaffolding-test uniffi_${TEST_NAME})
+
+add_test(NAME ${TEST_NAME}-scaffolding-test COMMAND ${TEST_NAME}-scaffolding-test)
+
+add_test(NAME ${TEST_NAME}-scaffolding-test-memcheck
+  COMMAND valgrind
+    --error-exitcode=1
+    --tool=memcheck
+    --leak-check=full
+    --errors-for-leak-kinds=definite
+    --show-leak-kinds=definite $<TARGET_FILE:${TEST_NAME}-scaffolding-test>)
+
+add_dependencies(${TEST_NAME}-scaffolding-test uniffi_${TEST_NAME})
+
+list(APPEND BINDING_FILES ${BINDINGS_SRC_DIR}/${TEST_NAME}_cpp_scaffolding.cpp)
+
+endmacro(scaffolding_test_case)
+
+
 test_case(arithmetic)
 test_case(callbacks)
 test_case(fixture_callbacks)
@@ -48,6 +75,20 @@ test_case(coverall)
 test_case(uniffi_docstring)
 test_case(trait_methods)
 test_case(custom_types_builtin)
+
+scaffolding_test_case(arithmetic)
+# scaffolding_test_case(callbacks)
+scaffolding_test_case(chronological)
+# scaffolding_test_case(custom_types)
+scaffolding_test_case(geometry)
+# scaffolding_test_case(rondpoint)
+# scaffolding_test_case(sprites)
+# scaffolding_test_case(todolist)
+# scaffolding_test_case(traits)
+# scaffolding_test_case(coverall)
+# scaffolding_test_case(uniffi_docstring)
+# scaffolding_test_case(trait_methods)
+# scaffolding_test_case(custom_types_builtin)
 
 add_custom_target(libs ALL
     BYPRODUCTS ${BINDING_FILES}

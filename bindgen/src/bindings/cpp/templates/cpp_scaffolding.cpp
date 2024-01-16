@@ -195,7 +195,16 @@ RustBuffer {{ ci.ffi_rustbuffer_reserve().name() }}(RustBuffer buffer, int32_t a
 {{- arg.type_().borrow()|ffi_type_name }} {{ arg.name() }}{% if !loop.last || func.has_rust_call_status_arg() %}, {% endif -%}
 {% endfor %}
 {%- if func.has_rust_call_status_arg() %}RustCallStatus *out_status{% endif -%}
-) { {%- match func.return_type() %}{% when Some with (return_type) %} return {{ return_type|ffi_type_name }}{}; {% when None %}{% endmatch -%} }
+) { 
+    {%- match func.return_type() %}{% when Some with (return_type) %}
+        {% match return_type %}
+        {% when FfiType::RustArcPtr(_) %}
+        return nullptr;
+        {% else %}
+        return {{ return_type|ffi_type_name }}{};
+        {% endmatch %}
+    {% when None %}{% endmatch -%}
+}
 {% endfor %}
 
 {% for checksum in ci.iter_checksums() %}

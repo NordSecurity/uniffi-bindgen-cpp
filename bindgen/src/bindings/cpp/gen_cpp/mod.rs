@@ -20,7 +20,7 @@ use serde::{Deserialize, Serialize};
 use topological_sort::TopologicalSort;
 use uniffi_bindgen::{
     backend::TemplateExpression,
-    interface::{AsType, Type, UniffiTrait},
+    interface::{AsType, FfiType, Type, UniffiTrait},
     BindingsConfig, ComponentInterface,
 };
 
@@ -248,7 +248,11 @@ pub(crate) struct Bindings {
     pub(crate) cpp_scaffolding_header: String,
 }
 
-pub(crate) fn generate_cpp_bindings(ci: &ComponentInterface, config: &Config, scaffolding_config: &ScaffoldingConfig) -> Result<Bindings> {
+pub(crate) fn generate_cpp_bindings(
+    ci: &ComponentInterface,
+    config: &Config,
+    scaffolding_config: &ScaffoldingConfig,
+) -> Result<Bindings> {
     let scaffolding_header = ScaffoldingHeader::new(ci)
         .render()
         .context("generating scaffolding header failed")?;
