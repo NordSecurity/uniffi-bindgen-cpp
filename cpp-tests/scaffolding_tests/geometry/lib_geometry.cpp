@@ -1,10 +1,10 @@
 #include "lib_geometry.hpp"
 
-double lib_geometry::gradient(lib_geometry::Line line) {
+double geometry::gradient(geometry::Line line) {
     return (line.end.coord_y - line.start.coord_y) / (line.end.coord_x - line.start.coord_x);
 }
 
-std::optional<lib_geometry::Point> lib_geometry::intersection(lib_geometry::Line line1, lib_geometry::Line line2) {
+std::optional<geometry::Point> geometry::intersection(geometry::Line line1, geometry::Line line2) {
     double m1 = gradient(line1);
     double m2 = gradient(line2);
     double c1 = line1.start.coord_y - m1 * line1.start.coord_x;
@@ -14,5 +14,7 @@ std::optional<lib_geometry::Point> lib_geometry::intersection(lib_geometry::Line
     }
     double x = (c2 - c1) / (m1 - m2);
     double y = m1 * x + c1;
-    return lib_geometry::Point{x, y};
+    return geometry::Point{x, y};
 }
+
+#include <geometry_cpp_scaffolding.cpp>

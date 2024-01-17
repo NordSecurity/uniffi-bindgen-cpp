@@ -1,4 +1,4 @@
-{% let namespace = "lib_".to_owned() + ci.namespace() %}
+{% let namespace = ci.namespace() %}
 {% match config.namespace %}
 {% when Some with (ns) %}
 {% let namespace = ns %}
@@ -13,7 +13,6 @@
 #include <cstdlib>
 #include <memory>
 
-#include <{{ namespace }}.hpp>
 using namespace {{ namespace }};
 
 struct ForeignBytes {
