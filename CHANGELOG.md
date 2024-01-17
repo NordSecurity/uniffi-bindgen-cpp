@@ -1,8 +1,17 @@
+#### v0.2.2+v0.25.0
+
+----
+
+- Implement checksum verifition for the generated bindings.
+
+
 #### v0.2.1+v0.25.0
 
 ----
 
 - Fix incorrect macro invocation in object bindings.
+
+#### v0.2.0+v0.25.0
 
 ----
 
