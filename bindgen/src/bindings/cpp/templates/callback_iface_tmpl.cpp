@@ -34,7 +34,7 @@ int uniffi::{{ class_name }}::callback_stub(uint64_t handle, uint32_t method, ui
         callbacks.erase(handle);
         break;
     {%- for method in iface.methods() %}
-    case {{ loop.index }}:
+    case {{ loop.index }}: {
         {% if method.throws_type().is_some() %}{{ "try {" }}{% endif %}
             auto impl = lift(handle);
         {%- if method.return_type().is_some() %}
@@ -63,6 +63,7 @@ int uniffi::{{ class_name }}::callback_stub(uint64_t handle, uint32_t method, ui
         {% else %}
         {%- endmatch %}
         break;
+    }
     {%- endfor %}
     }
 
