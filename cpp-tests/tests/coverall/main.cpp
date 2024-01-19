@@ -26,7 +26,7 @@ void test_some_dict() {
     ASSERT_EQ(22.0f / 7.0f, dict.maybe_float32);
     ASSERT_EQ(0.0, dict.float64);
     ASSERT_EQ(1.0, dict.maybe_float64);
-    ASSERT_EQ("some_dict", dict.coveralls.value()->get_name());
+    ASSERT_EQ("some_dict", dict.coveralls->get_name());
 }
 
 void test_arcs() {
@@ -35,7 +35,7 @@ void test_arcs() {
 
         ASSERT_EQ(1ul, coverall::get_num_alive());
         ASSERT_EQ(2ul, coveralls->strong_count());
-        ASSERT_EQ(std::nullopt, coveralls->get_other());
+        ASSERT_EQ(nullptr, coveralls->get_other());
 
         coveralls->take_other(coveralls);
         ASSERT_EQ(3ul, coveralls->strong_count());
@@ -43,14 +43,14 @@ void test_arcs() {
 
         {
             auto other = coveralls->get_other();
-            ASSERT_EQ("test_arcs", other.value()->get_name());
+            ASSERT_EQ("test_arcs", other->get_name());
         }
 
         EXPECT_EXCEPTION(coveralls->take_other_fallible(), coverall::coverall_error::TooManyHoles);
         EXPECT_EXCEPTION(coveralls->take_other_panic("take_other_panic"), std::runtime_error);
         EXPECT_EXCEPTION(coveralls->fallible_panic("fallible_panic"), std::runtime_error);
 
-        coveralls->take_other(std::nullopt);
+        coveralls->take_other(nullptr);
         ASSERT_EQ(2ul, coveralls->strong_count());
     }
 

@@ -14,14 +14,25 @@ impl OptionalCodeType {
     pub(crate) fn new(inner: Type) -> Self {
         Self { inner }
     }
+
+    pub(crate) fn can_dereference(inner_type: &Type) -> bool {
+        match inner_type {
+            Type::Object { .. } => true,
+            _ => false,
+        }
+    }
 }
 
 impl CodeType for OptionalCodeType {
     fn type_label(&self) -> String {
-        format!(
-            "std::optional<{}>",
+        if OptionalCodeType::can_dereference(&self.inner) {
             CppCodeOracle.find(&self.inner).type_label()
-        )
+        } else {
+            format!(
+                "std::optional<{}>",
+                CppCodeOracle.find(&self.inner).type_label()
+            )
+        }
     }
 
     fn canonical_name(&self) -> String {

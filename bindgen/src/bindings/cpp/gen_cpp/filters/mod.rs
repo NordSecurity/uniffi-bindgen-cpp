@@ -195,3 +195,11 @@ pub(crate) fn docstring(docstring: &str, spaces: &i32) -> Result<String> {
 
     Ok(textwrap::indent(&wrapped, &" ".repeat(*spaces as usize)))
 }
+
+pub(crate) fn can_dereference_optional(type_: &Type) -> Result<bool> {
+    let result = match type_ {
+        Type::Optional { inner_type } => compounds::OptionalCodeType::can_dereference(inner_type),
+        _ => false,
+    };
+    Ok(result)
+}
