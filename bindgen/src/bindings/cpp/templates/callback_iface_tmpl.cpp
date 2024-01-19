@@ -22,8 +22,11 @@ uint64_t uniffi::{{ class_name }}::lower(std::shared_ptr<{{ type_name|class_name
 }
 
 int uniffi::{{ class_name }}::callback_stub(uint64_t handle, uint32_t method, uint8_t *args_data, int32_t args_len, RustBuffer *buf_ptr) {
-    ForeignBytes bytes = { args_len, args_data };
-    auto buf = rustbuffer_from_bytes(bytes);
+    RustBuffer buf = {
+        .capacity = args_len,
+        .len = args_len,
+        .data = args_data
+    };
     auto stream = RustStream(&buf);
 
     switch (method) {
@@ -62,6 +65,8 @@ int uniffi::{{ class_name }}::callback_stub(uint64_t handle, uint32_t method, ui
         break;
     {%- endfor %}
     }
+
+
 
     return 0;
 }
