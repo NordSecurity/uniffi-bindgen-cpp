@@ -179,11 +179,8 @@ pub(crate) fn class_name(nm: &str) -> Result<String> {
 
 pub(crate) fn parameter(arg: &Argument) -> Result<String> {
     Ok(match arg.as_type() {
-        Type::Object { .. } => {
+        Type::Object { .. } | Type::CallbackInterface { .. } => {
             format!("const {} &{}", arg.as_codetype().type_label(), arg.name())
-        }
-        Type::CallbackInterface { name, .. } => {
-            format!("std::shared_ptr<{}> {}", name, arg.name())
         }
         t => format!("{} {}", type_name(&t)?, arg.name()),
     })
