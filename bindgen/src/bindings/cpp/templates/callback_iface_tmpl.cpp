@@ -38,8 +38,11 @@ int32_t uniffi::{{ class_name }}::allocation_size(const {{ type_name }} &impl) {
 }
 
 int uniffi::{{ class_name }}::callback_stub(uint64_t handle, uint32_t method, uint8_t *args_data, int32_t args_len, RustBuffer *buf_ptr) {
-    ForeignBytes bytes = { args_len, args_data };
-    auto buf = rustbuffer_from_bytes(bytes);
+    auto buf = RustBuffer {
+        .capacity = args_len,
+        .len = args_len,
+        .data = args_data,
+    };
     auto stream = RustStream(&buf);
 
     switch (method) {
@@ -50,11 +53,14 @@ int uniffi::{{ class_name }}::callback_stub(uint64_t handle, uint32_t method, ui
     case {{ loop.index }}: {
         {% if method.throws_type().is_some() %}{{ "try {" }}{% endif %}
             auto impl = lift(handle);
-        {%- if method.return_type().is_some() %}
+            {%- for arg in method.arguments() %}
+            auto arg{{ loop.index0 }} = {{- arg|read_fn }}(stream);
+            {%- endfor -%}
+            {%- if method.return_type().is_some() %}
             auto ret = {% endif -%}
             impl->{{ method.name() }}(
             {%- for arg in method.arguments() %}
-            {{- arg|read_fn }}(stream){%- if !loop.last %}, {% else %}{% endif %}
+            arg{{ loop.index0 }}{%- if !loop.last %}, {% else %}{% endif %}
             {%- endfor -%}
         );
         {%- match method.return_type() %}
@@ -71,7 +77,7 @@ int uniffi::{{ class_name }}::callback_stub(uint64_t handle, uint32_t method, ui
             return 1;
         } catch (std::exception &ex) {
             *buf_ptr = {{ Type::String.borrow()|lower_fn }}(ex.what());
-            return 1;
+            return 2;
         }
         {% else %}
         {%- endmatch %}
