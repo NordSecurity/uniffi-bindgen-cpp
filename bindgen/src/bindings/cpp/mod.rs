@@ -67,7 +67,11 @@ impl BindingGenerator for CppBindingGenerator {
         Ok(())
     }
 
-    fn check_library_path(&self, _library_path: &Utf8Path, cdylib_name: Option<&str>) -> Result<()> {
+    fn check_library_path(
+        &self,
+        _library_path: &Utf8Path,
+        cdylib_name: Option<&str>,
+    ) -> Result<()> {
         if cdylib_name.is_none() {
             bail!("A path to a library file is required to generate bindings");
         }
