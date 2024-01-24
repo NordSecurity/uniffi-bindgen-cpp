@@ -7,17 +7,17 @@ edition = "2021"
 crate-type = ["cdylib", "lib"]
 
 [dependencies]
-uniffi-example-arithmetic = { git = "https://github.com/NordSecurity/uniffi-rs.git", branch = "nordsec.0.25.0" }
-uniffi-example-callbacks = { git = "https://github.com/NordSecurity/uniffi-rs.git", branch = "nordsec.0.25.0" }
-uniffi-example-custom-types = { git = "https://github.com/NordSecurity/uniffi-rs.git", branch = "nordsec.0.25.0" }
-uniffi-example-geometry = { git = "https://github.com/NordSecurity/uniffi-rs.git", branch = "nordsec.0.25.0" }
-uniffi-example-rondpoint = { git = "https://github.com/NordSecurity/uniffi-rs.git", branch = "nordsec.0.25.0" }
-uniffi-example-sprites = { git = "https://github.com/NordSecurity/uniffi-rs.git", branch = "nordsec.0.25.0" }
-uniffi-example-todolist = { git = "https://github.com/NordSecurity/uniffi-rs.git", branch = "nordsec.0.25.0" }
-uniffi-example-traits = { git = "https://github.com/NordSecurity/uniffi-rs.git", branch = "nordsec.0.25.0" }
-uniffi-fixture-callbacks = { git = "https://github.com/NordSecurity/uniffi-rs.git", branch = "nordsec.0.25.0" }
-uniffi-fixture-coverall = { git = "https://github.com/NordSecurity/uniffi-rs.git", branch = "nordsec.0.25.0" }
-uniffi-fixture-docstring = { git = "https://github.com/NordSecurity/uniffi-rs.git", branch = "nordsec.0.25.0" }
-uniffi-fixture-time = { git = "https://github.com/NordSecurity/uniffi-rs.git", branch = "nordsec.0.25.0" }
-uniffi-fixture-trait-methods = { git = "https://github.com/NordSecurity/uniffi-rs.git", branch = "nordsec.0.25.0" }
+uniffi-example-arithmetic = { git = "https://github.com/NordSecurity/uniffi-rs.git", tag = "v0.3.1+v0.25.0" }
+uniffi-example-callbacks = { git = "https://github.com/NordSecurity/uniffi-rs.git", tag = "v0.3.1+v0.25.0" }
+uniffi-example-custom-types = { git = "https://github.com/NordSecurity/uniffi-rs.git", tag = "v0.3.1+v0.25.0" }
+uniffi-example-geometry = { git = "https://github.com/NordSecurity/uniffi-rs.git", tag = "v0.3.1+v0.25.0" }
+uniffi-example-rondpoint = { git = "https://github.com/NordSecurity/uniffi-rs.git", tag = "v0.3.1+v0.25.0" }
+uniffi-example-sprites = { git = "https://github.com/NordSecurity/uniffi-rs.git", tag = "v0.3.1+v0.25.0" }
+uniffi-example-todolist = { git = "https://github.com/NordSecurity/uniffi-rs.git", tag = "v0.3.1+v0.25.0" }
+uniffi-example-traits = { git = "https://github.com/NordSecurity/uniffi-rs.git", tag = "v0.3.1+v0.25.0" }
+uniffi-fixture-callbacks = { git = "https://github.com/NordSecurity/uniffi-rs.git", tag = "v0.3.1+v0.25.0" }
+uniffi-fixture-coverall = { git = "https://github.com/NordSecurity/uniffi-rs.git", tag = "v0.3.1+v0.25.0" }
+uniffi-fixture-docstring = { git = "https://github.com/NordSecurity/uniffi-rs.git", tag = "v0.3.1+v0.25.0" }
+uniffi-fixture-time = { git = "https://github.com/NordSecurity/uniffi-rs.git", tag = "v0.3.1+v0.25.0" }
+uniffi-fixture-trait-methods = { git = "https://github.com/NordSecurity/uniffi-rs.git", tag = "v0.3.1+v0.25.0" }
 uniffi-custom-types-builtin = { path = "custom-types-builtin" }

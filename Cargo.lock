@@ -841,8 +841,8 @@ checksum = "e51733f11c9c4f72aa0c160008246859e340b00807569a0da0e7a1079b27ba85"
 
 [[package]]
 name = "uniffi"
-version = "0.25.0"
-source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=nordsec.0.25.0#de1e773204d0ddcda58faac0a77570f1f8056679"
+version = "0.3.1+v0.25.0"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "anyhow",
  "uniffi_build",
@@ -899,7 +899,7 @@ dependencies = [
 [[package]]
 name = "uniffi-example-arithmetic"
 version = "0.22.0"
-source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=nordsec.0.25.0#de1e773204d0ddcda58faac0a77570f1f8056679"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "thiserror",
  "uniffi",
@@ -908,7 +908,7 @@ dependencies = [
 [[package]]
 name = "uniffi-example-callbacks"
 version = "0.22.0"
-source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=nordsec.0.25.0#de1e773204d0ddcda58faac0a77570f1f8056679"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "thiserror",
  "uniffi",
@@ -917,7 +917,7 @@ dependencies = [
 [[package]]
 name = "uniffi-example-custom-types"
 version = "0.22.0"
-source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=nordsec.0.25.0#de1e773204d0ddcda58faac0a77570f1f8056679"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "anyhow",
  "bytes",
@@ -928,7 +928,7 @@ dependencies = [
 [[package]]
 name = "uniffi-example-geometry"
 version = "0.22.0"
-source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=nordsec.0.25.0#de1e773204d0ddcda58faac0a77570f1f8056679"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "uniffi",
 ]
@@ -936,7 +936,7 @@ dependencies = [
 [[package]]
 name = "uniffi-example-rondpoint"
 version = "0.22.0"
-source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=nordsec.0.25.0#de1e773204d0ddcda58faac0a77570f1f8056679"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "uniffi",
 ]
@@ -944,7 +944,7 @@ dependencies = [
 [[package]]
 name = "uniffi-example-sprites"
 version = "0.22.0"
-source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=nordsec.0.25.0#de1e773204d0ddcda58faac0a77570f1f8056679"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "uniffi",
 ]
@@ -952,7 +952,7 @@ dependencies = [
 [[package]]
 name = "uniffi-example-todolist"
 version = "0.22.0"
-source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=nordsec.0.25.0#de1e773204d0ddcda58faac0a77570f1f8056679"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "once_cell",
  "thiserror",
@@ -962,7 +962,7 @@ dependencies = [
 [[package]]
 name = "uniffi-example-traits"
 version = "0.22.0"
-source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=nordsec.0.25.0#de1e773204d0ddcda58faac0a77570f1f8056679"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "thiserror",
  "uniffi",
@@ -971,7 +971,7 @@ dependencies = [
 [[package]]
 name = "uniffi-fixture-callbacks"
 version = "0.22.0"
-source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=nordsec.0.25.0#de1e773204d0ddcda58faac0a77570f1f8056679"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "thiserror",
  "uniffi",
@@ -980,7 +980,7 @@ dependencies = [
 [[package]]
 name = "uniffi-fixture-coverall"
 version = "0.22.0"
-source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=nordsec.0.25.0#de1e773204d0ddcda58faac0a77570f1f8056679"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "once_cell",
  "thiserror",
@@ -990,7 +990,7 @@ dependencies = [
 [[package]]
 name = "uniffi-fixture-docstring"
 version = "0.22.0"
-source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=nordsec.0.25.0#de1e773204d0ddcda58faac0a77570f1f8056679"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "thiserror",
  "uniffi",
@@ -999,7 +999,7 @@ dependencies = [
 [[package]]
 name = "uniffi-fixture-time"
 version = "0.22.0"
-source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=nordsec.0.25.0#de1e773204d0ddcda58faac0a77570f1f8056679"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "chrono",
  "thiserror",
@@ -1009,7 +1009,7 @@ dependencies = [
 [[package]]
 name = "uniffi-fixture-trait-methods"
 version = "0.22.0"
-source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=nordsec.0.25.0#de1e773204d0ddcda58faac0a77570f1f8056679"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "once_cell",
  "thiserror",
@@ -1018,8 +1018,8 @@ dependencies = [
 
 [[package]]
 name = "uniffi_bindgen"
-version = "0.25.0"
-source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=nordsec.0.25.0#de1e773204d0ddcda58faac0a77570f1f8056679"
+version = "0.3.1+v0.25.0"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "anyhow",
  "askama",
@@ -1041,8 +1041,8 @@ dependencies = [
 
 [[package]]
 name = "uniffi_build"
-version = "0.25.0"
-source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=nordsec.0.25.0#de1e773204d0ddcda58faac0a77570f1f8056679"
+version = "0.3.1+v0.25.0"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "anyhow",
  "camino",
@@ -1051,8 +1051,8 @@ dependencies = [
 
 [[package]]
 name = "uniffi_checksum_derive"
-version = "0.25.0"
-source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=nordsec.0.25.0#de1e773204d0ddcda58faac0a77570f1f8056679"
+version = "0.3.1+v0.25.0"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "quote",
  "syn",
@@ -1061,7 +1061,7 @@ dependencies = [
 [[package]]
 name = "uniffi_core"
 version = "0.25.0"
-source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=nordsec.0.25.0#de1e773204d0ddcda58faac0a77570f1f8056679"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "anyhow",
  "bytes",
@@ -1075,8 +1075,8 @@ dependencies = [
 
 [[package]]
 name = "uniffi_macros"
-version = "0.25.0"
-source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=nordsec.0.25.0#de1e773204d0ddcda58faac0a77570f1f8056679"
+version = "0.3.1+v0.25.0"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "bincode",
  "camino",
@@ -1093,8 +1093,8 @@ dependencies = [
 
 [[package]]
 name = "uniffi_meta"
-version = "0.25.0"
-source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=nordsec.0.25.0#de1e773204d0ddcda58faac0a77570f1f8056679"
+version = "0.3.1+v0.25.0"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "anyhow",
  "bytes",
@@ -1104,8 +1104,8 @@ dependencies = [
 
 [[package]]
 name = "uniffi_testing"
-version = "0.25.0"
-source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=nordsec.0.25.0#de1e773204d0ddcda58faac0a77570f1f8056679"
+version = "0.3.1+v0.25.0"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "anyhow",
  "camino",
@@ -1116,8 +1116,8 @@ dependencies = [
 
 [[package]]
 name = "uniffi_udl"
-version = "0.25.0"
-source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=nordsec.0.25.0#de1e773204d0ddcda58faac0a77570f1f8056679"
+version = "0.3.1+v0.25.0"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "anyhow",
  "uniffi_meta",
@@ -1157,7 +1157,7 @@ checksum = "49874b5167b65d7193b8aba1567f5c7d93d001cafc34600cee003eda787e483f"
 [[package]]
 name = "weedle2"
 version = "4.0.0"
-source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=nordsec.0.25.0#de1e773204d0ddcda58faac0a77570f1f8056679"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "nom",
 ]
