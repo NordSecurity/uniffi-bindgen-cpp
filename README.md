@@ -15,11 +15,19 @@ cargo install uniffi-bindgen-cpp --git https://github.com/NordSecurity/uniffi-bi
 
 # How to generate bindings
 
+## Generating with a single UDL file
+
 ```bash
 uniffi-bindgen-cpp path/to/definitions.udl
 ```
 
-Generates bindings files
+## Generating using a library file
+
+```bash
+uniffi-bindgen-cpp --library your_rust_library.so --out-dir output_directory
+```
+
+Regardless of the generation method, these files are produced:
 
 * `path/to/definitions.hpp`
 * `path/to/definitions.cpp`
@@ -41,6 +49,8 @@ The following uniffi features are unsupported.
 
 It's possible to [configure some settings](docs/CONFIGURATION.md) by passing `--config`
 argument to the generator.
+
+Note: configuration is not supported when using library mode
 
 ```bash
 uniffi-bindgen-cpp path/to/definitions.udl --config path/to/uniffi.toml
