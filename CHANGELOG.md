@@ -1,3 +1,9 @@
+#### UNRELEASED+v0.25.0
+
+----
+
+- Dereference optional objects in the generated bindings
+
 #### v0.2.2+v0.25.0
 
 ----
