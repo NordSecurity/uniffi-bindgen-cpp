@@ -1,11 +1,12 @@
 {%- let type_name = typ|type_name %}
 {%- let ffi_converter_name = typ|ffi_converter_name %}
 {%- let class_name = ffi_converter_name|class_name %}
+{%- let canonical_type_name = typ|canonical_name %}
 {%- let iface = ci|get_callback_interface_definition(name) %}
 std::once_flag uniffi::{{ class_name }}::once = std::once_flag();
-uniffi::HandleMap<{{ type_name|class_name }}> uniffi::{{ class_name }}::callbacks = {};
+uniffi::HandleMap<{{ canonical_type_name }}> uniffi::{{ class_name }}::callbacks = {};
 
-std::shared_ptr<{{ type_name|class_name }}> uniffi::{{ class_name }}::lift(uint64_t handle) {
+{{ type_name }} uniffi::{{ class_name }}::lift(uint64_t handle) {
     std::call_once({{ class_name }}::once, []() {
         rust_call({{ iface.ffi_init_callback().name() }}, nullptr, callback_stub);
     });
@@ -13,7 +14,7 @@ std::shared_ptr<{{ type_name|class_name }}> uniffi::{{ class_name }}::lift(uint6
     return callbacks.at(handle);
 }
 
-uint64_t uniffi::{{ class_name }}::lower(std::shared_ptr<{{ type_name|class_name }}> impl) {
+uint64_t uniffi::{{ class_name }}::lower(const {{type_name}}& impl) {
     std::call_once({{ class_name }}::once, []() {
         rust_call({{ iface.ffi_init_callback().name() }}, nullptr, callback_stub);
     });
@@ -21,9 +22,27 @@ uint64_t uniffi::{{ class_name }}::lower(std::shared_ptr<{{ type_name|class_name
     return callbacks.insert(impl);
 }
 
+{{ type_name }} uniffi::{{ class_name }}::read(RustStream &stream) {
+    uint64_t handle;
+    stream >> handle;
+
+    return lift(handle);
+}
+
+void uniffi::{{ class_name }}::write(RustStream &stream, const {{ type_name }} &impl) {
+    stream << lower(impl);
+}
+
+int32_t uniffi::{{ class_name }}::allocation_size(const {{ type_name }} &impl) {
+    return sizeof(uint64_t);
+}
+
 int uniffi::{{ class_name }}::callback_stub(uint64_t handle, uint32_t method, uint8_t *args_data, int32_t args_len, RustBuffer *buf_ptr) {
-    ForeignBytes bytes = { args_len, args_data };
-    auto buf = rustbuffer_from_bytes(bytes);
+    auto buf = RustBuffer {
+        .capacity = args_len,
+        .len = args_len,
+        .data = args_data,
+    };
     auto stream = RustStream(&buf);
 
     switch (method) {
@@ -31,14 +50,17 @@ int uniffi::{{ class_name }}::callback_stub(uint64_t handle, uint32_t method, ui
         callbacks.erase(handle);
         break;
     {%- for method in iface.methods() %}
-    case {{ loop.index }}:
+    case {{ loop.index }}: {
         {% if method.throws_type().is_some() %}{{ "try {" }}{% endif %}
             auto impl = lift(handle);
-        {%- if method.return_type().is_some() %}
+            {%- for arg in method.arguments() %}
+            auto arg{{ loop.index0 }} = {{- arg|read_fn }}(stream);
+            {%- endfor -%}
+            {%- if method.return_type().is_some() %}
             auto ret = {% endif -%}
             impl->{{ method.name() }}(
             {%- for arg in method.arguments() %}
-            {{- arg|read_fn }}(stream){%- if !loop.last %}, {% else %}{% endif %}
+            arg{{ loop.index0 }}{%- if !loop.last %}, {% else %}{% endif %}
             {%- endfor -%}
         );
         {%- match method.return_type() %}
@@ -55,11 +77,12 @@ int uniffi::{{ class_name }}::callback_stub(uint64_t handle, uint32_t method, ui
             return 1;
         } catch (std::exception &ex) {
             *buf_ptr = {{ Type::String.borrow()|lower_fn }}(ex.what());
-            return 1;
+            return 2;
         }
         {% else %}
         {%- endmatch %}
         break;
+    }
     {%- endfor %}
     }
 

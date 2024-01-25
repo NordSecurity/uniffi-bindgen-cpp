@@ -17,7 +17,7 @@ impl OptionalCodeType {
 
     pub(crate) fn can_dereference(inner_type: &Type) -> bool {
         match inner_type {
-            Type::Object { .. } => true,
+            Type::Object { .. } | Type::CallbackInterface { .. } => true,
             _ => false,
         }
     }

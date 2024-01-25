@@ -1,8 +1,9 @@
 {%- let iface = ci|get_callback_interface_definition(name) %}
 {%- let type_name = typ|type_name %}
 {%- let class_name = type_name|class_name %}
+{%- let canonical_type_name = typ|canonical_name %}
 {% call macros::docstring(iface, 0) %}
-struct {{ class_name }} {
+struct {{ canonical_type_name }} {
     {%- for method in iface.methods() %}
     {% call macros::docstring(method, 4) %}
     virtual
@@ -11,5 +12,5 @@ struct {{ class_name }} {
     {{ method.name()|fn_name }}({% call macros::param_list(method) %}) = 0;
     {%- endfor %}
 
-    virtual ~{{ class_name }}() = default;
+    virtual ~{{ canonical_type_name }}() = default;
 };

@@ -1,8 +1,9 @@
-#### UNRELEASED+v0.25.0
+#### v0.3.0+v0.25.0
 
 ----
 
 - Dereference optional objects in the generated bindings
+- **IMPORTANT**: Fix callback code generation
 
 #### v0.2.2+v0.25.0
 
