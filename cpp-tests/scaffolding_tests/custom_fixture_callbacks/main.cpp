@@ -4,13 +4,25 @@
 
 class ForeignGetters : public custom_fixture_callbacks::ForeignGetters {
 public:
-    virtual bool get_bool(bool v, bool arg2) override { return v ^ arg2; }
+    virtual bool get_bool(bool v, bool arg2) override {
+        return v ^ arg2;
+    }
 
-    virtual std::string get_string(std::string v, bool arg2) override { return arg2 ? "1234567890123" : v; }
+    virtual std::string get_string(std::string v, bool arg2) override {
+        return arg2 ? "1234567890123" : v;
+    }
 
-    // virtual std::vector<int32_t> get_list(std::vector<int32_t> v, bool arg2) override { return arg2 ? std::vector<int32_t>{1, 2, 3} : v; }
+    virtual std::vector<int32_t> get_list(std::vector<int32_t> v, bool arg2) override {
+        return arg2 ? v : std::vector<int32_t>();
+    }
 
-    virtual std::optional<std::string> get_option(std::optional<std::string> v, bool arg2) override { return arg2 ? std::optional<std::string>("1234567890123") : v; }
+    virtual std::optional<std::string> get_option(std::optional<std::string> v, bool arg2) override {
+        return arg2 ? std::optional<std::string>("1234567890123") : v;
+    }
+
+    virtual std::vector<uint8_t> get_bytes(std::vector<uint8_t> v, bool arg2) override {
+        return arg2 ? v : std::vector<uint8_t>();
+    }
 };
 
 int main() {
@@ -23,7 +35,7 @@ int main() {
     ASSERT_EQ(cb->get_bool(false, flag), custom_fixture_callbacks::get_bool_roundtrip(cb, false, flag));
 
     for (auto list : {std::vector<int32_t>{1, 2}, std::vector<int32_t>{0, 1}}) {
-        // ASSERT_EQ(cb->get_list(list, flag), custom_fixture_callbacks::get_list_roundtrip(cb, list, flag));
+        ASSERT_EQ(cb->get_list(list, flag), custom_fixture_callbacks::get_list_roundtrip(cb, list, flag));
     }
 
     for (auto str : {"Hello", "World"}) {
@@ -36,6 +48,10 @@ int main() {
 
     ASSERT_EQ("TestString", custom_fixture_callbacks::get_string_optional_callback(cb, "TestString", false));
     ASSERT_EQ(custom_fixture_callbacks::get_string_optional_callback(nullptr, "TestString", false), std::nullopt);
+
+    for (auto bytes : {std::vector<uint8_t>{1, 2}, std::vector<uint8_t>{0, 1}}) {
+        ASSERT_EQ(cb->get_bytes(bytes, flag), custom_fixture_callbacks::get_bytes_roundtrip(cb, bytes, flag));
+    }
 
     return 0;
 }
