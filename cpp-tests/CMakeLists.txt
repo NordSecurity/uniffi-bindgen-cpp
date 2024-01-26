@@ -53,7 +53,7 @@ add_test(NAME ${TEST_NAME}-scaffolding-test-memcheck
     --errors-for-leak-kinds=definite
     --show-leak-kinds=definite $<TARGET_FILE:${TEST_NAME}-scaffolding-test>)
 
-add_dependencies(${TEST_NAME}-scaffolding-test uniffi_${TEST_NAME})
+add_dependencies(${TEST_NAME}-scaffolding-test custom_bindings uniffi_${TEST_NAME})
 
 list(APPEND BINDING_FILES ${BINDINGS_SRC_DIR}/${TEST_NAME}_cpp_scaffolding.cpp)
 
@@ -76,6 +76,7 @@ test_case(custom_types_builtin)
 
 scaffolding_test_case(arithmetic)
 # scaffolding_test_case(callbacks)
+scaffolding_test_case(custom_fixture_callbacks)
 scaffolding_test_case(chronological)
 # scaffolding_test_case(custom_types)
 scaffolding_test_case(geometry)
@@ -84,7 +85,6 @@ scaffolding_test_case(geometry)
 # scaffolding_test_case(todolist)
 # scaffolding_test_case(traits)
 # scaffolding_test_case(coverall)
-# scaffolding_test_case(uniffi_docstring)
 # scaffolding_test_case(trait_methods)
 # scaffolding_test_case(custom_types_builtin)
 
@@ -100,4 +100,11 @@ add_custom_target(bindings ALL
     COMMAND ./uniffi-bindgen-cpp --library libuniffi_bindgen_cpp_fixtures.so --out-dir bindings
     WORKING_DIRECTORY ${BINDINGS_BUILD_DIR}
     COMMENT "Generating bindings"
+)
+
+add_custom_target(custom_bindings ALL
+    DEPENDS bindings
+    COMMAND ./uniffi-bindgen-cpp ${CMAKE_CURRENT_SOURCE_DIR}/scaffolding_tests/custom_fixture_callbacks/udl/custom_callback_fixtures.udl --crate fixture_callbacks --out-dir ${BINDINGS_SRC_DIR}
+    WORKING_DIRECTORY ${BINDINGS_BUILD_DIR}
+    COMMENT "Generating custom bindings"
 )

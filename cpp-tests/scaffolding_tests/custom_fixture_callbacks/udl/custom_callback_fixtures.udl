@@ -1,0 +1,19 @@
+namespace custom_fixture_callbacks {
+    boolean get_bool_roundtrip(ForeignGetters cb, boolean v, boolean arg2);
+
+    string get_string_roundtrip(ForeignGetters cb, string v, boolean arg2);
+
+    //sequence<i32> get_list_roundtrip(ForeignGetters cb, sequence<i32> v, boolean arg2);
+
+    string? get_option_roundtrip(ForeignGetters cb, string? v, boolean arg2);
+
+    string? get_string_optional_callback(ForeignGetters? cb, string v, boolean arg2);
+};
+
+callback interface ForeignGetters {
+    boolean get_bool(boolean v, boolean arg2);
+    string get_string(string v, boolean arg2);
+    //sequence<i32> get_list(sequence<i32> v, boolean arg2);
+    string? get_option(string? v, boolean arg2);
+};
+
