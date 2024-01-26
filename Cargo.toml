@@ -7,5 +7,5 @@ members = [
 resolver = "2"
 
 [workspace.dependencies]
-uniffi = { git = "https://github.com/NordSecurity/uniffi-rs.git", tag="v0.3.1+v0.25.0" }
-uniffi_bindgen = { git = "https://github.com/NordSecurity/uniffi-rs.git", tag="v0.3.1+v0.25.0" }
+uniffi = { git = "https://github.com/NordSecurity/uniffi-rs.git", brach = "disable_rust_checks" }
+uniffi_bindgen = { git = "https://github.com/NordSecurity/uniffi-rs.git", branch = "disable_rust_checks" }

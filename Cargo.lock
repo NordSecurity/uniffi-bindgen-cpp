@@ -845,9 +845,20 @@ version = "0.3.1+v0.25.0"
 source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "anyhow",
- "uniffi_build",
- "uniffi_core",
- "uniffi_macros",
+ "uniffi_build 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0)",
+ "uniffi_core 0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0)",
+ "uniffi_macros 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0)",
+]
+
+[[package]]
+name = "uniffi"
+version = "0.3.1+v0.25.0"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git#1a5dc527165589456c3d7233107917e065192b03"
+dependencies = [
+ "anyhow",
+ "uniffi_build 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git)",
+ "uniffi_core 0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git)",
+ "uniffi_macros 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git)",
 ]
 
 [[package]]
@@ -863,7 +874,7 @@ dependencies = [
  "serde",
  "textwrap",
  "topological-sort",
- "uniffi_bindgen",
+ "uniffi_bindgen 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?branch=disable_rust_checks)",
 ]
 
 [[package]]
@@ -893,7 +904,7 @@ dependencies = [
  "once_cell",
  "paste",
  "thiserror",
- "uniffi",
+ "uniffi 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git)",
 ]
 
 [[package]]
@@ -902,7 +913,7 @@ version = "0.22.0"
 source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "thiserror",
- "uniffi",
+ "uniffi 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0)",
 ]
 
 [[package]]
@@ -911,7 +922,7 @@ version = "0.22.0"
 source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "thiserror",
- "uniffi",
+ "uniffi 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0)",
 ]
 
 [[package]]
@@ -921,7 +932,7 @@ source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1
 dependencies = [
  "anyhow",
  "bytes",
- "uniffi",
+ "uniffi 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0)",
  "url",
 ]
 
@@ -930,7 +941,7 @@ name = "uniffi-example-geometry"
 version = "0.22.0"
 source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
- "uniffi",
+ "uniffi 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0)",
 ]
 
 [[package]]
@@ -938,7 +949,7 @@ name = "uniffi-example-rondpoint"
 version = "0.22.0"
 source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
- "uniffi",
+ "uniffi 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0)",
 ]
 
 [[package]]
@@ -946,7 +957,7 @@ name = "uniffi-example-sprites"
 version = "0.22.0"
 source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
- "uniffi",
+ "uniffi 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0)",
 ]
 
 [[package]]
@@ -956,7 +967,7 @@ source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1
 dependencies = [
  "once_cell",
  "thiserror",
- "uniffi",
+ "uniffi 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0)",
 ]
 
 [[package]]
@@ -965,7 +976,7 @@ version = "0.22.0"
 source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "thiserror",
- "uniffi",
+ "uniffi 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0)",
 ]
 
 [[package]]
@@ -974,7 +985,7 @@ version = "0.22.0"
 source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "thiserror",
- "uniffi",
+ "uniffi 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0)",
 ]
 
 [[package]]
@@ -984,7 +995,7 @@ source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1
 dependencies = [
  "once_cell",
  "thiserror",
- "uniffi",
+ "uniffi 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0)",
 ]
 
 [[package]]
@@ -993,7 +1004,7 @@ version = "0.22.0"
 source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "thiserror",
- "uniffi",
+ "uniffi 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0)",
 ]
 
 [[package]]
@@ -1003,7 +1014,7 @@ source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1
 dependencies = [
  "chrono",
  "thiserror",
- "uniffi",
+ "uniffi 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0)",
 ]
 
 [[package]]
@@ -1013,7 +1024,7 @@ source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1
 dependencies = [
  "once_cell",
  "thiserror",
- "uniffi",
+ "uniffi 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0)",
 ]
 
 [[package]]
@@ -1034,9 +1045,55 @@ dependencies = [
  "serde",
  "textwrap",
  "toml",
- "uniffi_meta",
- "uniffi_testing",
- "uniffi_udl",
+ "uniffi_meta 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0)",
+ "uniffi_testing 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0)",
+ "uniffi_udl 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0)",
+]
+
+[[package]]
+name = "uniffi_bindgen"
+version = "0.3.1+v0.25.0"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=disable_rust_checks#c453ba5db974873b0b0f5c6ae7cec2c66b6ca0db"
+dependencies = [
+ "anyhow",
+ "askama",
+ "camino",
+ "cargo_metadata",
+ "fs-err",
+ "glob",
+ "goblin",
+ "heck",
+ "once_cell",
+ "paste",
+ "serde",
+ "textwrap",
+ "toml",
+ "uniffi_meta 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?branch=disable_rust_checks)",
+ "uniffi_testing 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?branch=disable_rust_checks)",
+ "uniffi_udl 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?branch=disable_rust_checks)",
+]
+
+[[package]]
+name = "uniffi_bindgen"
+version = "0.3.1+v0.25.0"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git#1a5dc527165589456c3d7233107917e065192b03"
+dependencies = [
+ "anyhow",
+ "askama",
+ "camino",
+ "cargo_metadata",
+ "fs-err",
+ "glob",
+ "goblin",
+ "heck",
+ "once_cell",
+ "paste",
+ "serde",
+ "textwrap",
+ "toml",
+ "uniffi_meta 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git)",
+ "uniffi_testing 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git)",
+ "uniffi_udl 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git)",
 ]
 
 [[package]]
@@ -1046,7 +1103,17 @@ source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1
 dependencies = [
  "anyhow",
  "camino",
- "uniffi_bindgen",
+ "uniffi_bindgen 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0)",
+]
+
+[[package]]
+name = "uniffi_build"
+version = "0.3.1+v0.25.0"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git#1a5dc527165589456c3d7233107917e065192b03"
+dependencies = [
+ "anyhow",
+ "camino",
+ "uniffi_bindgen 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git)",
 ]
 
 [[package]]
@@ -1059,9 +1126,42 @@ dependencies = [
 ]
 
 [[package]]
+name = "uniffi_checksum_derive"
+version = "0.3.1+v0.25.0"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=disable_rust_checks#c453ba5db974873b0b0f5c6ae7cec2c66b6ca0db"
+dependencies = [
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "uniffi_checksum_derive"
+version = "0.3.1+v0.25.0"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git#1a5dc527165589456c3d7233107917e065192b03"
+dependencies = [
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "uniffi_core"
 version = "0.25.0"
 source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
+dependencies = [
+ "anyhow",
+ "bytes",
+ "camino",
+ "log",
+ "once_cell",
+ "oneshot",
+ "paste",
+ "static_assertions",
+]
+
+[[package]]
+name = "uniffi_core"
+version = "0.25.0"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "anyhow",
  "bytes",
@@ -1087,8 +1187,26 @@ dependencies = [
  "serde",
  "syn",
  "toml",
- "uniffi_build",
- "uniffi_meta",
+ "uniffi_build 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0)",
+ "uniffi_meta 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0)",
+]
+
+[[package]]
+name = "uniffi_macros"
+version = "0.3.1+v0.25.0"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git#1a5dc527165589456c3d7233107917e065192b03"
+dependencies = [
+ "bincode",
+ "camino",
+ "fs-err",
+ "once_cell",
+ "proc-macro2",
+ "quote",
+ "serde",
+ "syn",
+ "toml",
+ "uniffi_build 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git)",
+ "uniffi_meta 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git)",
 ]
 
 [[package]]
@@ -1099,7 +1217,29 @@ dependencies = [
  "anyhow",
  "bytes",
  "siphasher",
- "uniffi_checksum_derive",
+ "uniffi_checksum_derive 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0)",
+]
+
+[[package]]
+name = "uniffi_meta"
+version = "0.3.1+v0.25.0"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=disable_rust_checks#c453ba5db974873b0b0f5c6ae7cec2c66b6ca0db"
+dependencies = [
+ "anyhow",
+ "bytes",
+ "siphasher",
+ "uniffi_checksum_derive 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?branch=disable_rust_checks)",
+]
+
+[[package]]
+name = "uniffi_meta"
+version = "0.3.1+v0.25.0"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git#1a5dc527165589456c3d7233107917e065192b03"
+dependencies = [
+ "anyhow",
+ "bytes",
+ "siphasher",
+ "uniffi_checksum_derive 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git)",
 ]
 
 [[package]]
@@ -1115,14 +1255,60 @@ dependencies = [
 ]
 
 [[package]]
+name = "uniffi_testing"
+version = "0.3.1+v0.25.0"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=disable_rust_checks#c453ba5db974873b0b0f5c6ae7cec2c66b6ca0db"
+dependencies = [
+ "anyhow",
+ "camino",
+ "cargo_metadata",
+ "fs-err",
+ "once_cell",
+]
+
+[[package]]
+name = "uniffi_testing"
+version = "0.3.1+v0.25.0"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git#1a5dc527165589456c3d7233107917e065192b03"
+dependencies = [
+ "anyhow",
+ "camino",
+ "cargo_metadata",
+ "fs-err",
+ "once_cell",
+]
+
+[[package]]
 name = "uniffi_udl"
 version = "0.3.1+v0.25.0"
 source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "anyhow",
- "uniffi_meta",
- "uniffi_testing",
- "weedle2",
+ "uniffi_meta 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0)",
+ "uniffi_testing 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0)",
+ "weedle2 4.0.0 (git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0)",
+]
+
+[[package]]
+name = "uniffi_udl"
+version = "0.3.1+v0.25.0"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=disable_rust_checks#c453ba5db974873b0b0f5c6ae7cec2c66b6ca0db"
+dependencies = [
+ "anyhow",
+ "uniffi_meta 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?branch=disable_rust_checks)",
+ "uniffi_testing 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git?branch=disable_rust_checks)",
+ "weedle2 4.0.0 (git+https://github.com/NordSecurity/uniffi-rs.git?branch=disable_rust_checks)",
+]
+
+[[package]]
+name = "uniffi_udl"
+version = "0.3.1+v0.25.0"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git#1a5dc527165589456c3d7233107917e065192b03"
+dependencies = [
+ "anyhow",
+ "uniffi_meta 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git)",
+ "uniffi_testing 0.3.1+v0.25.0 (git+https://github.com/NordSecurity/uniffi-rs.git)",
+ "weedle2 4.0.0 (git+https://github.com/NordSecurity/uniffi-rs.git)",
 ]
 
 [[package]]
@@ -1158,6 +1344,22 @@ checksum = "49874b5167b65d7193b8aba1567f5c7d93d001cafc34600cee003eda787e483f"
 name = "weedle2"
 version = "4.0.0"
 source = "git+https://github.com/NordSecurity/uniffi-rs.git?tag=v0.3.1+v0.25.0#1a5dc527165589456c3d7233107917e065192b03"
+dependencies = [
+ "nom",
+]
+
+[[package]]
+name = "weedle2"
+version = "4.0.0"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git?branch=disable_rust_checks#c453ba5db974873b0b0f5c6ae7cec2c66b6ca0db"
+dependencies = [
+ "nom",
+]
+
+[[package]]
+name = "weedle2"
+version = "4.0.0"
+source = "git+https://github.com/NordSecurity/uniffi-rs.git#1a5dc527165589456c3d7233107917e065192b03"
 dependencies = [
  "nom",
 ]
