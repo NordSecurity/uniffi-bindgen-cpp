@@ -10,6 +10,12 @@ namespace custom_fixture_callbacks {
     string? get_string_optional_callback(ForeignGetters? cb, string v, boolean arg2);
 
     bytes get_bytes_roundtrip(ForeignGetters cb, bytes v, boolean arg2);
+
+    string stringify_simple(i32 value);
+
+    string stringify_complex(sequence<f64?>? values);
+
+    string? roundtrip_record(record<string, string?> map, string? key);
 };
 
 callback interface ForeignGetters {

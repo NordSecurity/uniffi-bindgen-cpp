@@ -122,6 +122,8 @@ private:
 {% include "opt_conv.hpp" %}
 {%- when Type::Sequence { inner_type } %}
 {% include "seq_conv.hpp" %}
+{%- when Type::Map { key_type, value_type } %}
+{% include "map_conv.hpp" %}
 {%- when Type::CallbackInterface { module_path, name } %}
 {%- let ffi_converter_name = typ|ffi_converter_name %}
 {%- let type_name = typ|type_name %}
@@ -327,6 +329,8 @@ void rustbuffer_free(RustBuffer& buf) {
 {% include "opt_tmpl.cpp" %}
 {%- when Type::Sequence { inner_type } %}
 {% include "seq_tmpl.cpp" %}
+{%- when Type::Map { key_type, value_type } %}
+{% include "map_tmpl.cpp" %}
 {%- when Type::CallbackInterface { module_path, name } %}
 {%- let ffi_converter_name = typ|ffi_converter_name %}
 {%- let type_name = typ|type_name %}

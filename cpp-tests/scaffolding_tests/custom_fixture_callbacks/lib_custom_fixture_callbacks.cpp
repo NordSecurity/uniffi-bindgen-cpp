@@ -23,4 +23,41 @@ std::vector<uint8_t> custom_fixture_callbacks::get_bytes_roundtrip(std::shared_p
     return cb->get_bytes(v, args2);
 }
 
+std::string custom_fixture_callbacks::stringify_simple(int32_t value) {
+    return "C++: " + std::to_string(value);
+}
+
+std::string custom_fixture_callbacks::stringify_complex(custom_fixture_callbacks::ComplexType values) {
+    if (values.has_value()) {
+        std::string result = "C++:";
+        for (auto &v : values.value()) {
+            if (v.has_value()) {
+                result += std::to_string(v.value());
+            } else {
+                result += "null";
+            }
+            result += ",";
+        }
+
+        if (values.value().size() > 0) {
+            result.pop_back();
+        }
+
+        return result;
+    } else {
+        return "C++: null";
+    }
+}
+
+std::optional<std::string> custom_fixture_callbacks::roundtrip_record(std::unordered_map<std::string, std::optional<std::string>> map, std::optional<std::string> key) {
+    if (key.has_value()) {
+        auto it = map.find(key.value());
+        if (it != map.end()) {
+            return it->second;
+        }
+    }
+
+    return std::nullopt;
+}
+
 #include <custom_fixture_callbacks_cpp_scaffolding.cpp>
