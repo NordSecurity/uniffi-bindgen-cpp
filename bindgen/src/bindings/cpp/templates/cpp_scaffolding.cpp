@@ -337,8 +337,8 @@ void rustbuffer_free(RustBuffer& buf) {
 {%- let class_name = type_name|class_name %}
 {%- let canonical_type_name = typ|canonical_name %}
 {%- let iface = ci|get_callback_interface_definition(name) %}
-{{ type_name }} {{ ffi_converter_name|class_name }}::lift(uint64_t handle) {
-    class {{ iface.name() }}Proxy: public {{ iface.name() }} {
+namespace {
+class {{ iface.name() }}Proxy: public {{ iface.name() }} {
         public:
             {{ iface.name() }}Proxy(uint64_t handle): handle(handle) { }
 
@@ -389,7 +389,9 @@ void rustbuffer_free(RustBuffer& buf) {
         private:
             uint64_t handle;
     };
+}
 
+{{ type_name }} {{ ffi_converter_name|class_name }}::lift(uint64_t handle) {
     return std::make_shared<{{ iface.name() }}Proxy>(handle);
 }
 
