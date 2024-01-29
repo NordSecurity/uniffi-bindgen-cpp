@@ -342,6 +342,12 @@ class {{ iface.name() }}Proxy: public {{ iface.name() }} {
         public:
             {{ iface.name() }}Proxy(uint64_t handle): handle(handle) { }
 
+            ~{{ iface.name() }}Proxy() override {
+                ForeignCallback *callback_stub = reinterpret_cast<ForeignCallback *>({{ ffi_converter_name|class_name }}::fn_handle.load());
+
+                callback_stub(this->handle, 0, nullptr, 0, nullptr);
+            }
+
             {% for m in iface.methods() %}
             {%- match m.return_type() -%}
             {% when Some with (return_type) %}{{ return_type|type_name }} {% when None %}void {% endmatch %}{{ m.name() }}(
