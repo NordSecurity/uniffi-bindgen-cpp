@@ -14,6 +14,7 @@
 #include <cstdlib>
 #include <memory>
 #include <atomic>
+#include <map>
 
 using namespace {{ namespace }};
 
@@ -84,6 +85,8 @@ private:
     RustStreamBuffer streambuf;
 };
 
+{%- include "handle_map.cpp" %}
+
 {%- for typ in ci.iter_types() %}
 {%- match typ %}
 {%- when Type::Boolean %}
@@ -124,6 +127,8 @@ private:
 {% include "seq_conv.hpp" %}
 {%- when Type::Map { key_type, value_type } %}
 {% include "map_conv.hpp" %}
+{%- when Type::Object { module_path, name, imp } %}
+HandleMap<{{ typ|canonical_name }}> {{ name }}_map;
 {%- when Type::CallbackInterface { module_path, name } %}
 {%- let ffi_converter_name = typ|ffi_converter_name %}
 {%- let type_name = typ|type_name %}
@@ -135,7 +140,6 @@ struct {{ ffi_converter_name|class_name }} {
     static {{ type_name }} read(RustStream &);
     static void write(RustStream &, const {{ type_name }} &);
     static int32_t allocation_size(const {{ type_name }} &);
-
 
     static std::atomic<uint64_t> fn_handle;
 };
@@ -227,6 +231,77 @@ void {{ ffi_func.name() }}(ForeignCallback callback_stub, RustCallStatus *out_st
 
     {{ func|ffi_converter_name }}::fn_handle.store(reinterpret_cast<uint64_t>(callback_stub));
 }
+{% endfor %}
+
+{% for obj in ci.object_definitions() %}
+
+{% for ctor in obj.constructors() %}
+{% let ffi_ctor = ctor.ffi_func() %}
+{%- match ffi_ctor.return_type() -%}
+{% when Some with (return_type) %}{{ return_type|ffi_type_name }} {% when None %}void {% endmatch %}{{ ffi_ctor.name() }}(
+{%- for arg in ffi_ctor.arguments() %}
+{{- arg.type_().borrow()|ffi_type_name }} {{ arg.name() }}{% if !loop.last || ffi_ctor.has_rust_call_status_arg() %}, {% endif -%}
+{% endfor %}
+{%- if ffi_ctor.has_rust_call_status_arg() %}RustCallStatus *out_status{% endif -%}
+) {
+    {%- if ffi_ctor.has_rust_call_status_arg() %}
+    out_status->code = 0;
+    {% endif -%}
+
+    std::shared_ptr<{{ obj.name() }}> obj = std::make_shared<{{ obj.name() }}>(
+    {%- for arg in ctor.arguments() %}
+    {{- arg|lift_fn }}({{ arg.name()|var_name }}){% if !loop.last %}, {% endif -%}
+    {% endfor %});
+
+    return (void*){{ obj.name() }}_map.insert(obj);
+}
+{% endfor %}
+
+{% let ffi_dtor = obj.ffi_object_free() %}
+{%- match ffi_dtor.return_type() -%}
+{% when Some with (return_type) %}{{ return_type|ffi_type_name }} {% when None %}void {% endmatch %}{{ ffi_dtor.name() }}(
+{%- for arg in ffi_dtor.arguments() %}
+{{- arg.type_().borrow()|ffi_type_name }} {{ arg.name() }}{% if !loop.last || ffi_dtor.has_rust_call_status_arg() %}, {% endif -%}
+{% endfor %}
+{%- if ffi_dtor.has_rust_call_status_arg() %}RustCallStatus *out_status{% endif -%}
+) {
+    {%- if ffi_dtor.has_rust_call_status_arg() %}
+    out_status->code = 0;
+    {% endif -%}
+
+    {{ obj.name() }}_map.erase((uint64_t)ptr);
+}
+
+{% for func in obj.methods() %}
+{% let ffi_func = func.ffi_func() %}
+{%- match ffi_func.return_type() -%}
+{% when Some with (return_type) %}{{ return_type|ffi_type_name }} {% when None %}void {% endmatch %}{{ ffi_func.name() }}(
+{%- for arg in ffi_func.arguments() %}
+{{- arg.type_().borrow()|ffi_type_name }} {{ arg.name() }}{% if !loop.last || ffi_func.has_rust_call_status_arg() %}, {% endif -%}
+{% endfor %}
+{%- if ffi_func.has_rust_call_status_arg() %}RustCallStatus *out_status{% endif -%}
+) {
+    {%- if ffi_func.has_rust_call_status_arg() %}
+    out_status->code = 0;
+    {% endif -%}
+
+    auto obj = {{ obj.name() }}_map.at((uint64_t)ptr);
+
+    {% match func.return_type() %}
+    {% when Some with (return_type) %}
+    auto ret = obj->{{ func.name() }}(
+    {%- for arg in func.arguments() %}
+    {{- arg|lift_fn }}({{ arg.name()|var_name }}){% if !loop.last %}, {% endif -%}
+    {% endfor %});
+    return {{ return_type|lower_fn }}(ret);
+    {% when None %}
+    obj->{{ func.name() }}(
+    {%- for arg in func.arguments() %}
+    {{- arg|lift_fn }}({{ arg.name()|var_name }}){% if !loop.last %}, {% endif -%}
+    {% endfor %});
+    {% endmatch %}
+}
+{% endfor %}
 {% endfor %}
 
 {% for func in ci.iter_futures_ffi_function_definitons() %}
@@ -331,6 +406,7 @@ void rustbuffer_free(RustBuffer& buf) {
 {% include "seq_tmpl.cpp" %}
 {%- when Type::Map { key_type, value_type } %}
 {% include "map_tmpl.cpp" %}
+{%- when Type::Object { module_path, name, imp } %}
 {%- when Type::CallbackInterface { module_path, name } %}
 {%- let ffi_converter_name = typ|ffi_converter_name %}
 {%- let type_name = typ|type_name %}
