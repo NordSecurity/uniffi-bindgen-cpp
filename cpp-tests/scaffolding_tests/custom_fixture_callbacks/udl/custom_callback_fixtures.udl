@@ -1,28 +1,33 @@
-namespace custom_fixture_callbacks {
-    boolean get_bool_roundtrip(ForeignGetters cb, boolean v, boolean arg2);
-
-    string get_string_roundtrip(ForeignGetters cb, string v, boolean arg2);
-
-    sequence<i32> get_list_roundtrip(ForeignGetters cb, sequence<i32> v, boolean arg2);
-
-    string? get_option_roundtrip(ForeignGetters cb, string? v, boolean arg2);
-
-    string? get_string_optional_callback(ForeignGetters? cb, string v, boolean arg2);
-
-    bytes get_bytes_roundtrip(ForeignGetters cb, bytes v, boolean arg2);
-
-    string stringify_simple(i32 value);
-
-    string stringify_complex(sequence<f64?>? values);
-
-    string? roundtrip_record(record<string, string?> map, string? key);
-};
+namespace custom_fixture_callbacks {};
 
 callback interface ForeignGetters {
     boolean get_bool(boolean v, boolean arg2);
     string get_string(string v, boolean arg2);
-    sequence<i32> get_list(sequence<i32> v, boolean arg2);
     string? get_option(string? v, boolean arg2);
+    sequence<i32> get_list(sequence<i32> v, boolean arg2);
     bytes get_bytes(bytes v, boolean arg2);
+    void get_nothing(string v);
 };
 
+interface NativeGetters {
+    constructor();
+
+    boolean get_bool(ForeignGetters callback, boolean v, boolean arg2);
+    string get_string(ForeignGetters callback, string v, boolean arg2);
+    string? get_option(ForeignGetters callback, string? v, boolean arg2);
+    sequence<i32> get_list(ForeignGetters callback, sequence<i32> v, boolean arg2);
+    bytes get_bytes(ForeignGetters callback, bytes v, boolean arg2);
+    string? get_string_optional_callback(ForeignGetters? callback, string v, boolean arg2);
+    void get_nothing(ForeignGetters callback, string v);
+};
+
+callback interface StoredForeignStringifier {
+    string from_simple_type(i32 value);
+    string from_complex_type(sequence<f64?>? values);
+};
+
+interface NativeStringifier {
+    constructor(StoredForeignStringifier callback);
+    string from_simple_type(i32 value);
+    string from_complex_type(sequence<f64?>? values);
+};

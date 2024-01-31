@@ -1,63 +1,44 @@
 #include "lib_custom_fixture_callbacks.hpp"
 #include <optional>
 
-bool custom_fixture_callbacks::get_bool_roundtrip(std::shared_ptr<custom_fixture_callbacks::ForeignGetters> cb, bool v, bool args2) { return cb->get_bool(v, args2); }
-
-std::string custom_fixture_callbacks::get_string_roundtrip(std::shared_ptr<custom_fixture_callbacks::ForeignGetters> cb, std::string v, bool args2) {
-    return cb->get_string(v, args2);
+bool custom_fixture_callbacks::NativeGetters::get_bool(std::shared_ptr<ForeignGetters> cb, bool v, bool arg2) {
+    return cb->get_bool(v, arg2);
 }
 
-std::vector<int32_t> custom_fixture_callbacks::get_list_roundtrip(std::shared_ptr<custom_fixture_callbacks::ForeignGetters> cb, std::vector<int32_t> v, bool args2) {
-    return cb->get_list(v, args2);
+std::string custom_fixture_callbacks::NativeGetters::get_string(std::shared_ptr<ForeignGetters> cb, std::string v, bool arg2) {
+    return cb->get_string(v, arg2);
 }
 
-std::optional<std::string> custom_fixture_callbacks::get_option_roundtrip(std::shared_ptr<custom_fixture_callbacks::ForeignGetters> cb, std::optional<std::string> v, bool args2) {
-    return cb->get_option(v, args2);
+std::optional<std::string> custom_fixture_callbacks::NativeGetters::get_option(std::shared_ptr<ForeignGetters> cb, std::optional<std::string> v, bool arg2) {
+    return cb->get_option(v, arg2);
 }
 
-std::optional<std::string> custom_fixture_callbacks::get_string_optional_callback(std::shared_ptr<custom_fixture_callbacks::ForeignGetters> cb, std::string v, bool args2) {
-    return cb ? std::make_optional(cb->get_string(v, args2)) : std::nullopt;
+std::vector<int32_t> custom_fixture_callbacks::NativeGetters::get_list(std::shared_ptr<ForeignGetters> cb, std::vector<int32_t> v, bool arg2) {
+    return cb->get_list(v, arg2);
 }
 
-std::vector<uint8_t> custom_fixture_callbacks::get_bytes_roundtrip(std::shared_ptr<custom_fixture_callbacks::ForeignGetters> cb, std::vector<uint8_t> v, bool args2) {
-    return cb->get_bytes(v, args2);
+std::vector<uint8_t> custom_fixture_callbacks::NativeGetters::get_bytes(std::shared_ptr<ForeignGetters> cb, std::vector<uint8_t> v, bool arg2) {
+    return cb->get_bytes(v, arg2);
 }
 
-std::string custom_fixture_callbacks::stringify_simple(int32_t value) {
-    return "C++: " + std::to_string(value);
-}
-
-std::string custom_fixture_callbacks::stringify_complex(custom_fixture_callbacks::ComplexType values) {
-    if (values.has_value()) {
-        std::string result = "C++:";
-        for (auto &v : values.value()) {
-            if (v.has_value()) {
-                result += std::to_string(v.value());
-            } else {
-                result += "null";
-            }
-            result += ",";
-        }
-
-        if (values.value().size() > 0) {
-            result.pop_back();
-        }
-
-        return result;
+std::optional<std::string> custom_fixture_callbacks::NativeGetters::get_string_optional_callback(std::shared_ptr<ForeignGetters> cb, std::string v, bool arg2) {
+    if (cb) {
+        return cb->get_option(v, arg2);
     } else {
-        return "C++: null";
+        return std::nullopt;
     }
 }
 
-std::optional<std::string> custom_fixture_callbacks::roundtrip_record(std::unordered_map<std::string, std::optional<std::string>> map, std::optional<std::string> key) {
-    if (key.has_value()) {
-        auto it = map.find(key.value());
-        if (it != map.end()) {
-            return it->second;
-        }
-    }
+void custom_fixture_callbacks::NativeGetters::get_nothing(std::shared_ptr<ForeignGetters> cb, std::string v) {
+    cb->get_nothing(v);
+}
 
-    return std::nullopt;
+std::string custom_fixture_callbacks::NativeStringifier::from_simple_type(int32_t value) {
+    return cb->from_simple_type(value);
+}
+
+std::string custom_fixture_callbacks::NativeStringifier::from_complex_type(std::optional<std::vector<std::optional<double>>> values) {
+    return cb->from_complex_type(values);
 }
 
 #include <custom_fixture_callbacks_cpp_scaffolding.cpp>
