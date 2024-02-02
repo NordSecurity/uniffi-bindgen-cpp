@@ -127,6 +127,14 @@ private:
 {% include "seq_conv.hpp" %}
 {%- when Type::Map { key_type, value_type } %}
 {% include "map_conv.hpp" %}
+{%- when Type::Enum { module_path, name } %}
+{%- let e = ci|get_enum_definition(name) %}
+{%- if ci.is_name_used_as_error(name) %}
+{%- else %}
+{%- if e.is_flat() %}
+{% include "enum_conv.hpp" %}
+{% endif %}
+{%- endif %}
 {%- when Type::Object { module_path, name, imp } %}
 HandleMap<{{ typ|canonical_name }}> {{ name }}_map;
 {%- when Type::CallbackInterface { module_path, name } %}
@@ -406,6 +414,14 @@ void rustbuffer_free(RustBuffer& buf) {
 {% include "seq_tmpl.cpp" %}
 {%- when Type::Map { key_type, value_type } %}
 {% include "map_tmpl.cpp" %}
+{%- when Type::Enum { module_path, name } %}
+{%- let e = ci|get_enum_definition(name) %}
+{%- if ci.is_name_used_as_error(name) %}
+{%- else %}
+{%- if e.is_flat() %}
+{% include "enum_tmpl.cpp" %}
+{%- endif %}
+{%- endif %}
 {%- when Type::Object { module_path, name, imp } %}
 {%- when Type::CallbackInterface { module_path, name } %}
 {%- let ffi_converter_name = typ|ffi_converter_name %}
