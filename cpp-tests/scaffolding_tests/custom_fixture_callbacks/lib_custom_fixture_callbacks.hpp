@@ -9,6 +9,13 @@ namespace {
     namespace custom_fixture_callbacks {
         typedef std::optional<std::vector<std::optional<double>>> ComplexType;
 
+        enum class Enumeration {
+            A = 1,
+            B,
+            C,
+            UNKNOWN,
+        };
+
         class ForeignGetters {
         public:
             virtual bool get_bool(bool v, bool arg2) = 0;
@@ -17,6 +24,7 @@ namespace {
             virtual std::vector<int32_t> get_list(std::vector<int32_t> v, bool arg2) = 0;
             virtual std::vector<uint8_t> get_bytes(std::vector<uint8_t> v, bool arg2) = 0;
             virtual void get_nothing(std::string v) = 0;
+            virtual Enumeration get_enum(Enumeration v, uint32_t variant, bool arg2) = 0;
 
             virtual ~ForeignGetters() = default;
         };
@@ -38,6 +46,7 @@ namespace {
             std::vector<uint8_t> get_bytes(std::shared_ptr<ForeignGetters> cb, std::vector<uint8_t> v, bool arg2);
             std::optional<std::string> get_string_optional_callback(std::shared_ptr<ForeignGetters> cb, std::string v, bool arg2);
             void get_nothing(std::shared_ptr<ForeignGetters> cb, std::string v);
+            Enumeration get_enum(std::shared_ptr<ForeignGetters> cb, Enumeration v, uint32_t variant, bool arg2);
         };
 
         class NativeStringifier {

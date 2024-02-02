@@ -36,6 +36,23 @@ public:
     virtual void get_nothing(std::string v) override {
         // TODO errors
     }
+
+    virtual custom_fixture_callbacks::Enumeration get_enum(custom_fixture_callbacks::Enumeration v, uint32_t variant, bool arg2) override {
+        if (!arg2) {
+            return v;
+        }
+
+        switch (variant) {
+            case 0:
+                return custom_fixture_callbacks::Enumeration::A;
+            case 1:
+                return custom_fixture_callbacks::Enumeration::B;
+            case 2:
+                return custom_fixture_callbacks::Enumeration::C;
+            default:
+                return custom_fixture_callbacks::Enumeration::UNKNOWN;
+        }
+    }
 };
 
 struct CppStringifier : public custom_fixture_callbacks::StoredForeignStringifier {
@@ -93,6 +110,15 @@ int main() {
         ASSERT_EQ(cb->get_bytes(bytes, flag), native_cb->get_bytes(cb, bytes, flag));
     }
 
+    for (auto enum_val : {custom_fixture_callbacks::Enumeration::A, custom_fixture_callbacks::Enumeration::B, custom_fixture_callbacks::Enumeration::C}) {
+        for (auto variant : {0, 1, 2}) {
+            ASSERT_EQ(cb->get_enum(enum_val, variant, flag), native_cb->get_enum(cb, enum_val, variant, flag));
+        }
+    }
+
+    ASSERT_EQ(native_cb->get_enum(cb, custom_fixture_callbacks::Enumeration::B, 0, false), custom_fixture_callbacks::Enumeration::B);
+    ASSERT_EQ(native_cb->get_enum(cb, custom_fixture_callbacks::Enumeration::B, 10, true), custom_fixture_callbacks::Enumeration::UNKNOWN);
+
     auto stringifier = std::make_shared<CppStringifier>();
     auto native_stringifier = custom_fixture_callbacks::NativeStringifier::init(stringifier);
 
@@ -103,7 +129,6 @@ int main() {
     for (auto num : { std::optional<std::vector<std::optional<double>>>(), std::optional<std::vector<std::optional<double>>>(std::vector<std::optional<double>>{std::nullopt, 1.0, 2.0}) }) {
         ASSERT_EQ(stringifier->from_complex_type(num), native_stringifier->from_complex_type(num));
     }
-
 
     return 0;
 }

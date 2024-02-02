@@ -33,6 +33,10 @@ void custom_fixture_callbacks::NativeGetters::get_nothing(std::shared_ptr<Foreig
     cb->get_nothing(v);
 }
 
+custom_fixture_callbacks::Enumeration custom_fixture_callbacks::NativeGetters::get_enum(std::shared_ptr<ForeignGetters> cb, custom_fixture_callbacks::Enumeration v, uint32_t variant, bool arg2) {
+    return cb->get_enum(v, variant, arg2);
+}
+
 std::string custom_fixture_callbacks::NativeStringifier::from_simple_type(int32_t value) {
     return cb->from_simple_type(value);
 }
