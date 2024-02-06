@@ -43,3 +43,14 @@ Additionally, for examples of how to use the C++ scaffolding, refer to the [C++ 
 | `enum` | `enum class` |
 | `dictionary` | `struct/class` |
 | `interface` | `std::shared_ptr<struct/class>` |
+
+## Unsupported features
+
+The following features are currently not supported in the C++ scaffolding:
+
+- Complex enums
+- Error enums
+- Returning errors from functions
+- Custom types
+- Async
+- Default argument values
