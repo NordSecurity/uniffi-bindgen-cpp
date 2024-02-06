@@ -15,6 +15,7 @@
 #include <memory>
 #include <atomic>
 #include <map>
+#include <mutex>
 
 using namespace {{ namespace }};
 
