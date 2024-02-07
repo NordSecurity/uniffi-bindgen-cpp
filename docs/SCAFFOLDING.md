@@ -2,7 +2,27 @@
 
 ## Prerequisites
 
-To generate the C++ scaffolding, only a `.udl` file is needed, to learn more about how the UDL syntax works, refer to the [official documentation](https://mozilla.github.io/uniffi-rs/Overview.html) from Mozilla.
+To be able to generate the C++ scaffolding, only a `.udl` file is needed, to learn more about how the UDL syntax works, refer to the [official documentation](https://mozilla.github.io/uniffi-rs/Overview.html) from Mozilla.
+
+## Scaffolding generation
+
+To generate the C++ scaffolding you can run:
+
+```bash
+uniffi-bindgen-cpp --scaffolding your_definitions.udl --out-dir output_directory
+```
+
+And it will generate the scaffolding the provided location.
+
+### Limitations
+
+Currently, a `Cargo.toml` file has to be present in the parent directory of the UDL file that contains the following:
+```
+[package]
+name = "name-of-your-package"
+```
+
+The name provided in the `[package]` section, will be used as the namespace for the generated C++ and bindings code.
 
 ## Scaffolding integration
 
@@ -12,7 +32,7 @@ To ensure that the generated code is able to interface with the target C++ libra
 - When exposing a struct or class, all of the members mentioned in the UDL file should be public.
 - For object types, all constructors mentioned in the UDL file should have a matching public constructor in the C++ library.
 - When exposing callback interfaces, it's not recommended to have any logic in the constructors or destructors of the backing C++ class, as they will be called multiple times during the runtime of the application.
-- All of the exports mentioned in the UDL file should be under the same namespace in the C++ library.
+- All of the exports mentioned in the UDL file should be under the same namespace that is specified in the `Cargo.toml` file in the C++ library.
 
 Once the scaffolding is generated, the following file will be created:
 
