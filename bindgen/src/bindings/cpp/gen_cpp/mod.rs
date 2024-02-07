@@ -54,12 +54,12 @@ impl BindingsConfig for Config {
 
 #[derive(Template)]
 #[template(syntax = "cpp", escape = "none", path = "cpp_scaffolding.cpp")]
-struct CppScaffoldingHeader<'a> {
+struct CppScaffolding<'a> {
     ci: &'a ComponentInterface,
     config: &'a ScaffoldingConfig,
 }
 
-impl<'a> CppScaffoldingHeader<'a> {
+impl<'a> CppScaffolding<'a> {
     fn new(ci: &'a ComponentInterface, config: &'a ScaffoldingConfig) -> Self {
         Self { ci, config }
     }
@@ -245,14 +245,9 @@ pub(crate) struct Bindings {
     pub(crate) scaffolding_header: String,
     pub(crate) header: String,
     pub(crate) source: String,
-    pub(crate) cpp_scaffolding_header: String,
 }
 
-pub(crate) fn generate_cpp_bindings(
-    ci: &ComponentInterface,
-    config: &Config,
-    scaffolding_config: &ScaffoldingConfig,
-) -> Result<Bindings> {
+pub(crate) fn generate_cpp_bindings(ci: &ComponentInterface, config: &Config) -> Result<Bindings> {
     let scaffolding_header = ScaffoldingHeader::new(ci)
         .render()
         .context("generating scaffolding header failed")?;
@@ -262,14 +257,27 @@ pub(crate) fn generate_cpp_bindings(
     let source = CppWrapper::new(ci, config)
         .render()
         .context("generating C++ bindings failed")?;
-    let cpp_scaffolding_header = CppScaffoldingHeader::new(ci, scaffolding_config)
-        .render()
-        .context("generating C++ scaffolding header failed")?;
 
     Ok(Bindings {
         scaffolding_header,
         header,
         source,
-        cpp_scaffolding_header,
+    })
+}
+
+pub(crate) struct Scaffolding {
+    pub(crate) cpp_scaffolding_source: String,
+}
+
+pub(crate) fn generate_cpp_scaffolding(
+    ci: &ComponentInterface,
+    config: &ScaffoldingConfig,
+) -> Result<Scaffolding> {
+    let cpp_scaffolding_source = CppScaffolding::new(ci, config)
+        .render()
+        .context("generating C++ scaffolding source failed")?;
+
+    Ok(Scaffolding {
+        cpp_scaffolding_source,
     })
 }

@@ -39,15 +39,6 @@ add_library(uniffi_${TEST_NAME} SHARED
     scaffolding_tests/${TEST_NAME}/lib_${TEST_NAME}.cpp)
 target_include_directories(uniffi_${TEST_NAME} PRIVATE scaffolding_tests/${TEST_NAME} ${BINDINGS_SRC_DIR})
 
-# TODO: This is a hack to get custom scaffolding tests to work
-set (BINARY_SOURCES
-    scaffolding_tests/${TEST_NAME}/main.cpp
-)
-
-IF (EXISTS ${BINDINGS_SRC_DIR}/${TEST_NAME}.cpp)
-    list(APPEND BINARY_SOURCES ${BINDINGS_SRC_DIR}/${TEST_NAME}.cpp)
-ENDIF()
-
 add_executable(${TEST_NAME}-scaffolding-test ${BINARY_SOURCES})
 target_include_directories(${TEST_NAME}-scaffolding-test PRIVATE ${BINDINGS_SRC_DIR} include)
 target_link_libraries(${TEST_NAME}-scaffolding-test uniffi_${TEST_NAME})
@@ -62,9 +53,10 @@ add_test(NAME ${TEST_NAME}-scaffolding-test-memcheck
     --errors-for-leak-kinds=definite
     --show-leak-kinds=definite $<TARGET_FILE:${TEST_NAME}-scaffolding-test>)
 
-add_dependencies(${TEST_NAME}-scaffolding-test custom_bindings uniffi_${TEST_NAME})
+add_dependencies(uniffi_${TEST_NAME} bindings scaffolding custom_scaffolding uniffi_${TEST_NAME})
 
-list(APPEND BINDING_FILES ${BINDINGS_SRC_DIR}/${TEST_NAME}_cpp_scaffolding.cpp)
+list(APPEND BINDING_FILES ${BINDINGS_SRC_DIR}/${TEST_NAME}.cpp)
+list(APPEND SCAFFOLDING_FILES ${BINDINGS_SRC_DIR}/${TEST_NAME}_cpp_scaffolding.cpp)
 
 endmacro(scaffolding_test_case)
 
@@ -111,9 +103,18 @@ add_custom_target(bindings ALL
     COMMENT "Generating bindings"
 )
 
-add_custom_target(custom_bindings ALL
-    DEPENDS bindings
-    COMMAND ./uniffi-bindgen-cpp ${CMAKE_CURRENT_SOURCE_DIR}/scaffolding_tests/custom_fixture_callbacks/udl/custom_callback_fixtures.udl --crate fixture_callbacks --out-dir ${BINDINGS_SRC_DIR}
+add_custom_target(scaffolding ALL
+    BYPRODUCTS ${SCAFFOLDING_FILES}
+    DEPENDS libs
+    COMMAND ./uniffi-bindgen-cpp --scaffolding --library libuniffi_bindgen_cpp_fixtures.so --out-dir bindings
     WORKING_DIRECTORY ${BINDINGS_BUILD_DIR}
-    COMMENT "Generating custom bindings"
+    COMMENT "Generating scaffolding"
+)
+
+add_custom_target(custom_scaffolding ALL
+    DEPENDS scaffolding
+    COMMAND ./uniffi-bindgen-cpp --scaffolding ${CMAKE_CURRENT_SOURCE_DIR}/scaffolding_tests/custom_fixture_callbacks/udl/custom_callback_fixtures.udl --crate fixture_callbacks --out-dir ${BINDINGS_SRC_DIR}
+    COMMAND ./uniffi-bindgen-cpp ${CMAKE_CURRENT_SOURCE_DIR}/scaffolding_tests/custom_fixture_callbacks/udl/custom_callback_fixtures.udl --crate fixture_callbacks --out-dir ${BINDINGS_SRC_DIR} 
+    WORKING_DIRECTORY ${BINDINGS_BUILD_DIR}
+    COMMENT "Generating custom test scaffolding"
 )

@@ -15,6 +15,8 @@ struct Args {
     lib_file: Option<Utf8PathBuf>,
     #[clap(long = "library", conflicts_with_all = ["config", "lib_file"], requires = "out_dir")]
     library_mode: bool,
+    #[clap(long = "scaffolding")]
+    scaffolding_mode: bool,
     #[clap(long = "crate")]
     crate_name: Option<String>,
     source: Utf8PathBuf,
@@ -25,7 +27,9 @@ fn main() {
 
     if args.library_mode {
         uniffi_bindgen::library_mode::generate_external_bindings(
-            CppBindingGenerator {},
+            CppBindingGenerator {
+                scaffolding_mode: args.scaffolding_mode,
+            },
             &args.source,
             args.crate_name,
             args.config.as_deref(),
@@ -34,7 +38,9 @@ fn main() {
         .unwrap();
     } else {
         uniffi_bindgen::generate_external_bindings(
-            CppBindingGenerator {},
+            CppBindingGenerator {
+                scaffolding_mode: args.scaffolding_mode,
+            },
             args.source,
             args.config.as_deref(),
             args.out_dir,
