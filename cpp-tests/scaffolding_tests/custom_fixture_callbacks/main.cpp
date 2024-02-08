@@ -2,6 +2,9 @@
 
 #include <custom_fixture_callbacks.hpp>
 
+#include <algorithm>
+#include <string>
+
 struct ForeignGetters : public custom_fixture_callbacks::ForeignGetters {
 public:
     virtual bool get_bool(bool v, bool arg2) override {

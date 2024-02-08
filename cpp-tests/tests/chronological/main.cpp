@@ -4,11 +4,12 @@
 #include <ctime>
 #include <iomanip>
 #include <thread>
+#include <sstream>
 
 using namespace std::chrono_literals;
 
-std::chrono::time_point<std::chrono::system_clock> epoch_second(int seconds, int nanoseconds) {
-    return std::chrono::time_point<std::chrono::system_clock>(std::chrono::seconds(seconds)) + std::chrono::nanoseconds(nanoseconds);
+std::chrono::time_point<std::chrono::system_clock, std::chrono::nanoseconds> epoch_second(int seconds, int nanoseconds) {
+    return std::chrono::time_point<std::chrono::system_clock, std::chrono::nanoseconds>(std::chrono::seconds(seconds)) + std::chrono::nanoseconds(nanoseconds);
 }
 
 

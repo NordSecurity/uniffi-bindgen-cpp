@@ -25,7 +25,7 @@ chronological::timestamp chronological::get_pre_epoch_timestamp() {
 }
 
 chronological::timestamp chronological::add(chronological::timestamp a, chronological::duration b) {
-    return a + b;
+    return std::chrono::time_point_cast<std::chrono::system_clock::duration>(a + b);
 }
 
 chronological::duration chronological::diff(chronological::timestamp a, chronological::timestamp b) {

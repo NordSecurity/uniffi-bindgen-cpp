@@ -26,7 +26,7 @@ RustBuffer {{ ffi_converter_name }}::lower(const {{ type_name }} &val) {
 
     auto sign = secs < 0 ? -1 : 1;
 
-    auto duration = std::chrono::seconds(secs) + (sign * std::chrono::nanoseconds(nanos));
+    auto duration = std::chrono::duration_cast<{{ type_name }}::duration>(std::chrono::seconds(secs) + (sign * std::chrono::nanoseconds(nanos)));
 
     return {{ type_name }}(duration);
 }

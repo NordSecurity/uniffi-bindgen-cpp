@@ -2,6 +2,7 @@
 
 #include <rondpoint.hpp>
 #include <variant>
+#include <string>
 
 template <typename T, typename F, typename ...Args>
 void affirm_aller_retour(const T& c, const F& func, Args&& ...arg) {
