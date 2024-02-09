@@ -56,6 +56,11 @@ Note: configuration is not supported when using library mode
 uniffi-bindgen-cpp path/to/definitions.udl --config path/to/uniffi.toml
 ```
 
+# EXPERIMENTAL: C++ Scaffolding
+
+It is possible to generate experimental C++ uniffi scaffolding that allows bridging C++ code with any other uniffi supported language (except Rust).
+More documentation and limitations can be found in the [scaffolding documentation](docs/SCAFFOLDING.md)
+
 # Versioning
 
 `uniffi-bindgen-cpp` is versioned separately from `uniffi-rs`. UniFFI follows the [SemVer rules from
@@ -79,7 +84,7 @@ the version of uniffi-rs it is based on.
 
 The table shows `uniffi-rs` version history for tags that were published before tag naming convention described above was introduced.
 
-| uniffi-bindgen-cpp version                | uniffi-rs version                                |
+| uniffi-bindgen-cpp version               | uniffi-rs version                                |
 |------------------------------------------|--------------------------------------------------|
 | v0.1.0                                   | v0.25.0                                          |
 | v0.2.0                                   | v0.25.0                                          |
