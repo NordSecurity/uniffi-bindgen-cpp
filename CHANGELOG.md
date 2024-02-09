@@ -1,3 +1,9 @@
+#### v0.4.0+v.25.0
+
+----
+
+- Add experimental C++ scaffolding generation option
+
 #### v0.3.0+v0.25.0
 
 ----
