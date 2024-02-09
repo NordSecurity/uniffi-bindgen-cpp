@@ -7,20 +7,30 @@ use camino::Utf8Path;
 use serde::{Deserialize, Serialize};
 use uniffi_bindgen::{BindingGenerator, BindingsConfig, ComponentInterface};
 
-use self::gen_cpp::{generate_cpp_bindings, Bindings};
+use self::gen_cpp::{generate_cpp_bindings, generate_cpp_scaffolding, Bindings, Scaffolding};
 
-pub(crate) struct CppBindingGenerator {}
+pub(crate) struct CppBindingGenerator {
+    pub scaffolding_mode: bool,
+}
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ConfigRoot {
     #[serde(default)]
     bindings: ConfigBindings,
+    #[serde(default)]
+    scaffolding: ConfigScaffolding,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ConfigBindings {
     #[serde(default)]
     cpp: gen_cpp::Config,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct ConfigScaffolding {
+    #[serde(default)]
+    cpp: gen_cpp::ScaffoldingConfig,
 }
 
 impl BindingsConfig for ConfigRoot {
@@ -51,20 +61,34 @@ impl BindingGenerator for CppBindingGenerator {
         config: &Self::Config,
         out_dir: &Utf8Path,
     ) -> Result<()> {
-        let Bindings {
-            scaffolding_header,
-            header,
-            source,
-        } = generate_cpp_bindings(&ci, &config.bindings.cpp)?;
-        let scaffolding_header_path = out_dir.join(format!("{}_scaffolding.hpp", ci.namespace()));
-        let header_path = out_dir.join(format!("{}.hpp", ci.namespace()));
-        let source_path = out_dir.join(format!("{}.cpp", ci.namespace()));
+        if self.scaffolding_mode {
+            let Scaffolding {
+                cpp_scaffolding_source,
+            } = generate_cpp_scaffolding(ci, &config.scaffolding.cpp)?;
 
-        fs::write(&scaffolding_header_path, scaffolding_header)?;
-        fs::write(&header_path, header)?;
-        fs::write(&source_path, source)?;
+            let cpp_scaffolding_path =
+                out_dir.join(format!("{}_cpp_scaffolding.cpp", ci.namespace()));
 
-        Ok(())
+            fs::write(&cpp_scaffolding_path, cpp_scaffolding_source)?;
+
+            Ok(())
+        } else {
+            let Bindings {
+                scaffolding_header,
+                header,
+                source,
+            } = generate_cpp_bindings(&ci, &config.bindings.cpp)?;
+            let scaffolding_header_path =
+                out_dir.join(format!("{}_scaffolding.hpp", ci.namespace()));
+            let header_path = out_dir.join(format!("{}.hpp", ci.namespace()));
+            let source_path = out_dir.join(format!("{}.cpp", ci.namespace()));
+
+            fs::write(&scaffolding_header_path, scaffolding_header)?;
+            fs::write(&header_path, header)?;
+            fs::write(&source_path, source)?;
+
+            Ok(())
+        }
     }
 
     fn check_library_path(

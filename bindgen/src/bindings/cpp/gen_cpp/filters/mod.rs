@@ -167,9 +167,9 @@ pub(crate) fn ffi_type_name(ffi_type: &FfiType) -> Result<String> {
         FfiType::ForeignCallback => "ForeignCallback".into(),
         FfiType::ForeignExecutorHandle => unimplemented!("Async is not implemented"),
         FfiType::ForeignExecutorCallback => unimplemented!("Async is not implemented"),
-        FfiType::RustFutureHandle => "void *".into(),
-        FfiType::RustFutureContinuationCallback => "void *".into(),
-        FfiType::RustFutureContinuationData => "void *".into(),
+        FfiType::RustFutureHandle => "intptr_t".into(),
+        FfiType::RustFutureContinuationCallback => "intptr_t".into(),
+        FfiType::RustFutureContinuationData => "intptr_t".into(),
     })
 }
 

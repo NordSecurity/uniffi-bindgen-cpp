@@ -5,7 +5,7 @@
 struct {{ typ|ffi_converter_name }} {
     static {{ name }} lift(RustBuffer);
     static RustBuffer lower(const {{ name }} &);
-    static {{ name }} read(uniffi::RustStream &);
+    static {{ name }} read(RustStream &);
     static void write(RustStream &, const {{ name }} &);
     static int32_t allocation_size(const {{ name }} &);
 };

@@ -1,4 +1,4 @@
-{{ type_name }} uniffi::{{ ffi_converter_name }}::lift(RustBuffer buf) {
+{{ type_name }} {{ ffi_converter_name }}::lift(RustBuffer buf) {
     auto stream = RustStream(&buf);
     auto ret = {{ ffi_converter_name }}::read(stream);
 
@@ -7,7 +7,7 @@
     return ret;
 }
 
-RustBuffer uniffi::{{ ffi_converter_name }}::lower(const {{ type_name }}& val) {
+RustBuffer {{ ffi_converter_name }}::lower(const {{ type_name }}& val) {
     auto buf = rustbuffer_alloc({{ ffi_converter_name }}::allocation_size(val));
     auto stream = RustStream(&buf);
 
@@ -16,7 +16,7 @@ RustBuffer uniffi::{{ ffi_converter_name }}::lower(const {{ type_name }}& val) {
     return buf;
 }
 
-{{ type_name }} uniffi::{{ ffi_converter_name }}::read(RustStream &stream) {
+{{ type_name }} {{ ffi_converter_name }}::read(RustStream &stream) {
     uint8_t has_value;
 
     stream.get(has_value);
@@ -36,7 +36,7 @@ RustBuffer uniffi::{{ ffi_converter_name }}::lower(const {{ type_name }}& val) {
     {%- endif %}
 }
 
-void uniffi::{{ ffi_converter_name }}::write(RustStream &stream, const {{ type_name }}& value) {
+void {{ ffi_converter_name }}::write(RustStream &stream, const {{ type_name }}& value) {
     stream.put(static_cast<uint8_t>(!!value));
 
     if (value) {
@@ -48,7 +48,7 @@ void uniffi::{{ ffi_converter_name }}::write(RustStream &stream, const {{ type_n
     }
 }
 
-int32_t uniffi::{{ ffi_converter_name }}::allocation_size(const {{ type_name }} &val) {
+int32_t {{ ffi_converter_name }}::allocation_size(const {{ type_name }} &val) {
     int32_t ret = 1;
 
     if (val) {

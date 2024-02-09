@@ -20,7 +20,7 @@ use serde::{Deserialize, Serialize};
 use topological_sort::TopologicalSort;
 use uniffi_bindgen::{
     backend::TemplateExpression,
-    interface::{AsType, Type, UniffiTrait},
+    interface::{AsType, FfiType, Type, UniffiTrait},
     BindingsConfig, ComponentInterface,
 };
 
@@ -38,12 +38,31 @@ pub(crate) struct Config {
     custom_types: HashMap<String, CustomTypesConfig>,
 }
 
+#[derive(Clone, Deserialize, Serialize, Debug, Default)]
+pub(crate) struct ScaffoldingConfig {
+    #[serde(default)]
+    namespace: Option<String>,
+}
+
 impl BindingsConfig for Config {
     fn update_from_ci(&mut self, _ci: &ComponentInterface) {}
 
     fn update_from_cdylib_name(&mut self, _cdylib_name: &str) {}
 
     fn update_from_dependency_configs(&mut self, _config_map: HashMap<&str, &Self>) {}
+}
+
+#[derive(Template)]
+#[template(syntax = "cpp", escape = "none", path = "cpp_scaffolding.cpp")]
+struct CppScaffolding<'a> {
+    ci: &'a ComponentInterface,
+    config: &'a ScaffoldingConfig,
+}
+
+impl<'a> CppScaffolding<'a> {
+    fn new(ci: &'a ComponentInterface, config: &'a ScaffoldingConfig) -> Self {
+        Self { ci, config }
+    }
 }
 
 #[derive(Template)]
@@ -243,5 +262,22 @@ pub(crate) fn generate_cpp_bindings(ci: &ComponentInterface, config: &Config) ->
         scaffolding_header,
         header,
         source,
+    })
+}
+
+pub(crate) struct Scaffolding {
+    pub(crate) cpp_scaffolding_source: String,
+}
+
+pub(crate) fn generate_cpp_scaffolding(
+    ci: &ComponentInterface,
+    config: &ScaffoldingConfig,
+) -> Result<Scaffolding> {
+    let cpp_scaffolding_source = CppScaffolding::new(ci, config)
+        .render()
+        .context("generating C++ scaffolding source failed")?;
+
+    Ok(Scaffolding {
+        cpp_scaffolding_source,
     })
 }

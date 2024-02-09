@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <test_common.hpp>
 
+#include <string>
 #include <algorithm>
 #include <cctype>
 #include <fixture_callbacks.hpp>

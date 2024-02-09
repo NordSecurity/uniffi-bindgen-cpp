@@ -1,7 +1,7 @@
 {%- let ffi_converter_name = typ|ffi_converter_name %}
 {%- let class_name = ffi_converter_name|class_name %}
 {%- let type_name = typ|type_name %}
-{{ type_name }} uniffi::{{ class_name }}::lift(RustBuffer buf) {
+{{ type_name }} {{ class_name }}::lift(RustBuffer buf) {
     auto stream = RustStream(&buf);
     auto ret = read(stream);
 
@@ -10,8 +10,8 @@
     return ret;
 }
 
-RustBuffer uniffi::{{ class_name }}::lower(const {{ type_name }} &val) {
-    auto buf = uniffi::rustbuffer_alloc(allocation_size(val));
+RustBuffer {{ class_name }}::lower(const {{ type_name }} &val) {
+    auto buf = rustbuffer_alloc(allocation_size(val));
     auto stream = RustStream(&buf);
 
     write(stream, val);
@@ -19,7 +19,7 @@ RustBuffer uniffi::{{ class_name }}::lower(const {{ type_name }} &val) {
     return buf;
 }
 
-{{ type_name }} uniffi::{{ class_name }}::read(RustStream &stream) {
+{{ type_name }} {{ class_name }}::read(RustStream &stream) {
     {{ type_name }} ret;
     int32_t count;
     stream >> count;
@@ -33,7 +33,7 @@ RustBuffer uniffi::{{ class_name }}::lower(const {{ type_name }} &val) {
     return ret;
 }
 
-void uniffi::{{ class_name }}::write(uniffi::RustStream &stream, const {{ type_name }} &val) {
+void {{ class_name }}::write(RustStream &stream, const {{ type_name }} &val) {
     stream << static_cast<int32_t>(val.size());
 
     for (auto &elem : val) {
@@ -41,7 +41,7 @@ void uniffi::{{ class_name }}::write(uniffi::RustStream &stream, const {{ type_n
     }
 }
 
-int32_t uniffi::{{ class_name }}::allocation_size(const {{ type_name }} &val) {
+int32_t {{ class_name }}::allocation_size(const {{ type_name }} &val) {
     int32_t size = sizeof(int32_t);
 
     for (auto &elem : val) {

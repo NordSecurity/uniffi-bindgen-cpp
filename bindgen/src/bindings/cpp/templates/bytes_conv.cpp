@@ -9,7 +9,7 @@
 }
 
 RustBuffer {{ ffi_converter_name }}::lower(const {{ type_name }} &val) {
-    auto buf = uniffi::rustbuffer_alloc(allocation_size(val));
+    auto buf = rustbuffer_alloc(allocation_size(val));
     auto stream = RustStream(&buf);
 
     write(stream, val);

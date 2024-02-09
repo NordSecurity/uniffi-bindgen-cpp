@@ -3,10 +3,10 @@
 {%- let class_name = ffi_converter_name|class_name %}
 {%- let canonical_type_name = typ|canonical_name %}
 {%- let iface = ci|get_callback_interface_definition(name) %}
-std::once_flag uniffi::{{ class_name }}::once = std::once_flag();
-uniffi::HandleMap<{{ canonical_type_name }}> uniffi::{{ class_name }}::callbacks = {};
+std::once_flag {{ class_name }}::once = std::once_flag();
+uniffi::HandleMap<{{ canonical_type_name }}> {{ class_name }}::callbacks = {};
 
-{{ type_name }} uniffi::{{ class_name }}::lift(uint64_t handle) {
+{{ type_name }} {{ class_name }}::lift(uint64_t handle) {
     std::call_once({{ class_name }}::once, []() {
         rust_call({{ iface.ffi_init_callback().name() }}, nullptr, callback_stub);
     });
@@ -14,7 +14,7 @@ uniffi::HandleMap<{{ canonical_type_name }}> uniffi::{{ class_name }}::callbacks
     return callbacks.at(handle);
 }
 
-uint64_t uniffi::{{ class_name }}::lower(const {{type_name}}& impl) {
+uint64_t {{ class_name }}::lower(const {{type_name}}& impl) {
     std::call_once({{ class_name }}::once, []() {
         rust_call({{ iface.ffi_init_callback().name() }}, nullptr, callback_stub);
     });
@@ -37,7 +37,7 @@ int32_t uniffi::{{ class_name }}::allocation_size(const {{ type_name }} &impl) {
     return sizeof(uint64_t);
 }
 
-int uniffi::{{ class_name }}::callback_stub(uint64_t handle, uint32_t method, uint8_t *args_data, int32_t args_len, RustBuffer *buf_ptr) {
+int {{ class_name }}::callback_stub(uint64_t handle, uint32_t method, uint8_t *args_data, int32_t args_len, RustBuffer *buf_ptr) {
     auto buf = RustBuffer {
         .capacity = args_len,
         .len = args_len,

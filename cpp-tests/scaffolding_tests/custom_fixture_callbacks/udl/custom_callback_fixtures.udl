@@ -1,0 +1,42 @@
+namespace custom_fixture_callbacks {};
+
+enum Enumeration {
+    "A",
+    "B",
+    "C",
+    "UNKNOWN",
+};
+
+callback interface ForeignGetters {
+    boolean get_bool(boolean v, boolean arg2);
+    string get_string(string v, boolean arg2);
+    string? get_option(string? v, boolean arg2);
+    sequence<i32> get_list(sequence<i32> v, boolean arg2);
+    bytes get_bytes(bytes v, boolean arg2);
+    void get_nothing(string v);
+    Enumeration get_enum(Enumeration v, u32 variant, boolean arg2);
+};
+
+interface NativeGetters {
+    constructor();
+
+    boolean get_bool(ForeignGetters callback, boolean v, boolean arg2);
+    string get_string(ForeignGetters callback, string v, boolean arg2);
+    string? get_option(ForeignGetters callback, string? v, boolean arg2);
+    sequence<i32> get_list(ForeignGetters callback, sequence<i32> v, boolean arg2);
+    bytes get_bytes(ForeignGetters callback, bytes v, boolean arg2);
+    string? get_string_optional_callback(ForeignGetters? callback, string v, boolean arg2);
+    void get_nothing(ForeignGetters callback, string v);
+    Enumeration get_enum(ForeignGetters callback, Enumeration v, u32 variant, boolean arg2);
+};
+
+callback interface StoredForeignStringifier {
+    string from_simple_type(i32 value);
+    string from_complex_type(sequence<f64?>? values);
+};
+
+interface NativeStringifier {
+    constructor(StoredForeignStringifier callback);
+    string from_simple_type(i32 value);
+    string from_complex_type(sequence<f64?>? values);
+};

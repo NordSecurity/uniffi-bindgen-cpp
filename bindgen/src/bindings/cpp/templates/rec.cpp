@@ -1,6 +1,6 @@
 {%- let rec = ci|get_record_definition(name) %}
 {%- let class_name = type_name|class_name %}
-{{ class_name }} uniffi::{{ ffi_converter_name }}::lift(RustBuffer buf) {
+{{ class_name }} {{ ffi_converter_name }}::lift(RustBuffer buf) {
     auto stream = RustStream(&buf);
     auto ret = {{ ffi_converter_name }}::read(stream);
 
@@ -9,7 +9,7 @@
     return std::move(ret);
 }
 
-RustBuffer uniffi::{{ ffi_converter_name }}::lower(const {{ class_name }} &val) {
+RustBuffer {{ ffi_converter_name }}::lower(const {{ class_name }} &val) {
     auto buf = rustbuffer_alloc(allocation_size(val));
     auto stream = RustStream(&buf);
 
@@ -18,7 +18,7 @@ RustBuffer uniffi::{{ ffi_converter_name }}::lower(const {{ class_name }} &val) 
     return std::move(buf);
 }
 
-{{ class_name }} uniffi::{{ ffi_converter_name }}::read(RustStream &stream) {
+{{ class_name }} {{ ffi_converter_name }}::read(RustStream &stream) {
     return {
         {%- for field in rec.fields() %}
         {{ field|read_fn }}(stream){% if !loop.last %},{% endif %}
@@ -26,13 +26,13 @@ RustBuffer uniffi::{{ ffi_converter_name }}::lower(const {{ class_name }} &val) 
     };
 }
 
-void uniffi::{{ ffi_converter_name }}::write(RustStream &stream, const {{ class_name }} &val) {
+void {{ ffi_converter_name }}::write(RustStream &stream, const {{ class_name }} &val) {
     {%- for field in rec.fields() %}
     {{ field|write_fn }}(stream, val.{{ field.name()|var_name }});
     {%- endfor %}
 }
 
-int32_t uniffi::{{ ffi_converter_name }}::allocation_size(const {{ class_name }} &val) {
+int32_t {{ ffi_converter_name }}::allocation_size(const {{ class_name }} &val) {
     return {% for field in rec.fields() %}
         {{ field|allocation_size_fn}}(val.{{ field.name()|var_name() }}){% if !loop.last %} +{% else -%};{%- endif %}
     {%- endfor %}

@@ -1,5 +1,5 @@
 {%- if e.is_flat() %}
-{{ type_name }} uniffi::{{ ffi_converter_name }}::lift(RustBuffer buf) {
+{{ type_name }} {{ ffi_converter_name }}::lift(RustBuffer buf) {
     auto stream = RustStream(&buf);
     auto ret = {{ ffi_converter_name }}::read(stream);
 
@@ -8,7 +8,7 @@
     return std::move(ret);
 }
 
-RustBuffer uniffi::{{ ffi_converter_name }}::lower(const {{ type_name }} &val) {
+RustBuffer {{ ffi_converter_name }}::lower(const {{ type_name }} &val) {
     auto buf = rustbuffer_alloc({{ ffi_converter_name }}::allocation_size(val));
     auto stream = RustStream(&buf);
 
@@ -17,7 +17,7 @@ RustBuffer uniffi::{{ ffi_converter_name }}::lower(const {{ type_name }} &val) {
     return std::move(buf);
 }
 
-{{ type_name }} uniffi::{{ ffi_converter_name }}::read(RustStream &stream) {
+{{ type_name }} {{ ffi_converter_name }}::read(RustStream &stream) {
     int32_t variant;
     stream >> variant;
 
@@ -31,15 +31,15 @@ RustBuffer uniffi::{{ ffi_converter_name }}::lower(const {{ type_name }} &val) {
     }
 }
 
-void uniffi::{{ ffi_converter_name }}::write(RustStream &stream, const {{ type_name }} &val) {
+void {{ ffi_converter_name }}::write(RustStream &stream, const {{ type_name }} &val) {
     stream << static_cast<int32_t>(val);
 }
 
-int32_t uniffi::{{ ffi_converter_name }}::allocation_size(const {{ type_name|class_name }} &) {
+int32_t {{ ffi_converter_name }}::allocation_size(const {{ type_name|class_name }} &) {
     return sizeof(int32_t);
 }
 {%- else %}
-{{ type_name }} uniffi::{{ ffi_converter_name }}::lift(RustBuffer buf) {
+{{ type_name }} {{ ffi_converter_name }}::lift(RustBuffer buf) {
     auto stream = RustStream(&buf);
     auto ret = {{ ffi_converter_name }}::read(stream);
 
@@ -48,7 +48,7 @@ int32_t uniffi::{{ ffi_converter_name }}::allocation_size(const {{ type_name|cla
     return std::move(ret);
 }
 
-RustBuffer uniffi::{{ ffi_converter_name }}::lower(const {{ type_name }} &val) {
+RustBuffer {{ ffi_converter_name }}::lower(const {{ type_name }} &val) {
     auto buf = rustbuffer_alloc({{ ffi_converter_name }}::allocation_size(val));
     auto stream = RustStream(&buf);
 
@@ -57,7 +57,7 @@ RustBuffer uniffi::{{ ffi_converter_name }}::lower(const {{ type_name }} &val) {
     return std::move(buf);
 }
 
-{{ type_name }} uniffi::{{ ffi_converter_name }}::read(RustStream &stream) {
+{{ type_name }} {{ ffi_converter_name }}::read(RustStream &stream) {
     int32_t variant_id;
     stream >> variant_id;
     
@@ -75,7 +75,7 @@ RustBuffer uniffi::{{ ffi_converter_name }}::lower(const {{ type_name }} &val) {
     }
 }
 
-void uniffi::{{ ffi_converter_name }}::write(RustStream &stream, const {{ type_name }} &val) {
+void {{ ffi_converter_name }}::write(RustStream &stream, const {{ type_name }} &val) {
     int32_t variant_id = val.variant.index() + 1;
 
     stream << variant_id;
@@ -97,7 +97,7 @@ void uniffi::{{ ffi_converter_name }}::write(RustStream &stream, const {{ type_n
     }, val.variant); 
 }
 
-int32_t uniffi::{{ ffi_converter_name }}::allocation_size(const {{ type_name|class_name }} &val) {
+int32_t {{ ffi_converter_name }}::allocation_size(const {{ type_name|class_name }} &val) {
     int32_t size = sizeof(int32_t);
 
     size += std::visit([&](auto &&arg) {

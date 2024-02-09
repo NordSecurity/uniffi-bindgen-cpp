@@ -1,5 +1,5 @@
 {%- let type_name = typ|type_name %}
-{{ type_name }} uniffi::{{ ffi_converter_name }}::lift(RustBuffer buf) {
+{{ type_name }} {{ ffi_converter_name }}::lift(RustBuffer buf) {
     auto stream = RustStream(&buf);
     auto val = {{ ffi_converter_name }}::read(stream);
 
@@ -8,7 +8,7 @@
     return val;
 }
 
-RustBuffer uniffi::{{ ffi_converter_name }}::lower(const {{ type_name }} &val) {
+RustBuffer {{ ffi_converter_name }}::lower(const {{ type_name }} &val) {
     auto buf = rustbuffer_alloc(allocation_size(val));
     auto stream = RustStream(&buf);
 
@@ -17,7 +17,7 @@ RustBuffer uniffi::{{ ffi_converter_name }}::lower(const {{ type_name }} &val) {
     return std::move(buf);
 }
 
-{{ type_name }} uniffi::{{ ffi_converter_name }}::read(RustStream &stream) {
+{{ type_name }} {{ ffi_converter_name }}::read(RustStream &stream) {
     uint64_t secs;
     uint32_t nanos;
 
@@ -27,13 +27,13 @@ RustBuffer uniffi::{{ ffi_converter_name }}::lower(const {{ type_name }} &val) {
     return std::chrono::seconds(secs) + std::chrono::nanoseconds(nanos);
 }
 
-void uniffi::{{ ffi_converter_name }}::write(RustStream &stream, const {{ type_name }} &val) {
+void {{ ffi_converter_name }}::write(RustStream &stream, const {{ type_name }} &val) {
     auto secs =  std::chrono::duration_cast<std::chrono::duration<int64_t>>(val);
     auto nanos = (val - secs).count();
 
     stream << secs.count() << static_cast<uint32_t>(nanos);
 }
 
-int32_t uniffi::{{ ffi_converter_name }}::allocation_size(const {{ type_name }} &) {
+int32_t {{ ffi_converter_name }}::allocation_size(const {{ type_name }} &) {
     return sizeof(uint64_t) + sizeof(uint32_t);
 }
