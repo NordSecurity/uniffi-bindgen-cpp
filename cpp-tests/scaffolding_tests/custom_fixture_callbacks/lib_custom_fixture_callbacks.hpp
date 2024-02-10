@@ -26,6 +26,10 @@ namespace {
             virtual void get_nothing(std::string v) = 0;
             virtual Enumeration get_enum(Enumeration v, uint32_t variant, bool arg2) = 0;
 
+            virtual std::string get_string_by_ref(const std::string& v, bool arg2) = 0;
+            virtual std::vector<int32_t> get_list_by_ref(const std::vector<int32_t>& v, bool arg2) = 0;
+            virtual std::vector<uint8_t> get_bytes_by_ref(const std::vector<uint8_t>& v, bool arg2) = 0;
+
             virtual ~ForeignGetters() = default;
         };
 
@@ -47,6 +51,10 @@ namespace {
             std::optional<std::string> get_string_optional_callback(std::shared_ptr<ForeignGetters> cb, std::string v, bool arg2);
             void get_nothing(std::shared_ptr<ForeignGetters> cb, std::string v);
             Enumeration get_enum(std::shared_ptr<ForeignGetters> cb, Enumeration v, uint32_t variant, bool arg2);
+
+            std::string get_string_by_ref(std::shared_ptr<ForeignGetters> cb, const std::string& v, bool arg2);
+            std::vector<int32_t> get_list_by_ref(std::shared_ptr<ForeignGetters> cb, const std::vector<int32_t>& v, bool arg2);
+            std::vector<uint8_t> get_bytes_by_ref(std::shared_ptr<ForeignGetters> cb, const std::vector<uint8_t>& v, bool arg2);
         };
 
         class NativeStringifier {

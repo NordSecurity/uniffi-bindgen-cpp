@@ -56,6 +56,18 @@ public:
                 return custom_fixture_callbacks::Enumeration::UNKNOWN;
         }
     }
+
+    virtual std::string get_string_by_ref(const std::string &v, bool arg2) override {
+        return arg2 ? "1234567890123" : v;
+    }
+
+    virtual std::vector<int32_t> get_list_by_ref(const std::vector<int32_t> &v, bool arg2) override {
+        return arg2 ? v : std::vector<int32_t>();
+    }
+
+    virtual std::vector<uint8_t> get_bytes_by_ref(const std::vector<uint8_t> &v, bool arg2) override {
+        return arg2 ? v : std::vector<uint8_t>();
+    }
 };
 
 struct CppStringifier : public custom_fixture_callbacks::StoredForeignStringifier {
@@ -91,15 +103,18 @@ int main() {
     auto flag = true;
 
     ASSERT_EQ(cb->get_string("test", flag), native_cb->get_string(cb, "test", flag));
+    ASSERT_EQ(cb->get_string_by_ref("test", flag), native_cb->get_string_by_ref(cb, "test", flag));
     ASSERT_EQ(cb->get_bool(true, flag), native_cb->get_bool(cb, true, flag));
     ASSERT_EQ(cb->get_bool(false, flag), native_cb->get_bool(cb, false, flag));
 
     for (auto list : {std::vector<int32_t>{1, 2}, std::vector<int32_t>{0, 1}}) {
         ASSERT_EQ(cb->get_list(list, flag), native_cb->get_list(cb, list, flag));
+        ASSERT_EQ(cb->get_list_by_ref(list, flag), native_cb->get_list_by_ref(cb, list, flag));
     }
 
     for (auto str : {"Hello", "World"}) {
         ASSERT_EQ(cb->get_string(str, flag), native_cb->get_string(cb, str, flag));
+        ASSERT_EQ(cb->get_string_by_ref(str, flag), native_cb->get_string_by_ref(cb, str, flag));
     }
 
     for (auto opt : {std::optional<std::string>("Hello"), std::optional<std::string>(std::nullopt)}) {
@@ -111,6 +126,7 @@ int main() {
 
     for (auto bytes : {std::vector<uint8_t>{1, 2}, std::vector<uint8_t>{0, 1}}) {
         ASSERT_EQ(cb->get_bytes(bytes, flag), native_cb->get_bytes(cb, bytes, flag));
+        ASSERT_EQ(cb->get_bytes_by_ref(bytes, flag), native_cb->get_bytes_by_ref(cb, bytes, flag));
     }
 
     for (auto enum_val : {custom_fixture_callbacks::Enumeration::A, custom_fixture_callbacks::Enumeration::B, custom_fixture_callbacks::Enumeration::C}) {

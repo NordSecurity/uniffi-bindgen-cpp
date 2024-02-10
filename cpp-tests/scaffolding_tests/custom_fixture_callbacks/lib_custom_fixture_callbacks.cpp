@@ -37,6 +37,18 @@ custom_fixture_callbacks::Enumeration custom_fixture_callbacks::NativeGetters::g
     return cb->get_enum(v, variant, arg2);
 }
 
+std::string custom_fixture_callbacks::NativeGetters::get_string_by_ref(std::shared_ptr<ForeignGetters> cb, const std::string& v, bool arg2) {
+    return cb->get_string_by_ref(v, arg2);
+}
+
+std::vector<int32_t> custom_fixture_callbacks::NativeGetters::get_list_by_ref(std::shared_ptr<ForeignGetters> cb, const std::vector<int32_t>& v, bool arg2) {
+    return cb->get_list_by_ref(v, arg2);
+}
+
+std::vector<uint8_t> custom_fixture_callbacks::NativeGetters::get_bytes_by_ref(std::shared_ptr<ForeignGetters> cb, const std::vector<uint8_t>& v, bool arg2) {
+    return cb->get_bytes_by_ref(v, arg2);
+}
+
 std::string custom_fixture_callbacks::NativeStringifier::from_simple_type(int32_t value) {
     return cb->from_simple_type(value);
 }

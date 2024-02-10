@@ -23,6 +23,6 @@ namespace {
             void move_by(Vector vector);
         };
 
-        Point translate(Point point, Vector vector);
+        Point translate(const Point &point, Vector vector);
     }
 }

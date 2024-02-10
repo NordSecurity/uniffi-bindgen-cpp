@@ -178,12 +178,10 @@ pub(crate) fn class_name(nm: &str) -> Result<String> {
 }
 
 pub(crate) fn parameter(arg: &Argument) -> Result<String> {
-    Ok(match arg.as_type() {
-        Type::Object { .. } | Type::CallbackInterface { .. } => {
-            format!("const {} &{}", arg.as_codetype().type_label(), arg.name())
-        }
-        t => format!("{} {}", type_name(&t)?, arg.name()),
-    })
+    match arg.by_ref() {
+        true => Ok(format!("const {} &{}", type_name(&arg)?, arg.name())),
+        false => Ok(format!("{} {}", type_name(&arg)?, arg.name())),
+    }
 }
 
 pub(crate) fn docstring(docstring: &str, spaces: &i32) -> Result<String> {

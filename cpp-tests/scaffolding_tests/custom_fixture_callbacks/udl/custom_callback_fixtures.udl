@@ -15,6 +15,10 @@ callback interface ForeignGetters {
     bytes get_bytes(bytes v, boolean arg2);
     void get_nothing(string v);
     Enumeration get_enum(Enumeration v, u32 variant, boolean arg2);
+
+    string get_string_by_ref([ByRef] string v, boolean arg2);
+    sequence<i32> get_list_by_ref([ByRef] sequence<i32> v, boolean arg2);
+    bytes get_bytes_by_ref([ByRef] bytes v, boolean arg2);
 };
 
 interface NativeGetters {
@@ -28,6 +32,10 @@ interface NativeGetters {
     string? get_string_optional_callback(ForeignGetters? callback, string v, boolean arg2);
     void get_nothing(ForeignGetters callback, string v);
     Enumeration get_enum(ForeignGetters callback, Enumeration v, u32 variant, boolean arg2);
+
+    string get_string_by_ref(ForeignGetters callback, [ByRef] string v, boolean arg2);
+    sequence<i32> get_list_by_ref(ForeignGetters callback, [ByRef] sequence<i32> v, boolean arg2);
+    bytes get_bytes_by_ref(ForeignGetters callback, [ByRef] bytes v, boolean arg2);
 };
 
 callback interface StoredForeignStringifier {

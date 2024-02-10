@@ -23,5 +23,10 @@ int main() {
     ASSERT_EQ(rel->get_position().x, 1.0);
     ASSERT_EQ(rel->get_position().y, 2.5);
 
+    auto p = sprites::Point { 1.0, 2.0 };
+    auto t_p = sprites::translate(p, sprites::Vector { 1.0, 1.5 });
+    ASSERT_EQ(t_p.x, 2.0);
+    ASSERT_EQ(t_p.y, 3.5);
+
     return 0;
 }

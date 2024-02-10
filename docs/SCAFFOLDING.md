@@ -39,6 +39,7 @@ To ensure that the generated code is able to interface with the target C++ libra
 - For object types, all constructors mentioned in the UDL file should have a matching public constructor in the C++ library.
 - When exposing callback interfaces, it is recommended to not have any processing-intensive or global data modifying logic in the constructors and destructors of the backing C++ class, as due to the way uniffi internally handles callback interfaces, callback instances may be dynamically constructed multiple times during the runtime of the application.
 - All of the exports mentioned in the UDL file should be under the same namespace that is specified in the `Cargo.toml` file in the C++ library.
+- All arguments are passed value by default, to pass an argument by reference the `[ByRef]` tag has to be used.
 
 Some of the types in the UDL file might not have a direct mapping to a C++ type. To see the full list of mappings, refer to the [UDL to C++ type mapping](#udl-to-c-type-mapping-table) table.
 

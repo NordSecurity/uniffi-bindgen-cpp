@@ -1,6 +1,6 @@
 #include "lib_sprites.hpp"
 
-sprites::Point sprites::translate(Point position, Vector direction) {
+sprites::Point sprites::translate(const Point &position, Vector direction) {
     return sprites::Point { position.x + direction.dx, position.y + direction.dy };
 }
 
