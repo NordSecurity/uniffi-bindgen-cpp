@@ -1,3 +1,9 @@
+#### v0.4.1+v0.25.0
+
+----
+
+- Scaffolding: Decorate public functions with `__declspec(dllexport)` under Windows
+
 #### v0.4.0+v0.25.0
 
 ----
