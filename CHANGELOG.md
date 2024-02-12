@@ -4,6 +4,7 @@
 
 - Scaffolding: Decorate public functions with `__declspec(dllexport)` under Windows and `__attribute__((visibility("default")))` on other platforms
 - Core: Make complex function arguments be passed by `const&` for non-callback functions
+- Core: Write enums based on variant instead of casting to uint during conversion
 
 #### v0.4.0+v0.25.0
 
