@@ -9,7 +9,7 @@
 #if defined(_WIN32) || defined(_WIN64)
 #define UNIFFI_EXPORT __declspec(dllexport)
 #else
-#define UNIFFI_EXPORT
+#define UNIFFI_EXPORT __attribute__((visibility("default")))
 #endif
 
 #include <stdio.h>

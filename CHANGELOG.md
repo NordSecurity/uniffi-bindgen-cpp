@@ -2,7 +2,7 @@
 
 ----
 
-- Scaffolding: Decorate public functions with `__declspec(dllexport)` under Windows
+- Scaffolding: Decorate public functions with `__declspec(dllexport)` under Windows and `__attribute__((visibility("default")))` on other platforms
 
 #### v0.4.0+v0.25.0
 
