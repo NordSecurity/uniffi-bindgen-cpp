@@ -3,6 +3,7 @@
 ----
 
 - Scaffolding: Decorate public functions with `__declspec(dllexport)` under Windows and `__attribute__((visibility("default")))` on other platforms
+- Core: Make complex function arguments be passed by `const&` for non-callback functions
 
 #### v0.4.0+v0.25.0
 
