@@ -27,7 +27,7 @@
 
 {% macro param_list(func) %}
 {%- for arg in func.arguments() -%}
-{{ arg|parameter }}
+{{ arg|parameter(ci) }}
 {%- if !loop.last -%}, {% endif -%}
 {% endfor -%}
 {% endmacro %}

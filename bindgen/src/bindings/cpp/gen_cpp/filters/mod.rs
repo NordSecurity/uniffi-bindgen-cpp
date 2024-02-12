@@ -4,6 +4,7 @@ pub(crate) use uniffi_bindgen::backend::filters::*;
 use uniffi_bindgen::{
     backend::CodeType,
     interface::{Argument, AsType, FfiType, Literal, Type, Variant},
+    ComponentInterface,
 };
 
 use crate::bindings::cpp::gen_cpp::{
@@ -177,12 +178,35 @@ pub(crate) fn class_name(nm: &str) -> Result<String> {
     Ok(CppCodeOracle.class_name(nm))
 }
 
-pub(crate) fn parameter(arg: &Argument) -> Result<String> {
-    Ok(match arg.as_type() {
-        Type::Object { .. } | Type::CallbackInterface { .. } => {
-            format!("const {} &{}", arg.as_codetype().type_label(), arg.name())
-        }
-        t => format!("{} {}", type_name(&t)?, arg.name()),
+pub(crate) fn by_ref(ci: &ComponentInterface, arg: &Argument) -> bool {
+    match arg.as_type() {
+        Type::UInt8
+        | Type::Int8
+        | Type::UInt16
+        | Type::Int16
+        | Type::UInt32
+        | Type::Int32
+        | Type::UInt64
+        | Type::Int64
+        | Type::Float32
+        | Type::Float64
+        | Type::Boolean
+        | Type::Optional { .. } => false,
+        Type::Enum {
+            module_path: _,
+            name,
+        } => match ci.get_enum_definition(&name) {
+            Some(_enum) => _enum.is_flat(),
+            None => false,
+        },
+        _ => true,
+    }
+}
+
+pub(crate) fn parameter(arg: &Argument, ci: &ComponentInterface) -> Result<String> {
+    Ok(match by_ref(ci, arg) {
+        true => format!("const {} &{}", arg.as_codetype().type_label(), arg.name()),
+        false => format!("{} {}", arg.as_codetype().type_label(), arg.name()),
     })
 }
 
