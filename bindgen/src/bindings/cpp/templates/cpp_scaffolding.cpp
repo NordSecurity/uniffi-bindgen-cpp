@@ -6,6 +6,12 @@
 {% else %}
 {% endmatch %}
 
+#if defined(_WIN32) || defined(_WIN64)
+#define UNIFFI_EXPORT __declspec(dllexport)
+#else
+#define UNIFFI_EXPORT __attribute__((visibility("default")))
+#endif
+
 #include <stdio.h>
 #include <stdint.h>
 #include <bit>
@@ -148,7 +154,7 @@ HandleMap<{{ typ|canonical_name }}> {{ name }}_map;
 extern "C" {
 #endif
 
-RustBuffer {{ ci.ffi_rustbuffer_alloc().name() }}(int32_t size, RustCallStatus *out_status) {
+UNIFFI_EXPORT RustBuffer {{ ci.ffi_rustbuffer_alloc().name() }}(int32_t size, RustCallStatus *out_status) {
     out_status->code = 0;
 
     RustBuffer buf = {
@@ -160,7 +166,7 @@ RustBuffer {{ ci.ffi_rustbuffer_alloc().name() }}(int32_t size, RustCallStatus *
     return std::move(buf);
 }
 
-RustBuffer {{ ci.ffi_rustbuffer_from_bytes().name() }}(ForeignBytes bytes, RustCallStatus *out_status) {
+UNIFFI_EXPORT RustBuffer {{ ci.ffi_rustbuffer_from_bytes().name() }}(ForeignBytes bytes, RustCallStatus *out_status) {
     out_status->code = 0;
 
     RustBuffer buf = {
@@ -174,13 +180,13 @@ RustBuffer {{ ci.ffi_rustbuffer_from_bytes().name() }}(ForeignBytes bytes, RustC
     return std::move(buf);
 }
 
-void {{ ci.ffi_rustbuffer_free().name() }}(RustBuffer buf, RustCallStatus *out_status) {
+UNIFFI_EXPORT void {{ ci.ffi_rustbuffer_free().name() }}(RustBuffer buf, RustCallStatus *out_status) {
     out_status->code = 0;
 
     delete[] buf.data;
 }
 
-RustBuffer {{ ci.ffi_rustbuffer_reserve().name() }}(RustBuffer buffer, int32_t additional, RustCallStatus *out_status) {
+UNIFFI_EXPORT RustBuffer {{ ci.ffi_rustbuffer_reserve().name() }}(RustBuffer buffer, int32_t additional, RustCallStatus *out_status) {
     out_status->code = 0;
 
     RustBuffer buf = {
@@ -194,7 +200,8 @@ RustBuffer {{ ci.ffi_rustbuffer_reserve().name() }}(RustBuffer buffer, int32_t a
 
 {% for func in ci.function_definitions() %}
 {% let ffi_func = func.ffi_func() %}
-{%- match ffi_func.return_type() -%}
+UNIFFI_EXPORT
+{% match ffi_func.return_type() -%}
 {% when Some with (return_type) %}{{ return_type|ffi_type_name }} {% when None %}void {% endmatch %}{{ ffi_func.name() }}(
 {%- for arg in ffi_func.arguments() %}
 {{- arg.type_().borrow()|ffi_type_name }} {{ arg.name() }}{% if !loop.last || ffi_func.has_rust_call_status_arg() %}, {% endif -%}
@@ -223,7 +230,7 @@ RustBuffer {{ ci.ffi_rustbuffer_reserve().name() }}(RustBuffer buffer, int32_t a
 
 {% for func in ci.callback_interface_definitions() %}
 {% let ffi_func = func.ffi_init_callback() %}
-void {{ ffi_func.name() }}(ForeignCallback callback_stub, RustCallStatus *out_status) {
+UNIFFI_EXPORT void {{ ffi_func.name() }}(ForeignCallback callback_stub, RustCallStatus *out_status) {
     out_status->code = 0;
 
     {{ func|ffi_converter_name }}::fn_handle.store(reinterpret_cast<uint64_t>(callback_stub));
@@ -234,7 +241,8 @@ void {{ ffi_func.name() }}(ForeignCallback callback_stub, RustCallStatus *out_st
 
 {% for ctor in obj.constructors() %}
 {% let ffi_ctor = ctor.ffi_func() %}
-{%- match ffi_ctor.return_type() -%}
+UNIFFI_EXPORT
+{% match ffi_ctor.return_type() -%}
 {% when Some with (return_type) %}{{ return_type|ffi_type_name }} {% when None %}void {% endmatch %}{{ ffi_ctor.name() }}(
 {%- for arg in ffi_ctor.arguments() %}
 {{- arg.type_().borrow()|ffi_type_name }} {{ arg.name() }}{% if !loop.last || ffi_ctor.has_rust_call_status_arg() %}, {% endif -%}
@@ -255,7 +263,8 @@ void {{ ffi_func.name() }}(ForeignCallback callback_stub, RustCallStatus *out_st
 {% endfor %}
 
 {% let ffi_dtor = obj.ffi_object_free() %}
-{%- match ffi_dtor.return_type() -%}
+UNIFFI_EXPORT
+{% match ffi_dtor.return_type() -%}
 {% when Some with (return_type) %}{{ return_type|ffi_type_name }} {% when None %}void {% endmatch %}{{ ffi_dtor.name() }}(
 {%- for arg in ffi_dtor.arguments() %}
 {{- arg.type_().borrow()|ffi_type_name }} {{ arg.name() }}{% if !loop.last || ffi_dtor.has_rust_call_status_arg() %}, {% endif -%}
@@ -271,7 +280,8 @@ void {{ ffi_func.name() }}(ForeignCallback callback_stub, RustCallStatus *out_st
 
 {% for func in obj.methods() %}
 {% let ffi_func = func.ffi_func() %}
-{%- match ffi_func.return_type() -%}
+UNIFFI_EXPORT
+{% match ffi_func.return_type() -%}
 {% when Some with (return_type) %}{{ return_type|ffi_type_name }} {% when None %}void {% endmatch %}{{ ffi_func.name() }}(
 {%- for arg in ffi_func.arguments() %}
 {{- arg.type_().borrow()|ffi_type_name }} {{ arg.name() }}{% if !loop.last || ffi_func.has_rust_call_status_arg() %}, {% endif -%}
@@ -302,7 +312,8 @@ void {{ ffi_func.name() }}(ForeignCallback callback_stub, RustCallStatus *out_st
 {% endfor %}
 
 {% for func in ci.iter_futures_ffi_function_definitons() %}
-{%- match func.return_type() -%}
+UNIFFI_EXPORT
+{% match func.return_type() -%}
 {% when Some with (return_type) %}{{ return_type|ffi_type_name }} {% when None %}void {% endmatch %}{{ func.name() }}(
 {%- for arg in func.arguments() %}
 {{- arg.type_().borrow()|ffi_type_name }} {{ arg.name() }}{% if !loop.last || func.has_rust_call_status_arg() %}, {% endif -%}
@@ -321,11 +332,11 @@ void {{ ffi_func.name() }}(ForeignCallback callback_stub, RustCallStatus *out_st
 {% endfor %}
 
 {% for checksum in ci.iter_checksums() %}
-uint16_t {{ checksum.0 }}() { return {{ checksum.1 }}; }
+UNIFFI_EXPORT uint16_t {{ checksum.0 }}() { return {{ checksum.1 }}; }
 {% endfor %}
 
 {% let contract_fn = ci.ffi_uniffi_contract_version() %}
-uint32_t {{ contract_fn.name() }}() { return {{ ci.uniffi_contract_version() }}; }
+UNIFFI_EXPORT uint32_t {{ contract_fn.name() }}() { return {{ ci.uniffi_contract_version() }}; }
 
 #ifdef __cplusplus
 }
