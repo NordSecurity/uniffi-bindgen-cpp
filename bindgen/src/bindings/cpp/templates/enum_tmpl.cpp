@@ -32,7 +32,15 @@ RustBuffer {{ ffi_converter_name }}::lower(const {{ type_name }} &val) {
 }
 
 void {{ ffi_converter_name }}::write(RustStream &stream, const {{ type_name }} &val) {
-    stream << static_cast<int32_t>(val);
+    switch (val) {
+        {% for variant in e.variants() %}
+    case {{ type_name }}::{{ variant|variant_name }}:
+        stream << static_cast<int32_t>({{ loop.index }});
+        break;
+        {% endfor %}
+    default:
+        throw std::runtime_error("No matching {{ type_name }} variant");
+    }
 }
 
 int32_t {{ ffi_converter_name }}::allocation_size(const {{ type_name|class_name }} &) {
