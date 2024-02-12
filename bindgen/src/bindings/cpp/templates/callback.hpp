@@ -9,7 +9,10 @@ struct {{ canonical_type_name }} {
     virtual
     {%- match method.return_type() %}
     {% when Some with (return_type) %} {{ return_type|type_name }} {% else %} void {% endmatch -%}
-    {{ method.name()|fn_name }}({% call macros::param_list(method) %}) = 0;
+    {{ method.name()|fn_name }}(
+    {%- for arg in method.arguments() %}
+        {{- arg.as_type().borrow()|type_name }} {{ arg.name() }}{% if !loop.last %}, {% endif -%}
+    {% endfor %}) = 0;
     {%- endfor %}
 
     virtual ~{{ canonical_type_name }}() = default;

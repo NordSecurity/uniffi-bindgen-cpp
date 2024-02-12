@@ -60,7 +60,7 @@ int {{ class_name }}::callback_stub(uint64_t handle, uint32_t method, uint8_t *a
             auto ret = {% endif -%}
             impl->{{ method.name() }}(
             {%- for arg in method.arguments() %}
-            arg{{ loop.index0 }}{%- if !loop.last %}, {% else %}{% endif %}
+            std::move(arg{{ loop.index0 }}){%- if !loop.last %}, {% else %}{% endif %}
             {%- endfor -%}
         );
         {%- match method.return_type() %}
