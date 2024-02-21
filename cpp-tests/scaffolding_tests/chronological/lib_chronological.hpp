@@ -1,11 +1,24 @@
 #include <chrono>
 #include <optional>
 #include <string>
+#include <stdexcept>
 
 namespace {
     namespace chronological {
         typedef std::chrono::time_point<std::chrono::system_clock> timestamp;
         typedef std::chrono::duration<int64_t, std::nano> duration;
+
+        namespace chronological_error {
+            class TimeOverflow: public std::runtime_error {
+                public:
+                    TimeOverflow(): std::runtime_error("time overflow") { }
+            };
+
+            class TimeDiffError: public std::runtime_error {
+                public:
+                    TimeDiffError(): std::runtime_error("time diff error") { }
+            };
+        };
 
         timestamp return_timestamp(timestamp a);
 

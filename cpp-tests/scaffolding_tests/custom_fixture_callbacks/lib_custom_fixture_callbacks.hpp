@@ -10,7 +10,7 @@ namespace {
         typedef std::optional<std::vector<std::optional<double>>> ComplexType;
 
         enum class Enumeration {
-            A = 1,
+            A,
             B,
             C,
             UNKNOWN,
