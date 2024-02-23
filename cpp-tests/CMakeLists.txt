@@ -76,7 +76,7 @@ test_case(trait_methods)
 test_case(custom_types_builtin)
 
 scaffolding_test_case(arithmetic)
-# scaffolding_test_case(callbacks)
+scaffolding_test_case(callbacks)
 scaffolding_test_case(custom_fixture_callbacks)
 scaffolding_test_case(chronological)
 # scaffolding_test_case(custom_types)
