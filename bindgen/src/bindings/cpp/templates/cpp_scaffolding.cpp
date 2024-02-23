@@ -300,6 +300,7 @@ UNIFFI_EXPORT
 
     auto obj = {{ obj.name() }}_map.at((uint64_t)ptr);
 
+    {%- call macros::fn_prologue(ci, func, ffi_func) %}
     {% match func.return_type() %}
     {% when Some with (return_type) %}
     auto ret = obj->{{ func.name() }}(
@@ -313,6 +314,7 @@ UNIFFI_EXPORT
     {{- arg|lift_fn }}({{ arg.name()|var_name }}){% if !loop.last %}, {% endif -%}
     {% endfor %});
     {% endmatch %}
+    {%- call macros::fn_epilogue(ci, func, ffi_func) %}
 }
 {% endfor %}
 {% endfor %}
