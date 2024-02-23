@@ -23,6 +23,10 @@
     } catch (...) {
         out_status->code = CALL_STATUS_PANIC;
     }
+{% match func.return_type() %}
+{% when Some with (return_type) %}
     return {};
+{% else %}
+{% endmatch %}
 {%- endif %}
 {% endmacro %}
