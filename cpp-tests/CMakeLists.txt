@@ -10,6 +10,16 @@ find_package(Threads REQUIRED)
 set(BINDINGS_BUILD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../target/debug)
 set(BINDINGS_SRC_DIR ${BINDINGS_BUILD_DIR}/bindings)
 
+macro(memcheck_test TEST_NAME)
+add_test(NAME ${TEST_NAME}-test-memcheck
+  COMMAND valgrind
+    --error-exitcode=1
+    --tool=memcheck
+    --leak-check=full
+    --errors-for-leak-kinds=definite
+    --show-leak-kinds=definite $<TARGET_FILE:${TEST_NAME}>)
+endmacro(memcheck_test)
+
 macro(test_case TEST_NAME)
 add_executable(${TEST_NAME}-test tests/${TEST_NAME}/main.cpp ${BINDINGS_SRC_DIR}/${TEST_NAME}.cpp)
 
@@ -19,14 +29,7 @@ target_link_libraries(${TEST_NAME}-test uniffi_bindgen_cpp_fixtures Threads::Thr
 target_compile_definitions(${TEST_NAME}-test PRIVATE UNIFFI_BINDING_DIR="${BINDINGS_SRC_DIR}")
 
 add_test(NAME ${TEST_NAME}-test COMMAND ${TEST_NAME}-test)
-
-add_test(NAME ${TEST_NAME}-test-memcheck
-  COMMAND valgrind
-    --error-exitcode=1
-    --tool=memcheck
-    --leak-check=full
-    --errors-for-leak-kinds=definite
-    --show-leak-kinds=definite $<TARGET_FILE:${TEST_NAME}-test>)
+memcheck_test(${TEST_NAME}-test)
 
 add_dependencies(${TEST_NAME}-test bindings)
 
@@ -44,14 +47,7 @@ target_include_directories(${TEST_NAME}-scaffolding-test PRIVATE ${BINDINGS_SRC_
 target_link_libraries(${TEST_NAME}-scaffolding-test uniffi_${TEST_NAME} Threads::Threads)
 
 add_test(NAME ${TEST_NAME}-scaffolding-test COMMAND ${TEST_NAME}-scaffolding-test)
-
-add_test(NAME ${TEST_NAME}-scaffolding-test-memcheck
-  COMMAND valgrind
-    --error-exitcode=1
-    --tool=memcheck
-    --leak-check=full
-    --errors-for-leak-kinds=definite
-    --show-leak-kinds=definite $<TARGET_FILE:${TEST_NAME}-scaffolding-test>)
+memcheck_test(${TEST_NAME}-scaffolding-test)
 
 add_dependencies(uniffi_${TEST_NAME} bindings scaffolding custom_scaffolding uniffi_${TEST_NAME})
 
