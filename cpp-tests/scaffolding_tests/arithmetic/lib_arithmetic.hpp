@@ -6,7 +6,7 @@ namespace {
         namespace arithmetic_error {
             class IntegerOverflow: public std::runtime_error {
                 public:
-                    IntegerOverflow(): std::runtime_error("integer overflow") { }
+                    IntegerOverflow(): std::runtime_error("Integer overflow") { }
             };
         };
 

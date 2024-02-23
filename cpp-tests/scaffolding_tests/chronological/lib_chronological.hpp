@@ -11,12 +11,12 @@ namespace {
         namespace chronological_error {
             class TimeOverflow: public std::runtime_error {
                 public:
-                    TimeOverflow(): std::runtime_error("time overflow") { }
+                    TimeOverflow(): std::runtime_error("Time overflow") { }
             };
 
             class TimeDiffError: public std::runtime_error {
                 public:
-                    TimeDiffError(): std::runtime_error("time diff error") { }
+                    TimeDiffError(): std::runtime_error("Time Diff error") { }
             };
         };
 
