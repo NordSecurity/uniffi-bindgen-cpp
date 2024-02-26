@@ -57,7 +57,7 @@ int main() {
         auto default_list = todolist::get_default_list();
         ASSERT_TRUE(default_list);
 
-        ASSERT_TRUE(compare_lists(todo->get_entries(), default_list->get_entries()));    
+        ASSERT_TRUE(compare_lists(todo->get_entries(), default_list->get_entries()));
         ASSERT_FALSE(compare_lists(todo2->get_entries(), default_list->get_entries()));
     }
 
