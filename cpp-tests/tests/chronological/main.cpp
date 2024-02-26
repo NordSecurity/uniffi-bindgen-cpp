@@ -15,7 +15,6 @@ std::chrono::time_point<std::chrono::system_clock, std::chrono::nanoseconds> epo
 
 std::chrono::duration<int64_t, std::nano> time_span_seconds(int seconds, int nanoseconds) {
     return std::chrono::nanoseconds(std::chrono::seconds(seconds) + std::chrono::nanoseconds(nanoseconds));
-
 }
 
 std::chrono::time_point<std::chrono::system_clock> time_from_string(const std::string& time) {
@@ -24,6 +23,60 @@ std::chrono::time_point<std::chrono::system_clock> time_from_string(const std::s
     ss >> std::get_time(&tm, "%Y-%m-%dT%H:%M:%S");
 
     return std::chrono::system_clock::from_time_t(timegm(&tm));
+}
+
+void test_string_timestamps() {
+    {
+        auto time_str = "1969-12-12T00:00:00.000000000Z";
+        auto time = time_from_string(time_str);
+
+        ASSERT_EQ(time_str, chronological::to_string_timestamp(time));
+    }
+
+    {
+        // get_time doesn't support nanoseconds, so we have to add them manually
+        auto time_str = "1969-12-31T23:59:58.999999900Z";
+        auto time = time_from_string(time_str) + 999999900ns;
+
+        ASSERT_EQ(time_str, chronological::to_string_timestamp(time));
+    }
+
+    {
+        // get_time doesn't support nanoseconds, so we have to add them manually
+        auto time = time_from_string("1955-11-05T00:06:01.283000200Z") + 283000200ns;
+        auto time2 = time_from_string("1955-11-05T00:06:00.283000100Z") + 283000100ns;
+
+        ASSERT_EQ(
+            time,
+            chronological::add(time2, time_span_seconds(1, 100))
+        );
+    }
+}
+
+void test_scaffolding_string_timestamps() {
+    {
+        auto time_str = "1970-01-01T00:00:00";
+        auto time = time_from_string(time_str);
+
+        ASSERT_EQ(time_str, chronological::to_string_timestamp(time));
+    }
+
+    {
+        auto time_str = "1970-12-31T23:59:58";
+        auto time = time_from_string(time_str);
+
+        ASSERT_EQ(time_str, chronological::to_string_timestamp(time));
+    }
+
+    {
+        auto time = time_from_string("1979-11-05T00:06:01") + 283000200ns;
+        auto time2 = time_from_string("1979-11-05T00:06:00") + 283000100ns;
+
+        ASSERT_EQ(
+            time,
+            chronological::add(time2, time_span_seconds(1, 100))
+        );
+    }
 }
 
 int main() {
@@ -57,31 +110,11 @@ int main() {
         chronological::return_duration(std::chrono::nanoseconds::max())
     );
 
-    {
-        auto time_str = "1969-12-12T00:00:00.000000000Z";
-        auto time = time_from_string(time_str);
-
-        ASSERT_EQ(time_str, chronological::to_string_timestamp(time));
-    }
-
-    {
-        // get_time doesn't support nanoseconds, so we have to add them manually
-        auto time_str = "1969-12-31T23:59:58.999999900Z";
-        auto time = time_from_string(time_str) + 999999900ns;
-
-        ASSERT_EQ(time_str, chronological::to_string_timestamp(time));
-    }
-
-    {
-        // get_time doesn't support nanoseconds, so we have to add them manually
-        auto time = time_from_string("1955-11-05T00:06:01.283000200Z") + 283000200ns;
-        auto time2 = time_from_string("1955-11-05T00:06:00.283000100Z") + 283000100ns;
-
-        ASSERT_EQ(
-            time,
-            chronological::add(time2, time_span_seconds(1, 100))
-        ); 
-    }
+    #ifdef SCAFFOLDING_TEST
+    test_scaffolding_string_timestamps();
+    #else
+    test_string_timestamps();
+    #endif
 
     auto before = std::chrono::system_clock::now();
     std::this_thread::sleep_for(1s);

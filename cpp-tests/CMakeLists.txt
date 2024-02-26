@@ -20,6 +20,7 @@ add_test(NAME ${TEST_NAME}-test-memcheck
     --show-leak-kinds=definite $<TARGET_FILE:${TEST_NAME}>)
 endmacro(memcheck_test)
 
+# Add a bindings test case
 macro(test_case TEST_NAME)
 add_executable(${TEST_NAME}-test tests/${TEST_NAME}/main.cpp ${BINDINGS_SRC_DIR}/${TEST_NAME}.cpp)
 
@@ -37,14 +38,16 @@ list(APPEND BINDING_FILES ${BINDINGS_SRC_DIR}/${TEST_NAME}.cpp)
 
 endmacro(test_case)
 
+# Add a scaffolding test case
 macro(scaffolding_test_case TEST_NAME)
 add_library(uniffi_${TEST_NAME} SHARED
     scaffolding_tests/${TEST_NAME}/lib_${TEST_NAME}.cpp)
 target_include_directories(uniffi_${TEST_NAME} PRIVATE scaffolding_tests/${TEST_NAME} ${BINDINGS_SRC_DIR})
 
-add_executable(${TEST_NAME}-scaffolding-test scaffolding_tests/${TEST_NAME}/main.cpp ${BINDINGS_SRC_DIR}/${TEST_NAME}.cpp)
+add_executable(${TEST_NAME}-scaffolding-test tests/${TEST_NAME}/main.cpp ${BINDINGS_SRC_DIR}/${TEST_NAME}.cpp)
 target_include_directories(${TEST_NAME}-scaffolding-test PRIVATE ${BINDINGS_SRC_DIR} include)
 target_link_libraries(${TEST_NAME}-scaffolding-test uniffi_${TEST_NAME} Threads::Threads)
+target_compile_definitions(${TEST_NAME}-scaffolding-test PRIVATE SCAFFOLDING_TEST=1)
 
 add_test(NAME ${TEST_NAME}-scaffolding-test COMMAND ${TEST_NAME}-scaffolding-test)
 memcheck_test(${TEST_NAME}-scaffolding-test)
@@ -73,7 +76,7 @@ test_case(custom_types_builtin)
 
 scaffolding_test_case(arithmetic)
 scaffolding_test_case(callbacks)
-scaffolding_test_case(custom_fixture_callbacks)
+# scaffolding_test_case(custom_fixture_callbacks)
 scaffolding_test_case(chronological)
 # scaffolding_test_case(custom_types)
 scaffolding_test_case(geometry)

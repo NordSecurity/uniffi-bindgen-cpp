@@ -16,7 +16,7 @@ std::string chronological::to_string_timestamp(chronological::timestamp a) {
     std::time_t time = std::chrono::system_clock::to_time_t(a);
     std::tm tm = *std::gmtime(&time);
     std::stringstream ss;
-    ss << std::put_time(&tm, "%Y-%m-%dT%H:%M:%S.000000000Z");
+    ss << std::put_time(&tm, "%Y-%m-%dT%H:%M:%S");
     return ss.str();
 }
 
@@ -29,6 +29,9 @@ chronological::timestamp chronological::add(chronological::timestamp a, chronolo
 }
 
 chronological::duration chronological::diff(chronological::timestamp a, chronological::timestamp b) {
+    if (a < b) {
+        throw chronological_error::TimeDiffError();
+    }
     return a - b;
 }
 
