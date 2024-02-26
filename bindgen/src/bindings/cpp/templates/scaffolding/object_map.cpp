@@ -17,9 +17,11 @@ template <typename T> struct ObjectMap {
 
     void erase(uint64_t ptr) {
         std::lock_guard<std::mutex> guard(this->mutex);
-        
-        if (this->map.at(ptr).use_count() == 1) {
-            this->map.erase(ptr);
+
+        if (this->map.find(ptr) != this->map.end()) {
+            if (this->map.at(ptr).use_count() == 1) {
+                this->map.erase(ptr);
+            }
         }
     }
     private:

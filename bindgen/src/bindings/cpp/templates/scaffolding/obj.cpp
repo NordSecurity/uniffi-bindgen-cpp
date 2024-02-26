@@ -1,10 +1,10 @@
-#include <cstdint>
 {{ type_name }} {{ ffi_converter_name }}::lift(void *ptr) {
     return {{ name }}_map.at((uint64_t)ptr);
 }
 
 void *{{ ffi_converter_name }}::lower(const {{ type_name }} &obj) {
-    return (void *)obj.get();
+    auto ret = {{ name }}_map.insert(obj);
+    return (void *)ret;
 }
 
 {{ type_name }} {{ ffi_converter_name }}::read(RustStream &stream) {
@@ -15,6 +15,7 @@ void *{{ ffi_converter_name }}::lower(const {{ type_name }} &obj) {
 }
 
 void {{ ffi_converter_name }}::write(RustStream &stream, const {{ type_name }} &obj) {
+    {{ name }}_map.insert(obj);
     stream << (uint64_t)obj.get();
 }
 
