@@ -97,7 +97,7 @@ private:
     RustStreamBuffer streambuf;
 };
 
-{%- include "handle_map.cpp" %}
+{%- include "scaffolding/object_map.cpp" %}
 
 {%- for typ in ci.iter_types() %}
 {%- match typ %}
@@ -151,7 +151,8 @@ private:
 {% endif %}
 {%- endif %}
 {%- when Type::Object { module_path, name, imp } %}
-HandleMap<{{ typ|canonical_name }}> {{ name }}_map;
+{% include "scaffolding/obj.hpp" %}
+ObjectMap<{{ typ|canonical_name }}> {{ name }}_map;
 {%- when Type::CallbackInterface { module_path, name } %}
 {% include "scaffolding/callback.hpp" %}
 {% else %}
@@ -263,7 +264,6 @@ UNIFFI_EXPORT
     {%- for arg in ctor.arguments() %}
     {{- arg|lift_fn }}({{ arg.name()|var_name }}){% if !loop.last %}, {% endif -%}
     {% endfor %});
-
     return (void*){{ obj.name() }}_map.insert(obj);
 }
 {% endfor %}
@@ -434,6 +434,7 @@ void rustbuffer_free(RustBuffer& buf) {
 {%- endif %}
 {%- endif %}
 {%- when Type::Object { module_path, name, imp } %}
+{% include "scaffolding/obj.cpp" %}
 {%- when Type::CallbackInterface { module_path, name } %}
 {% include "scaffolding/callback.cpp" %}
 {%- else %}
