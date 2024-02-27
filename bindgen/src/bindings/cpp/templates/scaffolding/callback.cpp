@@ -59,7 +59,7 @@ class {{ iface.name() }}Proxy: public {{ iface.name() }} {
                 }
                 else if (ret == CALL_STATUS_ERROR) {
                     RustStream out_stream(&out_buf);
-                    uint32_t v;
+                    int32_t v;
                     out_stream >> v;
                     {%- if m.throws() %}
                     switch (v) {
@@ -81,12 +81,10 @@ class {{ iface.name() }}Proxy: public {{ iface.name() }} {
                     }
                     {%- endif %}
                     rustbuffer_free(out_buf);
-                    throw std::runtime_error("Callback reuturned unexpected error code");
+                    throw std::runtime_error("Callback returned unexpected error code");
                 }
                 else if (ret == CALL_STATUS_PANIC) {
-                    RustStream out_stream(&out_buf);
-                    auto result = FfiConverterString::read(out_stream);
-                    rustbuffer_free(out_buf);
+                    auto result = FfiConverterString::lift(out_buf);
 
                     throw std::runtime_error(result);
                 }
