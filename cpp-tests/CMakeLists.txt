@@ -52,7 +52,7 @@ target_compile_definitions(${TEST_NAME}-scaffolding-test PRIVATE SCAFFOLDING_TES
 add_test(NAME ${TEST_NAME}-scaffolding-test COMMAND ${TEST_NAME}-scaffolding-test)
 memcheck_test(${TEST_NAME}-scaffolding-test)
 
-add_dependencies(uniffi_${TEST_NAME} bindings scaffolding custom_scaffolding uniffi_${TEST_NAME})
+add_dependencies(uniffi_${TEST_NAME} bindings scaffolding uniffi_${TEST_NAME})
 
 list(APPEND BINDING_FILES ${BINDINGS_SRC_DIR}/${TEST_NAME}.cpp)
 list(APPEND SCAFFOLDING_FILES ${BINDINGS_SRC_DIR}/${TEST_NAME}_cpp_scaffolding.cpp)
@@ -74,7 +74,6 @@ test_case(uniffi_docstring)
 test_case(trait_methods)
 test_case(custom_types_builtin)
 
-# scaffolding_test_case(custom_fixture_callbacks)
 scaffolding_test_case(arithmetic)
 scaffolding_test_case(callbacks)
 scaffolding_test_case(fixture_callbacks)
@@ -108,12 +107,4 @@ add_custom_target(scaffolding ALL
     COMMAND ./uniffi-bindgen-cpp --scaffolding --library libuniffi_bindgen_cpp_fixtures.so --out-dir bindings
     WORKING_DIRECTORY ${BINDINGS_BUILD_DIR}
     COMMENT "Generating scaffolding"
-)
-
-add_custom_target(custom_scaffolding ALL
-    DEPENDS scaffolding
-    COMMAND ./uniffi-bindgen-cpp --scaffolding ${CMAKE_CURRENT_SOURCE_DIR}/scaffolding_tests/custom_fixture_callbacks/udl/custom_callback_fixtures.udl --crate fixture_callbacks --out-dir ${BINDINGS_SRC_DIR}
-    COMMAND ./uniffi-bindgen-cpp ${CMAKE_CURRENT_SOURCE_DIR}/scaffolding_tests/custom_fixture_callbacks/udl/custom_callback_fixtures.udl --crate fixture_callbacks --out-dir ${BINDINGS_SRC_DIR} 
-    WORKING_DIRECTORY ${BINDINGS_BUILD_DIR}
-    COMMENT "Generating custom test scaffolding"
 )
