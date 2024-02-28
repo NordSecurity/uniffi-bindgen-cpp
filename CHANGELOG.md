@@ -1,3 +1,10 @@
+#### v0.4.2+v0.25.0
+
+----
+
+- Scaffolding: Add support for errors
+- Scaffolding: Add internal ref counts for object types
+
 #### v0.4.1+v0.25.0
 
 ----
