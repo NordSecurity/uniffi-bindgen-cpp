@@ -45,7 +45,7 @@ class {{ iface.name() }}Proxy: public {{ iface.name() }} {
                 auto ret = callback_stub(this->handle, {{ loop.index }}, in_buf.data, size, &out_buf);
                 rustbuffer_free(in_buf);
 
-                if (ret == CALL_STATUS_OK) {
+                if (ret == UNIFFI_CALL_STATUS_OK) {
                     {% match m.return_type() %}
                     {% when Some with (return_type) %}
                     RustStream out_stream(&out_buf);
@@ -57,7 +57,7 @@ class {{ iface.name() }}Proxy: public {{ iface.name() }} {
                     rustbuffer_free(out_buf);
                     {% endmatch %}
                 }
-                else if (ret == CALL_STATUS_ERROR) {
+                else if (ret == UNIFFI_CALL_STATUS_ERROR) {
                     RustStream out_stream(&out_buf);
                     int32_t v;
                     out_stream >> v;
@@ -77,20 +77,20 @@ class {{ iface.name() }}Proxy: public {{ iface.name() }} {
                     {%- endfor %}
                     default:
                         rustbuffer_free(out_buf);
-                        throw std::runtime_error("Unexpected error variant");
+                        throw std::runtime_error("Unexpected error variant: " + std::to_string(v));
                     }
                     {%- endif %}
                     rustbuffer_free(out_buf);
-                    throw std::runtime_error("Callback returned unexpected error code");
+                    throw std::runtime_error("Callback returned an error");
                 }
-                else if (ret == CALL_STATUS_PANIC) {
+                else if (ret == UNIFFI_CALL_STATUS_PANIC) {
                     auto result = FfiConverterString::lift(out_buf);
 
                     throw std::runtime_error(result);
                 }
                 else {
                     rustbuffer_free(out_buf);
-                    throw std::runtime_error("Unknown error code");
+                    throw std::runtime_error("Unknown error code: " + std::to_string(ret));
                 }
             }
             {% endfor %}

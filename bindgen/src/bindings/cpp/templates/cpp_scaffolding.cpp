@@ -26,9 +26,9 @@
 
 using namespace {{ namespace }};
 
-constexpr int8_t CALL_STATUS_OK = 0;
-constexpr int8_t CALL_STATUS_ERROR = 1;
-constexpr int8_t CALL_STATUS_PANIC = 2;
+constexpr int8_t UNIFFI_CALL_STATUS_OK = 0;
+constexpr int8_t UNIFFI_CALL_STATUS_ERROR = 1;
+constexpr int8_t UNIFFI_CALL_STATUS_PANIC = 2;
 
 struct ForeignBytes {
     int32_t len;
@@ -164,7 +164,7 @@ extern "C" {
 #endif
 
 UNIFFI_EXPORT RustBuffer {{ ci.ffi_rustbuffer_alloc().name() }}(int32_t size, RustCallStatus *out_status) {
-    out_status->code = CALL_STATUS_OK;
+    out_status->code = UNIFFI_CALL_STATUS_OK;
 
     RustBuffer buf = {
         .capacity = size,
@@ -176,7 +176,7 @@ UNIFFI_EXPORT RustBuffer {{ ci.ffi_rustbuffer_alloc().name() }}(int32_t size, Ru
 }
 
 UNIFFI_EXPORT RustBuffer {{ ci.ffi_rustbuffer_from_bytes().name() }}(ForeignBytes bytes, RustCallStatus *out_status) {
-    out_status->code = CALL_STATUS_OK;
+    out_status->code = UNIFFI_CALL_STATUS_OK;
 
     RustBuffer buf = {
         .capacity = bytes.len,
@@ -190,13 +190,13 @@ UNIFFI_EXPORT RustBuffer {{ ci.ffi_rustbuffer_from_bytes().name() }}(ForeignByte
 }
 
 UNIFFI_EXPORT void {{ ci.ffi_rustbuffer_free().name() }}(RustBuffer buf, RustCallStatus *out_status) {
-    out_status->code = CALL_STATUS_OK;
+    out_status->code = UNIFFI_CALL_STATUS_OK;
 
     delete[] buf.data;
 }
 
 UNIFFI_EXPORT RustBuffer {{ ci.ffi_rustbuffer_reserve().name() }}(RustBuffer buffer, int32_t additional, RustCallStatus *out_status) {
-    out_status->code = CALL_STATUS_OK;
+    out_status->code = UNIFFI_CALL_STATUS_OK;
 
     RustBuffer buf = {
         .capacity = buffer.capacity + additional,
@@ -238,7 +238,7 @@ UNIFFI_EXPORT
 {% for func in ci.callback_interface_definitions() %}
 {% let ffi_func = func.ffi_init_callback() %}
 UNIFFI_EXPORT void {{ ffi_func.name() }}(ForeignCallback callback_stub, RustCallStatus *out_status) {
-    out_status->code = CALL_STATUS_OK;
+    out_status->code = UNIFFI_CALL_STATUS_OK;
 
     {{ func|ffi_converter_name }}::fn_handle.store(reinterpret_cast<uint64_t>(callback_stub));
 }
@@ -257,7 +257,7 @@ UNIFFI_EXPORT
 {%- if ffi_ctor.has_rust_call_status_arg() %}RustCallStatus *out_status{% endif -%}
 ) {
     {%- if ffi_ctor.has_rust_call_status_arg() %}
-    out_status->code = CALL_STATUS_OK;
+    out_status->code = UNIFFI_CALL_STATUS_OK;
     {% endif -%}
 
     std::shared_ptr<{{ obj.name() }}> obj = std::make_shared<{{ obj.name() }}>(
@@ -278,7 +278,7 @@ UNIFFI_EXPORT
 {%- if ffi_dtor.has_rust_call_status_arg() %}RustCallStatus *out_status{% endif -%}
 ) {
     {%- if ffi_dtor.has_rust_call_status_arg() %}
-    out_status->code = CALL_STATUS_OK;
+    out_status->code = UNIFFI_CALL_STATUS_OK;
     {% endif -%}
 
     {{ obj.name() }}_map.erase((uint64_t)ptr);
@@ -295,7 +295,7 @@ UNIFFI_EXPORT
 {%- if ffi_func.has_rust_call_status_arg() %}RustCallStatus *out_status{% endif -%}
 ) {
     {%- if ffi_func.has_rust_call_status_arg() %}
-    out_status->code = CALL_STATUS_OK;
+    out_status->code = UNIFFI_CALL_STATUS_OK;
     {% endif -%}
 
     auto obj = {{ obj.name() }}_map.at((uint64_t)ptr);
@@ -351,7 +351,7 @@ UNIFFI_EXPORT uint32_t {{ contract_fn.name() }}() { return {{ ci.uniffi_contract
 #endif
 
 RustBuffer rustbuffer_alloc(int32_t size) {
-    RustCallStatus status = { CALL_STATUS_OK };
+    RustCallStatus status = { UNIFFI_CALL_STATUS_OK };
 
     return {{ ci.ffi_rustbuffer_alloc().name() }}(
         size,
@@ -360,7 +360,7 @@ RustBuffer rustbuffer_alloc(int32_t size) {
 }
 
 RustBuffer rustbuffer_from_bytes(const ForeignBytes& bytes) {
-    RustCallStatus status = { CALL_STATUS_OK };
+    RustCallStatus status = { UNIFFI_CALL_STATUS_OK };
 
     return {{ ci.ffi_rustbuffer_from_bytes().name() }}(
         bytes,
@@ -369,7 +369,7 @@ RustBuffer rustbuffer_from_bytes(const ForeignBytes& bytes) {
 }
 
 void rustbuffer_free(RustBuffer& buf) {
-    RustCallStatus status = { CALL_STATUS_OK };
+    RustCallStatus status = { UNIFFI_CALL_STATUS_OK };
 
     {{ ci.ffi_rustbuffer_free().name() }}(
         buf,
