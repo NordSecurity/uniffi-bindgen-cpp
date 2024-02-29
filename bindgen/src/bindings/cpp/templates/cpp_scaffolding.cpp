@@ -1,4 +1,4 @@
-{%- import "macros.cpp" as macros %}
+{%- import "scaffolding/macros.cpp" as macros %}
 {% let namespace = ci.namespace() %}
 {% match config.namespace %}
 {% when Some with (ns) %}
@@ -22,8 +22,13 @@
 #include <atomic>
 #include <map>
 #include <mutex>
+#include <cstring>
 
 using namespace {{ namespace }};
+
+constexpr int8_t UNIFFI_CALL_STATUS_OK = 0;
+constexpr int8_t UNIFFI_CALL_STATUS_ERROR = 1;
+constexpr int8_t UNIFFI_CALL_STATUS_PANIC = 2;
 
 struct ForeignBytes {
     int32_t len;
@@ -92,7 +97,7 @@ private:
     RustStreamBuffer streambuf;
 };
 
-{%- include "handle_map.cpp" %}
+{%- include "scaffolding/object_map.cpp" %}
 
 {%- for typ in ci.iter_types() %}
 {%- match typ %}
@@ -137,13 +142,17 @@ private:
 {%- when Type::Enum { module_path, name } %}
 {%- let e = ci|get_enum_definition(name) %}
 {%- if ci.is_name_used_as_error(name) %}
+{% for variant in e.variants() %}
+{% include "scaffolding/err.hpp" %}
+{% endfor %}
 {%- else %}
 {%- if e.is_flat() %}
 {% include "enum_conv.hpp" %}
 {% endif %}
 {%- endif %}
 {%- when Type::Object { module_path, name, imp } %}
-HandleMap<{{ typ|canonical_name }}> {{ name }}_map;
+{% include "scaffolding/obj.hpp" %}
+ObjectMap<{{ typ|canonical_name }}> {{ name }}_map;
 {%- when Type::CallbackInterface { module_path, name } %}
 {% include "scaffolding/callback.hpp" %}
 {% else %}
@@ -155,7 +164,7 @@ extern "C" {
 #endif
 
 UNIFFI_EXPORT RustBuffer {{ ci.ffi_rustbuffer_alloc().name() }}(int32_t size, RustCallStatus *out_status) {
-    out_status->code = 0;
+    out_status->code = UNIFFI_CALL_STATUS_OK;
 
     RustBuffer buf = {
         .capacity = size,
@@ -167,7 +176,7 @@ UNIFFI_EXPORT RustBuffer {{ ci.ffi_rustbuffer_alloc().name() }}(int32_t size, Ru
 }
 
 UNIFFI_EXPORT RustBuffer {{ ci.ffi_rustbuffer_from_bytes().name() }}(ForeignBytes bytes, RustCallStatus *out_status) {
-    out_status->code = 0;
+    out_status->code = UNIFFI_CALL_STATUS_OK;
 
     RustBuffer buf = {
         .capacity = bytes.len,
@@ -181,13 +190,13 @@ UNIFFI_EXPORT RustBuffer {{ ci.ffi_rustbuffer_from_bytes().name() }}(ForeignByte
 }
 
 UNIFFI_EXPORT void {{ ci.ffi_rustbuffer_free().name() }}(RustBuffer buf, RustCallStatus *out_status) {
-    out_status->code = 0;
+    out_status->code = UNIFFI_CALL_STATUS_OK;
 
     delete[] buf.data;
 }
 
 UNIFFI_EXPORT RustBuffer {{ ci.ffi_rustbuffer_reserve().name() }}(RustBuffer buffer, int32_t additional, RustCallStatus *out_status) {
-    out_status->code = 0;
+    out_status->code = UNIFFI_CALL_STATUS_OK;
 
     RustBuffer buf = {
         .capacity = buffer.capacity + additional,
@@ -208,12 +217,9 @@ UNIFFI_EXPORT
 {% endfor %}
 {%- if ffi_func.has_rust_call_status_arg() %}RustCallStatus *out_status{% endif -%}
 ) {
-    {%- if ffi_func.has_rust_call_status_arg() %}
-    out_status->code = 0;
-    {% endif -%}
-
-    {% match func.return_type() %}
-    {% when Some with (return_type) %}
+    {%- call macros::fn_prologue(ci, func, ffi_func) %}
+    {%- match func.return_type() %}
+    {%- when Some with (return_type) %}
     auto ret = {{ namespace }}::{{ func.name() }}(
     {%- for arg in func.arguments() %}
     {{- arg|lift_fn }}({{ arg.name()|var_name }}){% if !loop.last %}, {% endif -%}
@@ -223,15 +229,16 @@ UNIFFI_EXPORT
     {{ namespace }}::{{ func.name() }}(
     {%- for arg in func.arguments() %}
     {{- arg|lift_fn }}({{ arg.name()|var_name }}){% if !loop.last %}, {% endif -%}
-    {% endfor %});
-    {% endmatch %}
+    {%- endfor %});
+    {%- endmatch %}
+    {%- call macros::fn_epilogue(ci, func, ffi_func) %}
 }
 {% endfor %}
 
 {% for func in ci.callback_interface_definitions() %}
 {% let ffi_func = func.ffi_init_callback() %}
 UNIFFI_EXPORT void {{ ffi_func.name() }}(ForeignCallback callback_stub, RustCallStatus *out_status) {
-    out_status->code = 0;
+    out_status->code = UNIFFI_CALL_STATUS_OK;
 
     {{ func|ffi_converter_name }}::fn_handle.store(reinterpret_cast<uint64_t>(callback_stub));
 }
@@ -250,14 +257,13 @@ UNIFFI_EXPORT
 {%- if ffi_ctor.has_rust_call_status_arg() %}RustCallStatus *out_status{% endif -%}
 ) {
     {%- if ffi_ctor.has_rust_call_status_arg() %}
-    out_status->code = 0;
+    out_status->code = UNIFFI_CALL_STATUS_OK;
     {% endif -%}
 
     std::shared_ptr<{{ obj.name() }}> obj = std::make_shared<{{ obj.name() }}>(
     {%- for arg in ctor.arguments() %}
     {{- arg|lift_fn }}({{ arg.name()|var_name }}){% if !loop.last %}, {% endif -%}
     {% endfor %});
-
     return (void*){{ obj.name() }}_map.insert(obj);
 }
 {% endfor %}
@@ -272,7 +278,7 @@ UNIFFI_EXPORT
 {%- if ffi_dtor.has_rust_call_status_arg() %}RustCallStatus *out_status{% endif -%}
 ) {
     {%- if ffi_dtor.has_rust_call_status_arg() %}
-    out_status->code = 0;
+    out_status->code = UNIFFI_CALL_STATUS_OK;
     {% endif -%}
 
     {{ obj.name() }}_map.erase((uint64_t)ptr);
@@ -289,11 +295,12 @@ UNIFFI_EXPORT
 {%- if ffi_func.has_rust_call_status_arg() %}RustCallStatus *out_status{% endif -%}
 ) {
     {%- if ffi_func.has_rust_call_status_arg() %}
-    out_status->code = 0;
+    out_status->code = UNIFFI_CALL_STATUS_OK;
     {% endif -%}
 
     auto obj = {{ obj.name() }}_map.at((uint64_t)ptr);
 
+    {%- call macros::fn_prologue(ci, func, ffi_func) %}
     {% match func.return_type() %}
     {% when Some with (return_type) %}
     auto ret = obj->{{ func.name() }}(
@@ -307,6 +314,7 @@ UNIFFI_EXPORT
     {{- arg|lift_fn }}({{ arg.name()|var_name }}){% if !loop.last %}, {% endif -%}
     {% endfor %});
     {% endmatch %}
+    {%- call macros::fn_epilogue(ci, func, ffi_func) %}
 }
 {% endfor %}
 {% endfor %}
@@ -343,7 +351,7 @@ UNIFFI_EXPORT uint32_t {{ contract_fn.name() }}() { return {{ ci.uniffi_contract
 #endif
 
 RustBuffer rustbuffer_alloc(int32_t size) {
-    RustCallStatus status = { 0 };
+    RustCallStatus status = { UNIFFI_CALL_STATUS_OK };
 
     return {{ ci.ffi_rustbuffer_alloc().name() }}(
         size,
@@ -352,7 +360,7 @@ RustBuffer rustbuffer_alloc(int32_t size) {
 }
 
 RustBuffer rustbuffer_from_bytes(const ForeignBytes& bytes) {
-    RustCallStatus status = { 0 };
+    RustCallStatus status = { UNIFFI_CALL_STATUS_OK };
 
     return {{ ci.ffi_rustbuffer_from_bytes().name() }}(
         bytes,
@@ -361,7 +369,7 @@ RustBuffer rustbuffer_from_bytes(const ForeignBytes& bytes) {
 }
 
 void rustbuffer_free(RustBuffer& buf) {
-    RustCallStatus status = { 0 };
+    RustCallStatus status = { UNIFFI_CALL_STATUS_OK };
 
     {{ ci.ffi_rustbuffer_free().name() }}(
         buf,
@@ -417,12 +425,16 @@ void rustbuffer_free(RustBuffer& buf) {
 {%- when Type::Enum { module_path, name } %}
 {%- let e = ci|get_enum_definition(name) %}
 {%- if ci.is_name_used_as_error(name) %}
+{% for variant in e.variants() %}
+{% include "scaffolding/err.cpp" %}
+{% endfor %}
 {%- else %}
 {%- if e.is_flat() %}
 {% include "enum_tmpl.cpp" %}
 {%- endif %}
 {%- endif %}
 {%- when Type::Object { module_path, name, imp } %}
+{% include "scaffolding/obj.cpp" %}
 {%- when Type::CallbackInterface { module_path, name } %}
 {% include "scaffolding/callback.cpp" %}
 {%- else %}

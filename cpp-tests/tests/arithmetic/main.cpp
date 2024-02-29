@@ -20,7 +20,6 @@ int main() {
 
     ASSERT_FALSE(arithmetic::equal(2, 4));
     ASSERT_FALSE(arithmetic::equal(4, 8));
-    
 
     return 0;
 }
