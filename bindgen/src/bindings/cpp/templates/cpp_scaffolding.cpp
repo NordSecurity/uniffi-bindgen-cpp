@@ -6,6 +6,8 @@
 {% else %}
 {% endmatch %}
 
+template <class> inline constexpr bool always_false_v = false;
+
 #if defined(_WIN32) || defined(_WIN64)
 #define UNIFFI_EXPORT __declspec(dllexport)
 #else
@@ -146,9 +148,7 @@ private:
 {% include "scaffolding/err.hpp" %}
 {% endfor %}
 {%- else %}
-{%- if e.is_flat() %}
 {% include "enum_conv.hpp" %}
-{% endif %}
 {%- endif %}
 {%- when Type::Object { module_path, name, imp } %}
 {% include "scaffolding/obj.hpp" %}
@@ -429,9 +429,7 @@ void rustbuffer_free(RustBuffer& buf) {
 {% include "scaffolding/err.cpp" %}
 {% endfor %}
 {%- else %}
-{%- if e.is_flat() %}
 {% include "enum_tmpl.cpp" %}
-{%- endif %}
 {%- endif %}
 {%- when Type::Object { module_path, name, imp } %}
 {% include "scaffolding/obj.cpp" %}

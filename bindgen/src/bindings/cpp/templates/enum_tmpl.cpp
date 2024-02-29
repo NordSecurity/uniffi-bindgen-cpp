@@ -74,7 +74,7 @@ RustBuffer {{ ffi_converter_name }}::lower(const {{ type_name }} &val) {
     case {{ loop.index }}:
         return {{ type_name }}::{{ variant|variant_name }} {
             {%- for field in variant.fields() %}
-            .{{field.name()|var_name}} = uniffi::{{ field|read_fn }}(stream),
+            .{{field.name()|var_name}} = {{ field|read_fn }}(stream),
             {%- endfor %}
         };
         {% endfor %}
@@ -93,7 +93,7 @@ void {{ ffi_converter_name }}::write(RustStream &stream, const {{ type_name }} &
         {%- for variant in e.variants() %}
         {% if !loop.first %}else {% endif %}if constexpr (std::is_same_v<T, {{ type_name }}::{{ variant|variant_name }}>) {
             {%- for field in variant.fields() %}
-            uniffi::{{ field|write_fn }}(stream, arg.{{ field.name()|var_name }});
+            {{ field|write_fn }}(stream, arg.{{ field.name()|var_name }});
             {%- endfor %}
         }
         {%- endfor %}
@@ -114,7 +114,7 @@ int32_t {{ ffi_converter_name }}::allocation_size(const {{ type_name|class_name 
         {% if !loop.first %}else {% endif %}if constexpr (std::is_same_v<T, {{ type_name }}::{{ variant|variant_name }}>) {
             int32_t size = 0;
             {%- for field in variant.fields() %}
-            size += uniffi::{{ field|allocation_size_fn }}(arg.{{ field.name()|var_name }});
+            size += {{ field|allocation_size_fn }}(arg.{{ field.name()|var_name }});
             {%- endfor %}
             return size;
         }
