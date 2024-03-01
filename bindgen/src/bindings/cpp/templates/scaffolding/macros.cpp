@@ -31,16 +31,34 @@
 {%- endif %}
 {% endmacro %}
 
-{% macro invoke_native_fn(scaffolding_fn, prefix) %}
+{% macro invoke_native_fn(scaffolding_fn, namespace) %}
 {% match func.return_type() %}
 {% when Some with (return_type) %}
-auto ret = {{ prefix }}{{ scaffolding_fn.name() }}(
+auto ret = {{ namespace }}::{{ scaffolding_fn.name() }}(
 {%- for arg in scaffolding_fn.arguments() %}
 {{- arg|lift_fn }}({{ arg.name()|var_name }}){% if !loop.last %}, {% endif -%}
 {% endfor %});
 return {{ return_type|lower_fn }}(ret);
 {% when None %}
-{{ prefix }}{{ scaffolding_fn.name() }}(
+{{ namespace }}::{{ scaffolding_fn.name() }}(
+{%- for arg in scaffolding_fn.arguments() %}
+{{- arg|lift_fn }}({{ arg.name()|var_name }}){% if !loop.last %}, {% endif -%}
+{% endfor %});
+{% endmatch %}
+{% endmacro %}
+
+{% macro invoke_native_fn_obj(scaffolding_fn) %}
+{% match func.return_type() %}
+{% when Some with (return_type) %}
+auto ret = obj->{{ scaffolding_fn.name() }}(
+{% if scaffolding_fn.takes_self_by_arc() %}obj{% if !scaffolding_fn.arguments().is_empty() %},{% endif %}{% endif %}
+{%- for arg in scaffolding_fn.arguments() %}
+{{- arg|lift_fn }}({{ arg.name()|var_name }}){% if !loop.last %}, {% endif -%}
+{% endfor %});
+return {{ return_type|lower_fn }}(ret);
+{% when None %}
+obj->{{ scaffolding_fn.name() }}(
+{% if scaffolding_fn.takes_self_by_arc() %}obj{% if !scaffolding_fn.arguments().is_empty() %},{% endif %}{% endif %}
 {%- for arg in scaffolding_fn.arguments() %}
 {{- arg|lift_fn }}({{ arg.name()|var_name }}){% if !loop.last %}, {% endif -%}
 {% endfor %});

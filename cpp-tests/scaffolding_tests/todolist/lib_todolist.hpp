@@ -48,7 +48,7 @@ namespace {
             std::string text;
         };
 
-        class TodoList: public std::enable_shared_from_this<TodoList>{
+        class TodoList {
         public:
             TodoList() = default;
 
@@ -62,7 +62,7 @@ namespace {
             std::string get_last();
             std::string get_first();
             void clear_item(const std::string &item);
-            void make_default();
+            void make_default(const std::shared_ptr<TodoList> &self);
         private:
             std::vector<std::string> items;
             std::mutex items_mutex;

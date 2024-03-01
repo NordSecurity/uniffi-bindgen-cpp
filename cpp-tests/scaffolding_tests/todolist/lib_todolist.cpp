@@ -95,8 +95,8 @@ void todolist::TodoList::clear_item(const std::string &todo) {
     this->items.erase(it);
 }
 
-void todolist::TodoList::make_default() {
-    todolist::set_default_list(this->shared_from_this());
+void todolist::TodoList::make_default(const std::shared_ptr<TodoList> &self) {
+    todolist::set_default_list(self);
 }
 
 #include <todolist_cpp_scaffolding.cpp>

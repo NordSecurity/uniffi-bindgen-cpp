@@ -117,11 +117,11 @@ std::shared_ptr<coverall::Coveralls> coverall::Coveralls::get_other() {
     return this->other;
 }
 
-void coverall::Coveralls::take_other_fallible() {
+void coverall::Coveralls::take_other_fallible(const std::shared_ptr<Coveralls> &self) {
     throw coverall::coverall_error::TooManyHoles();
 }
 
-void coverall::Coveralls::take_other_panic(std::string message) {
+void coverall::Coveralls::take_other_panic(const std::shared_ptr<Coveralls> &self, std::string message) {
     throw std::runtime_error(message);
 }
 

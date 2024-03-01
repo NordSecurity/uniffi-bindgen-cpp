@@ -163,7 +163,7 @@ UNIFFI_EXPORT RustBuffer {{ ci.ffi_rustbuffer_reserve().name() }}(RustBuffer buf
 {% let ffi_func = func.ffi_func() %}
 UNIFFI_EXPORT {%- call macros::fn_definition(ffi_func) %} {
     {%- call macros::fn_prologue(ci, func, ffi_func) %}
-    {%- call macros::invoke_native_fn(func, "{}::"|format(namespace)) %}
+    {%- call macros::invoke_native_fn(func, namespace) %}
     {%- call macros::fn_epilogue(ci, func, ffi_func) %}
 }
 {% endfor %}
@@ -208,7 +208,7 @@ UNIFFI_EXPORT {%- call macros::fn_definition(ffi_dtor) %} {
 UNIFFI_EXPORT {%- call macros::fn_definition(ffi_func) %} {
     {%- call macros::fn_prologue(ci, func, ffi_func) %}
     auto obj = {{ obj.name() }}_map.at((uint64_t)ptr);
-    {%- call macros::invoke_native_fn(func, "obj->") %}
+    {%- call macros::invoke_native_fn_obj(func) %}
     {%- call macros::fn_epilogue(ci, func, ffi_func) %}
 }
 {% endfor %}
