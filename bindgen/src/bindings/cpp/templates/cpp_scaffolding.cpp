@@ -303,7 +303,7 @@ UNIFFI_EXPORT
     {%- call macros::fn_prologue(ci, func, ffi_func) %}
     {% match func.return_type() %}
     {% when Some with (return_type) %}
-    auto ret = obj->{{ func.name() }}(
+    auto ret = obj->{{ func.name() }}({% if func.takes_self_by_arc() %}obj{% if !func.arguments().is_empty() %},{% endif %}{% endif %}
     {%- for arg in func.arguments() %}
     {{- arg|lift_fn }}({{ arg.name()|var_name }}){% if !loop.last %}, {% endif -%}
     {% endfor %});
