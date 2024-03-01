@@ -161,28 +161,9 @@ UNIFFI_EXPORT RustBuffer {{ ci.ffi_rustbuffer_reserve().name() }}(RustBuffer buf
 
 {% for func in ci.function_definitions() %}
 {% let ffi_func = func.ffi_func() %}
-UNIFFI_EXPORT
-{% match ffi_func.return_type() -%}
-{% when Some with (return_type) %}{{ return_type|ffi_type_name }} {% when None %}void {% endmatch %}{{ ffi_func.name() }}(
-{%- for arg in ffi_func.arguments() %}
-{{- arg.type_().borrow()|ffi_type_name }} {{ arg.name() }}{% if !loop.last || ffi_func.has_rust_call_status_arg() %}, {% endif -%}
-{% endfor %}
-{%- if ffi_func.has_rust_call_status_arg() %}RustCallStatus *out_status{% endif -%}
-) {
+UNIFFI_EXPORT {%- call macros::fn_definition(ffi_func) %} {
     {%- call macros::fn_prologue(ci, func, ffi_func) %}
-    {%- match func.return_type() %}
-    {%- when Some with (return_type) %}
-    auto ret = {{ namespace }}::{{ func.name() }}(
-    {%- for arg in func.arguments() %}
-    {{- arg|lift_fn }}({{ arg.name()|var_name }}){% if !loop.last %}, {% endif -%}
-    {% endfor %});
-    return {{ return_type|lower_fn }}(ret);
-    {% when None %}
-    {{ namespace }}::{{ func.name() }}(
-    {%- for arg in func.arguments() %}
-    {{- arg|lift_fn }}({{ arg.name()|var_name }}){% if !loop.last %}, {% endif -%}
-    {%- endfor %});
-    {%- endmatch %}
+    {%- call macros::invoke_native_fn(func, "{}::"|format(namespace)) %}
     {%- call macros::fn_epilogue(ci, func, ffi_func) %}
 }
 {% endfor %}
@@ -200,14 +181,7 @@ UNIFFI_EXPORT void {{ ffi_func.name() }}(ForeignCallback callback_stub, RustCall
 
 {% for ctor in obj.constructors() %}
 {% let ffi_ctor = ctor.ffi_func() %}
-UNIFFI_EXPORT
-{% match ffi_ctor.return_type() -%}
-{% when Some with (return_type) %}{{ return_type|ffi_type_name }} {% when None %}void {% endmatch %}{{ ffi_ctor.name() }}(
-{%- for arg in ffi_ctor.arguments() %}
-{{- arg.type_().borrow()|ffi_type_name }} {{ arg.name() }}{% if !loop.last || ffi_ctor.has_rust_call_status_arg() %}, {% endif -%}
-{% endfor %}
-{%- if ffi_ctor.has_rust_call_status_arg() %}RustCallStatus *out_status{% endif -%}
-) {
+UNIFFI_EXPORT {%- call macros::fn_definition(ffi_ctor) %} {
     {%- if ffi_ctor.has_rust_call_status_arg() %}
     out_status->code = UNIFFI_CALL_STATUS_OK;
     {% endif -%}
@@ -221,14 +195,7 @@ UNIFFI_EXPORT
 {% endfor %}
 
 {% let ffi_dtor = obj.ffi_object_free() %}
-UNIFFI_EXPORT
-{% match ffi_dtor.return_type() -%}
-{% when Some with (return_type) %}{{ return_type|ffi_type_name }} {% when None %}void {% endmatch %}{{ ffi_dtor.name() }}(
-{%- for arg in ffi_dtor.arguments() %}
-{{- arg.type_().borrow()|ffi_type_name }} {{ arg.name() }}{% if !loop.last || ffi_dtor.has_rust_call_status_arg() %}, {% endif -%}
-{% endfor %}
-{%- if ffi_dtor.has_rust_call_status_arg() %}RustCallStatus *out_status{% endif -%}
-) {
+UNIFFI_EXPORT {%- call macros::fn_definition(ffi_dtor) %} {
     {%- if ffi_dtor.has_rust_call_status_arg() %}
     out_status->code = UNIFFI_CALL_STATUS_OK;
     {% endif -%}
@@ -238,48 +205,17 @@ UNIFFI_EXPORT
 
 {% for func in obj.methods() %}
 {% let ffi_func = func.ffi_func() %}
-UNIFFI_EXPORT
-{% match ffi_func.return_type() -%}
-{% when Some with (return_type) %}{{ return_type|ffi_type_name }} {% when None %}void {% endmatch %}{{ ffi_func.name() }}(
-{%- for arg in ffi_func.arguments() %}
-{{- arg.type_().borrow()|ffi_type_name }} {{ arg.name() }}{% if !loop.last || ffi_func.has_rust_call_status_arg() %}, {% endif -%}
-{% endfor %}
-{%- if ffi_func.has_rust_call_status_arg() %}RustCallStatus *out_status{% endif -%}
-) {
-    {%- if ffi_func.has_rust_call_status_arg() %}
-    out_status->code = UNIFFI_CALL_STATUS_OK;
-    {% endif -%}
-
-    auto obj = {{ obj.name() }}_map.at((uint64_t)ptr);
-
+UNIFFI_EXPORT {%- call macros::fn_definition(ffi_func) %} {
     {%- call macros::fn_prologue(ci, func, ffi_func) %}
-    {% match func.return_type() %}
-    {% when Some with (return_type) %}
-    auto ret = obj->{{ func.name() }}({% if func.takes_self_by_arc() %}obj{% if !func.arguments().is_empty() %},{% endif %}{% endif %}
-    {%- for arg in func.arguments() %}
-    {{- arg|lift_fn }}({{ arg.name()|var_name }}){% if !loop.last %}, {% endif -%}
-    {% endfor %});
-    return {{ return_type|lower_fn }}(ret);
-    {% when None %}
-    obj->{{ func.name() }}(
-    {%- for arg in func.arguments() %}
-    {{- arg|lift_fn }}({{ arg.name()|var_name }}){% if !loop.last %}, {% endif -%}
-    {% endfor %});
-    {% endmatch %}
+    auto obj = {{ obj.name() }}_map.at((uint64_t)ptr);
+    {%- call macros::invoke_native_fn(func, "obj->") %}
     {%- call macros::fn_epilogue(ci, func, ffi_func) %}
 }
 {% endfor %}
 {% endfor %}
 
 {% for func in ci.iter_futures_ffi_function_definitons() %}
-UNIFFI_EXPORT
-{% match func.return_type() -%}
-{% when Some with (return_type) %}{{ return_type|ffi_type_name }} {% when None %}void {% endmatch %}{{ func.name() }}(
-{%- for arg in func.arguments() %}
-{{- arg.type_().borrow()|ffi_type_name }} {{ arg.name() }}{% if !loop.last || func.has_rust_call_status_arg() %}, {% endif -%}
-{% endfor %}
-{%- if func.has_rust_call_status_arg() %}RustCallStatus *out_status{% endif -%}
-) {
+UNIFFI_EXPORT {%- call macros::fn_definition(func) %} {
     {%- match func.return_type() %}{% when Some with (return_type) %}
         {% match return_type %}
         {% when FfiType::RustArcPtr(_) %}

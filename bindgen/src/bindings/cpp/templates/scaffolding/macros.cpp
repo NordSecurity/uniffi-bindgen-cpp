@@ -30,3 +30,28 @@
 {% endmatch %}
 {%- endif %}
 {% endmacro %}
+
+{% macro invoke_native_fn(scaffolding_fn, prefix) %}
+{% match func.return_type() %}
+{% when Some with (return_type) %}
+auto ret = {{ prefix }}{{ scaffolding_fn.name() }}(
+{%- for arg in scaffolding_fn.arguments() %}
+{{- arg|lift_fn }}({{ arg.name()|var_name }}){% if !loop.last %}, {% endif -%}
+{% endfor %});
+return {{ return_type|lower_fn }}(ret);
+{% when None %}
+{{ prefix }}{{ scaffolding_fn.name() }}(
+{%- for arg in scaffolding_fn.arguments() %}
+{{- arg|lift_fn }}({{ arg.name()|var_name }}){% if !loop.last %}, {% endif -%}
+{% endfor %});
+{% endmatch %}
+{% endmacro %}
+
+{% macro fn_definition(ffi_func) %}
+{% match ffi_func.return_type() -%}
+{% when Some with (return_type) %}{{ return_type|ffi_type_name }} {% when None %}void {% endmatch %}{{ ffi_func.name() }}(
+{%- for arg in ffi_func.arguments() %}
+{{- arg.type_().borrow()|ffi_type_name }} {{ arg.name() }}{% if !loop.last || ffi_func.has_rust_call_status_arg() %}, {% endif -%}
+{% endfor %}
+{%- if ffi_func.has_rust_call_status_arg() %}RustCallStatus *out_status{% endif -%})
+{% endmacro %}
