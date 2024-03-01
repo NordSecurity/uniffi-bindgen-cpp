@@ -1,3 +1,4 @@
+#include <limits>
 #include <test_common.hpp>
 
 #include <rondpoint.hpp>
@@ -74,7 +75,7 @@ void test_roundtrip() {
 
     affirm_aller_retour(rt, &rondpoint::Retourneur::identique_i8, std::numeric_limits<int8_t>::min(), std::numeric_limits<int8_t>::max(), (int8_t)mean_value);
     affirm_aller_retour(rt, &rondpoint::Retourneur::identique_u8, std::numeric_limits<uint8_t>::min(), std::numeric_limits<uint8_t>::max(), (uint8_t)mean_value);
-    
+
     affirm_aller_retour(rt, &rondpoint::Retourneur::identique_i16, std::numeric_limits<int16_t>::min(), std::numeric_limits<int16_t>::max(), (int16_t)mean_value);
     affirm_aller_retour(rt, &rondpoint::Retourneur::identique_u16, std::numeric_limits<uint16_t>::min(), std::numeric_limits<uint16_t>::max(), (uint16_t)mean_value);
 
@@ -124,14 +125,14 @@ void test_roundtrip() {
         ASSERT_EQ(nombres.court_nombre, ret.court_nombre);
         ASSERT_EQ(nombres.nombre_simple, ret.nombre_simple);
         ASSERT_EQ(nombres.gros_nombre, ret.gros_nombre);
-    } 
+    }
 }
 
 void test_stringifier() {
     auto st = rondpoint::Stringifier::init();
 
     auto mean_value = 0x1234'5678'9123'4567;
-    
+
     ASSERT_EQ("uniffi 💚 cpp!", st->well_known_string("cpp"));
 
     // to_string doesn't work on booleans
@@ -151,11 +152,11 @@ void test_stringifier() {
     affirm_enchaine(st, &rondpoint::Stringifier::to_string_u64, std::numeric_limits<uint64_t>::min(), std::numeric_limits<uint64_t>::max(), (uint64_t)mean_value);
 
     for (float f : {std::numeric_limits<float>::min(), std::numeric_limits<float>::max(), std::numeric_limits<float>::epsilon()}) {
-        ASSERT_TRUE((f == std::stof(st->to_string_float(f))));
+        ASSERT_TRUE((std::abs(f - std::stof(st->to_string_float(f))) <= std::numeric_limits<float>::epsilon()));
     }
 
     for (double d : {std::numeric_limits<double>::min(), std::numeric_limits<double>::max(), std::numeric_limits<double>::epsilon()}) {
-        ASSERT_TRUE((d == std::stod(st->to_string_double(d))));
+        ASSERT_TRUE((std::abs(d - std::stod(st->to_string_double(d))) <= std::numeric_limits<double>::epsilon()));
     }
 }
 

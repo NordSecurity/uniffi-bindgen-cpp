@@ -4,6 +4,7 @@
 
 - Scaffolding: Add support for errors
 - Scaffolding: Add internal ref counts for object types
+- Scaffolding: Add support for associated enums
 
 #### v0.4.1+v0.25.0
 

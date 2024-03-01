@@ -80,11 +80,11 @@ scaffolding_test_case(fixture_callbacks)
 scaffolding_test_case(chronological)
 # scaffolding_test_case(custom_types)
 scaffolding_test_case(geometry)
-# scaffolding_test_case(rondpoint)
+scaffolding_test_case(rondpoint)
 scaffolding_test_case(sprites)
 scaffolding_test_case(todolist)
 scaffolding_test_case(traits)
-# scaffolding_test_case(coverall)
+scaffolding_test_case(coverall)
 # scaffolding_test_case(custom_types_builtin)
 
 add_custom_target(libs ALL

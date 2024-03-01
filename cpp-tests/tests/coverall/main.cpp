@@ -149,6 +149,19 @@ void test_bytes() {
     ASSERT_EQ(std::vector<uint8_t>({1, 2, 3}), coveralls->reverse(std::vector<uint8_t>({3, 2, 1})));
 }
 
+void test_dict_with_non_string_keys() {
+    auto coveralls = coverall::Coveralls::init("test_dict");
+
+    auto dict1 = coveralls->get_dict("answer", 42);
+    ASSERT_EQ(42, dict1.at("answer"));
+
+    auto dict2 = coveralls->get_dict2("answer", 42);
+    ASSERT_EQ(42, dict2.at("answer"));
+
+    auto dict3 = coveralls->get_dict3(31, 42);
+    ASSERT_EQ(42, dict3.at(31));
+}
+
 int main() {
     test_some_dict();
     test_arcs();
@@ -158,6 +171,7 @@ int main() {
     test_interface_in_dicts();
     test_multithread_calls();
     test_bytes();
+    test_dict_with_non_string_keys();
 
     return 0;
 }
