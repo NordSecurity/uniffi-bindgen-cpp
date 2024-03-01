@@ -68,7 +68,6 @@ Additionally, for examples of how to use the C++ scaffolding, refer to the [C++ 
 
 The following features are currently not supported in the C++ scaffolding:
 
-- Associated enums
 - Custom types
 - Async
 - Default argument values
