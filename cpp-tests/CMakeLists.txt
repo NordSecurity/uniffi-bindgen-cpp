@@ -47,7 +47,6 @@ target_include_directories(uniffi_${TEST_NAME} PRIVATE scaffolding_tests/${TEST_
 add_executable(${TEST_NAME}-scaffolding-test tests/${TEST_NAME}/main.cpp ${BINDINGS_SRC_DIR}/${TEST_NAME}.cpp)
 target_include_directories(${TEST_NAME}-scaffolding-test PRIVATE ${BINDINGS_SRC_DIR} include)
 target_link_libraries(${TEST_NAME}-scaffolding-test uniffi_${TEST_NAME} Threads::Threads)
-target_compile_definitions(${TEST_NAME}-scaffolding-test PRIVATE SCAFFOLDING_TEST=1)
 
 add_test(NAME ${TEST_NAME}-scaffolding-test COMMAND ${TEST_NAME}-scaffolding-test)
 memcheck_test(${TEST_NAME}-scaffolding-test)
