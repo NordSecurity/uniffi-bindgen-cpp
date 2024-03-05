@@ -91,8 +91,8 @@ namespace {
 
             void take_other(const std::shared_ptr<Coveralls> &other);
             std::shared_ptr<Coveralls> get_other();
-            void take_other_fallible();
-            void take_other_panic(std::string message);
+            void take_other_fallible(const std::shared_ptr<Coveralls> &self);
+            void take_other_panic(const std::shared_ptr<Coveralls> &self, std::string message);
 
             std::shared_ptr<Coveralls> clone_me();
 
