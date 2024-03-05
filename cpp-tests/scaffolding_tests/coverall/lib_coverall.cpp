@@ -96,7 +96,7 @@ bool coverall::Coveralls::maybe_throw_complex(uint8_t input) {
 }
 
 void coverall::Coveralls::panic(std::string message) {
-    throw std::runtime_error("coveralls->panic()");
+    throw std::runtime_error(message);
 }
 
 void coverall::Coveralls::fallible_panic(std::string message) {

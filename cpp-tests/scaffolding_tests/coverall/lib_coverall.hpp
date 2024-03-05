@@ -197,7 +197,7 @@ namespace {
         namespace coverall_error {
             class TooManyHoles: public std::runtime_error {
             public:
-                TooManyHoles() : TooManyHoles("") {}
+                TooManyHoles() : TooManyHoles("The coverall has too many holes") {}
                 TooManyHoles(const std::string &what_arg) : std::runtime_error(what_arg) {}
             };
         }
