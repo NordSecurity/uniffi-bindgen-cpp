@@ -34,7 +34,7 @@ void uniffi::{{ class_name }}::write(RustStream &stream, const {{ type_name }} &
 }
 
 int32_t uniffi::{{ class_name }}::allocation_size(const {{ type_name }} &impl) {
-    return sizeof(uint64_t);
+    return static_cast<int32_t>(sizeof(uint64_t));
 }
 
 int {{ class_name }}::callback_stub(uint64_t handle, uint32_t method, uint8_t *args_data, int32_t args_len, RustBuffer *buf_ptr) {

@@ -44,7 +44,7 @@ void {{ ffi_converter_name }}::write(RustStream &stream, const {{ type_name }} &
 }
 
 int32_t {{ ffi_converter_name }}::allocation_size(const {{ type_name|class_name }} &) {
-    return sizeof(int32_t);
+    return static_cast<int32_t>(sizeof(int32_t));
 }
 {%- else %}
 {{ type_name }} {{ ffi_converter_name }}::lift(RustBuffer buf) {
@@ -84,7 +84,7 @@ RustBuffer {{ ffi_converter_name }}::lower(const {{ type_name }} &val) {
 }
 
 void {{ ffi_converter_name }}::write(RustStream &stream, const {{ type_name }} &val) {
-    int32_t variant_id = val.variant.index() + 1;
+    int32_t variant_id = static_cast<int32_t>(val.variant.index() + 1);
 
     stream << variant_id;
 

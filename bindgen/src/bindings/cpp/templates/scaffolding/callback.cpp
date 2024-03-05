@@ -127,7 +127,7 @@ void {{ ffi_converter_name|class_name }}::write(RustStream &stream, const {{ typ
 }
 
 int32_t {{ ffi_converter_name|class_name }}::allocation_size(const {{ type_name }} &obj) {
-    return sizeof(uint64_t);
+    return static_cast<int32_t>(sizeof(uint64_t));
 }
 
 std::atomic<uint64_t> {{ ffi_converter_name|class_name }}::fn_handle = 0;

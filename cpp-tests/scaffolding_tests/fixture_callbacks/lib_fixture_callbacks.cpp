@@ -36,7 +36,7 @@ std::optional<std::string> fixture_callbacks::RustGetters::get_string_optional_c
             return foreign->get_string(v, argument_two);
         } catch (const fixture_callbacks::simple_error::BadArgument &e) {
             throw e;
-        } catch (const std::runtime_error &e) {
+        } catch (const std::runtime_error&) {
             throw fixture_callbacks::simple_error::UnexpectedError();
         }
     }

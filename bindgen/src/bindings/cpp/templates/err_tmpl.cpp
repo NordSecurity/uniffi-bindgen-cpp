@@ -66,17 +66,17 @@ void {{ ffi_converter_name }}::write(RustStream &stream, const {{ class_name }} 
 
 int32_t {{ ffi_converter_name }}::allocation_size(const {{ class_name }} &val) {
     {%- if e.is_flat() %}
-    return sizeof(int32_t);
+    return static_cast<int32_t>(sizeof(int32_t));
     {%- else %}
     switch (val.get_variant_idx()) {
     {%- for variant in e.variants() %}
     case {{ loop.index }}:
     {
         auto& var = static_cast<const {{ class_name|to_lower_snake_case }}::{{ variant.name() }}&>(val); 
-        return sizeof(int32_t)
+        return static_cast<int32_t>(sizeof(int32_t)
         {%- for field in variant.fields() %}
             + {{ field|allocation_size_fn }}(var.{{ field.name()|var_name }})
-        {%- endfor %};
+        {%- endfor %});
     }
     {%- endfor %}
     default:
