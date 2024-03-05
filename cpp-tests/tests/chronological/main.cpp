@@ -53,32 +53,6 @@ void test_string_timestamps() {
     }
 }
 
-void test_scaffolding_string_timestamps() {
-    {
-        auto time_str = "1970-01-01T00:00:00";
-        auto time = time_from_string(time_str);
-
-        ASSERT_EQ(time_str, chronological::to_string_timestamp(time));
-    }
-
-    {
-        auto time_str = "1970-12-31T23:59:58";
-        auto time = time_from_string(time_str);
-
-        ASSERT_EQ(time_str, chronological::to_string_timestamp(time));
-    }
-
-    {
-        auto time = time_from_string("1979-11-05T00:06:01") + 283000200ns;
-        auto time2 = time_from_string("1979-11-05T00:06:00") + 283000100ns;
-
-        ASSERT_EQ(
-            time,
-            chronological::add(time2, time_span_seconds(1, 100))
-        );
-    }
-}
-
 int main() {
     ASSERT_EQ(
         epoch_second(101, 110),
@@ -110,11 +84,7 @@ int main() {
         chronological::return_duration(std::chrono::nanoseconds::max())
     );
 
-    #ifdef SCAFFOLDING_TEST
-    test_scaffolding_string_timestamps();
-    #else
     test_string_timestamps();
-    #endif
 
     auto before = std::chrono::system_clock::now();
     std::this_thread::sleep_for(1s);

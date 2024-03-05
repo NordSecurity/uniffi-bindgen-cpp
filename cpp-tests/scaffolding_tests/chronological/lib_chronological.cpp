@@ -14,9 +14,18 @@ chronological::duration chronological::return_duration(chronological::duration a
 
 std::string chronological::to_string_timestamp(chronological::timestamp a) {
     std::time_t time = std::chrono::system_clock::to_time_t(a);
+    auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(a.time_since_epoch()).count() % 1000000000;
+    if (ns < 0) {
+        ns += 1000000000;
+        time -= 1;
+    }
+
     std::tm tm = *std::gmtime(&time);
     std::stringstream ss;
     ss << std::put_time(&tm, "%Y-%m-%dT%H:%M:%S");
+    ss<< "." << std::setfill('0') << std::setw(9) << ns;
+    ss << "Z";
+
     return ss.str();
 }
 
