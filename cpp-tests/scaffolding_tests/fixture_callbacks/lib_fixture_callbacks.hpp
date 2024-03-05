@@ -16,13 +16,13 @@ namespace {
         namespace simple_error {
             class BadArgument : public SimpleError {
             public:
-                BadArgument() : SimpleError("") {}
+                BadArgument() : SimpleError("BadArgument") {}
                 BadArgument(const std::string &what_arg) : SimpleError(what_arg) {}
             };
 
             class UnexpectedError : public SimpleError {
             public:
-                UnexpectedError() : SimpleError("") {}
+                UnexpectedError() : SimpleError("UnexpectedError") {}
                 UnexpectedError(const std::string &what_arg) : SimpleError(what_arg) {}
             };
         }
@@ -36,7 +36,7 @@ namespace {
         namespace complex_error {
             class ReallyBadArgument : public ComplexError {
             public:
-                ReallyBadArgument() : ComplexError("") {}
+                ReallyBadArgument() : ComplexError("ReallyBadArgument") {}
                 ReallyBadArgument(const std::string &what_arg) : ComplexError(what_arg) {}
 
                 uint32_t code;
@@ -44,7 +44,7 @@ namespace {
 
             class UnexpectedErrorWithReason : public ComplexError {
             public:
-                UnexpectedErrorWithReason() : ComplexError("") {}
+                UnexpectedErrorWithReason() : ComplexError("InternalTelephoneError") {}
                 UnexpectedErrorWithReason(const std::string &what_arg) : ComplexError(what_arg), reason(what_arg) {}
 
                 std::string reason;

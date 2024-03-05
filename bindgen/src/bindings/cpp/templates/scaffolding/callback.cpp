@@ -11,7 +11,15 @@ class {{ iface.name() }}Proxy: public {{ iface.name() }} {
             ~{{ iface.name() }}Proxy() override {
                 ForeignCallback *callback_stub = reinterpret_cast<ForeignCallback *>({{ ffi_converter_name|class_name }}::fn_handle.load());
 
-                callback_stub(this->handle, 0, nullptr, 0, nullptr);
+                RustBuffer out_buf = {
+                    .capacity = 0,
+                    .len = 0,
+                    .data = nullptr,
+                };
+
+                callback_stub(this->handle, 0, nullptr, 0, &out_buf);
+
+                rustbuffer_free(out_buf);
             }
 
             {% for m in iface.methods() %}
