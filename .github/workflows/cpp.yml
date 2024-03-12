@@ -42,6 +42,8 @@ jobs:
       image: ghcr.io/nordsecurity/uniffi-bindgen-cpp-test-runner:v0.3.0
     steps:
     - uses: actions/checkout@v3
+      with:
+        submodules: recursive
     - name: Test scaffolding Go
       shell: bash
       env:
