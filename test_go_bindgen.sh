@@ -23,4 +23,23 @@ pushd $BINDINGS_DIR
 LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}:$BINARIES_DIR" \
 	CGO_LDFLAGS="-luniffi_fixtures -L$BINARIES_DIR -lm -ldl" \
 	CGO_ENABLED=1 \
-	go test arithmetic_test.go -v
+	go test \
+	arithmetic_test.go \
+	callbacks_test.go \
+	fixture_callbacks_test.go \
+	geometry_test.go \
+	rondpoint_test.go \
+	sprites_test.go \
+	todolist_test.go \
+	coverall_test.go \
+	-v
+
+# We run the chronological tests separately, because we want to skip a few
+# specific functions due to C++ chrono library not supporting large timestamp
+# values
+LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}:$BINARIES_DIR" \
+	CGO_LDFLAGS="-luniffi_fixtures -L$BINARIES_DIR -lm -ldl" \
+	CGO_ENABLED=1 \
+	go test chronological_test.go -skip \
+	"TestTimestampMinMax|TestPreEpochTimestampsSerializesCorrectly" \
+	-v
