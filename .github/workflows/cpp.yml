@@ -52,4 +52,4 @@ jobs:
         HOME: /root
       run: |
         source ~/.bashrc
-        ./test_go_bindgen.sh
+        ./test_scaffolding_go.sh

@@ -19,11 +19,15 @@ pushd $GENERATOR_DIR
 cargo build
 ./build_bindings.sh
 
+
+# We add the skip section, that skips a few chronological test functions
+# due to C++ chrono library not supporting large timestamp values
 pushd $BINDINGS_DIR
 LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}:$BINARIES_DIR" \
 	CGO_LDFLAGS="-luniffi_fixtures -L$BINARIES_DIR -lm -ldl" \
 	CGO_ENABLED=1 \
 	go test \
+	binding_tests.go \
 	arithmetic_test.go \
 	callbacks_test.go \
 	fixture_callbacks_test.go \
@@ -32,14 +36,6 @@ LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}:$BINARIES_DIR" \
 	sprites_test.go \
 	todolist_test.go \
 	coverall_test.go \
-	-v
-
-# We run the chronological tests separately, because we want to skip a few
-# specific functions due to C++ chrono library not supporting large timestamp
-# values
-LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}:$BINARIES_DIR" \
-	CGO_LDFLAGS="-luniffi_fixtures -L$BINARIES_DIR -lm -ldl" \
-	CGO_ENABLED=1 \
-	go test chronological_test.go -skip \
-	"TestTimestampMinMax|TestPreEpochTimestampsSerializesCorrectly" \
+	chronological_test.go \
+	-skip "TestTimestampMinMax|TestPreEpochTimestampsSerializesCorrectly" \
 	-v
