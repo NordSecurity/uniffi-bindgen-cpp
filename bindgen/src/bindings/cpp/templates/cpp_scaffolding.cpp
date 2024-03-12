@@ -1,17 +1,9 @@
-{%- import "scaffolding/macros.cpp" as macros %}
-{% let namespace = ci.namespace() %}
-{% match config.namespace %}
-{% when Some with (ns) %}
-{% let namespace = ns %}
-{% else %}
-{% endmatch %}
-
-template <class> inline constexpr bool always_false_v = false;
-
+#ifndef UNIFFI_EXPORT
 #if defined(_WIN32) || defined(_WIN64)
 #define UNIFFI_EXPORT __declspec(dllexport)
 #else
 #define UNIFFI_EXPORT __attribute__((visibility("default")))
+#endif
 #endif
 
 #include <stdio.h>
@@ -25,6 +17,18 @@ template <class> inline constexpr bool always_false_v = false;
 #include <map>
 #include <mutex>
 #include <cstring>
+
+{% let namespace = ci.namespace() %}
+{% match config.namespace %}
+{% when Some with (ns) %}
+{% let namespace = ns %}
+{% else %}
+{% endmatch %}
+
+namespace uniffi_{{ namespace }} {
+
+{%- import "scaffolding/macros.cpp" as macros %}
+template <class> inline constexpr bool always_false_v = false;
 
 using namespace {{ namespace }};
 
@@ -326,3 +330,5 @@ void rustbuffer_free(RustBuffer& buf) {
 {%- else %}
 {%- endmatch %}
 {%- endfor %}
+
+}
