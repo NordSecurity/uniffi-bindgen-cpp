@@ -40,21 +40,19 @@ endmacro(test_case)
 
 # Add a scaffolding test case
 macro(scaffolding_test_case TEST_NAME)
-add_library(uniffi_${TEST_NAME} SHARED
-    scaffolding_tests/${TEST_NAME}/lib_${TEST_NAME}.cpp)
-target_include_directories(uniffi_${TEST_NAME} PRIVATE scaffolding_tests/${TEST_NAME} ${BINDINGS_SRC_DIR})
 
 add_executable(${TEST_NAME}-scaffolding-test tests/${TEST_NAME}/main.cpp ${BINDINGS_SRC_DIR}/${TEST_NAME}.cpp)
 target_include_directories(${TEST_NAME}-scaffolding-test PRIVATE ${BINDINGS_SRC_DIR} include)
-target_link_libraries(${TEST_NAME}-scaffolding-test uniffi_${TEST_NAME} Threads::Threads)
+target_link_libraries(${TEST_NAME}-scaffolding-test uniffi_fixtures Threads::Threads)
 
 add_test(NAME ${TEST_NAME}-scaffolding-test COMMAND ${TEST_NAME}-scaffolding-test)
 memcheck_test(${TEST_NAME}-scaffolding-test)
 
-add_dependencies(uniffi_${TEST_NAME} bindings scaffolding uniffi_${TEST_NAME})
+add_dependencies(${TEST_NAME}-scaffolding-test bindings scaffolding)
 
-list(APPEND BINDING_FILES ${BINDINGS_SRC_DIR}/${TEST_NAME}.cpp)
 list(APPEND SCAFFOLDING_FILES ${BINDINGS_SRC_DIR}/${TEST_NAME}_cpp_scaffolding.cpp)
+list(APPEND SCAFFOLDING_LIB_FILES scaffolding_tests/${TEST_NAME}/lib_${TEST_NAME}.cpp)
+list(APPEND SCAFFOLDING_LIB_INCLUDE_DIRS scaffolding_tests/${TEST_NAME})
 
 endmacro(scaffolding_test_case)
 
@@ -85,6 +83,12 @@ scaffolding_test_case(todolist)
 scaffolding_test_case(traits)
 scaffolding_test_case(coverall)
 # scaffolding_test_case(custom_types_builtin)
+
+add_library(uniffi_fixtures SHARED
+    ${SCAFFOLDING_LIB_FILES})
+target_include_directories(uniffi_fixtures PRIVATE
+    ${SCAFFOLDING_LIB_INCLUDE_DIRS} ${BINDINGS_SRC_DIR})
+add_dependencies(uniffi_fixtures scaffolding)
 
 add_custom_target(libs ALL
     BYPRODUCTS ${BINDING_FILES}
