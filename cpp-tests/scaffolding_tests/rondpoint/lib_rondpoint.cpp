@@ -1,5 +1,7 @@
 #include "lib_rondpoint.hpp"
 
+#include <sstream>
+
 int8_t rondpoint::Retourneur::identique_i8(int8_t value) {
     return value;
 }
@@ -98,11 +100,19 @@ std::string rondpoint::Stringifier::to_string_u64(uint64_t value) {
 }
 
 std::string rondpoint::Stringifier::to_string_float(float value) {
-    return std::to_string(value);
+    std::stringstream ss;
+    ss.precision(8);
+    ss << value;
+
+    return ss.str();
 }
 
 std::string rondpoint::Stringifier::to_string_double(double value) {
-    return std::to_string(value);
+    std::stringstream ss;
+    ss.precision(17);
+    ss << value;
+
+    return ss.str();
 }
 
 std::string rondpoint::Stringifier::to_string_boolean(bool value) {

@@ -1,3 +1,6 @@
 [submodule "3rd-party/uniffi-bindgen-go"]
 	path = 3rd-party/uniffi-bindgen-go
 	url = https://github.com/NordSecurity/uniffi-bindgen-go
+[submodule "3rd-party/uniffi-bindgen-cs"]
+	path = 3rd-party/uniffi-bindgen-cs
+	url = https://github.com/NordSecurity/uniffi-bindgen-cs
