@@ -12,7 +12,6 @@ pushd $GENERATOR_DIR
 ./build.sh
 ./generate_bindings.sh
 
-
 export LD_LIBRARY_PATH="$BINARIES_DIR:${LD_LIBRARY_PATH:-}"
 cd $SOLUTION_DIR
 dotnet test --filter \

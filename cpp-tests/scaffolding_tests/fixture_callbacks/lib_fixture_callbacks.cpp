@@ -7,6 +7,8 @@ bool fixture_callbacks::RustGetters::get_bool(std::shared_ptr<fixture_callbacks:
 std::string fixture_callbacks::RustGetters::get_string(std::shared_ptr<fixture_callbacks::ForeignGetters> foreign, std::string v, bool argument_two) {
     try {
         return foreign->get_string(v, argument_two);
+    } catch (const fixture_callbacks::simple_error::BadArgument &e) {
+        throw e;
     } catch (const std::runtime_error &e) {
         throw fixture_callbacks::simple_error::UnexpectedError(e.what());
     }
