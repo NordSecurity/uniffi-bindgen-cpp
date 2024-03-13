@@ -64,3 +64,24 @@ jobs:
       run: |
         source ~/.bashrc
         ./test_scaffolding_go.sh
+
+  test-scaffolding-cs:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/nordsecurity/uniffi-bindgen-cs-test-runner:v0.1.0
+    needs: build
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+    - uses: actions/download-artifact@v3
+      with:
+        name: scaffolding_lib
+        path: cpp-tests/build/
+    - name: Test scaffolding C#
+      shell: bash
+      env:
+        HOME: /root
+      run: |
+        source ~/.bashrc
+        ./test_scaffolding_cs.sh

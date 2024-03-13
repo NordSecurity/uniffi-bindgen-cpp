@@ -9,7 +9,7 @@ BINDINGS_DIR="$GENERATOR_DIR/binding_tests"
 BINARIES_DIR="$ROOT_DIR/cpp-tests/build"
 
 pushd $GENERATOR_DIR
-cargo build
+./build.sh
 ./build_bindings.sh
 
 pushd $BINDINGS_DIR
