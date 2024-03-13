@@ -5,16 +5,15 @@ SCRIPT_DIR="${SCRIPT_DIR:-$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>
 ROOT_DIR="$SCRIPT_DIR"
 
 GENERATOR_DIR="$ROOT_DIR/3rd-party/uniffi-bindgen-cs"
-BINDINGS_DIR="$GENERATOR_DIR/binding_tests"
+SOLUTION_DIR="dotnet-tests"
 BINARIES_DIR="$ROOT_DIR/cpp-tests/build"
 
 pushd $GENERATOR_DIR
 ./build.sh
 ./generate_bindings.sh
 
-SOLUTION_DIR="dotnet-tests"
 
-export LD_LIBRARY_PATH="$SCRIPT_DIR/target/debug/:${LD_LIBRARY_PATH:-}"
+export LD_LIBRARY_PATH="$BINARIES_DIR:${LD_LIBRARY_PATH:-}"
 cd $SOLUTION_DIR
 dotnet test --filter \
     "FullyQualifiedName!~Docstring \
