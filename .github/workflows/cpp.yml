@@ -10,13 +10,13 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
+  build-scaffolding:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/nordsecurity/uniffi-bindgen-cpp-test-runner:v0.3.0
     steps:
     - uses: actions/checkout@v3
-    - name: Build bindgen
+    - name: Build scaffolding
       shell: bash
       env:
         # Github sets HOME to /github/home and breaks dependencies in Docker image..
@@ -25,30 +25,32 @@ jobs:
       run: |
         source ~/.bashrc
         ./build_bindgen.sh
-    - name: Build bindings
-      shell: bash
-      env:
-        HOME: /root
-      run: |
-        source ~/.bashrc
-        ./build_bindings.sh
+        ./build_scaffolding.sh
+    - uses: actions/upload-artifact@v3
+      with:
+        name: scaffolding_lib
+        path: cpp-tests/build/libuniffi_fixtures.so
+
+  run-tests:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/nordsecurity/uniffi-bindgen-cpp-test-runner:v0.3.0
+    steps:
+    - uses: actions/checkout@v3
     - name: Run tests
       shell: bash
       env:
         HOME: /root
       run: |
         source ~/.bashrc
+        ./build_bindgen.sh
         ./test_bindings.sh
-    - uses: actions/upload-artifact@v3
-      with:
-        name: scaffolding_lib
-        path: cpp-tests/build/libuniffi_fixtures.so
 
   test-scaffolding-go:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/nordsecurity/uniffi-bindgen-cpp-test-runner:v0.3.0
-    needs: build
+    needs: build-scaffolding
     steps:
     - uses: actions/checkout@v3
       with:
@@ -69,7 +71,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/nordsecurity/uniffi-bindgen-cs-test-runner:v0.1.0
-    needs: build
+    needs: build-scaffolding
     steps:
     - uses: actions/checkout@v3
       with:
