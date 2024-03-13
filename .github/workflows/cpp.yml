@@ -13,20 +13,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: rust:1.72-bullseye
-    steps:
-    - uses: actions/checkout@v3
-    - name: Build
-      run: |
-        cargo build --release --package uniffi-bindgen-cpp
-
-  test-bindings:
-    runs-on: ubuntu-latest
-    container:
       image: ghcr.io/nordsecurity/uniffi-bindgen-cpp-test-runner:v0.3.0
     steps:
     - uses: actions/checkout@v3
-    - name: Test bindings
+    - name: Build bindgen
       shell: bash
       env:
         # Github sets HOME to /github/home and breaks dependencies in Docker image..
@@ -34,21 +24,42 @@ jobs:
         HOME: /root
       run: |
         source ~/.bashrc
+        ./build_bindgen.sh
+    - name: Build bindings
+      shell: bash
+      env:
+        HOME: /root
+      run: |
+        source ~/.bashrc
+        ./build_bindings.sh
+    - name: Run tests
+      shell: bash
+      env:
+        HOME: /root
+      run: |
+        source ~/.bashrc
         ./test_bindings.sh
+    - uses: actions/upload-artifact@v3
+      with:
+        name: scaffolding_lib
+        path: cpp-tests/build/libuniffi_fixtures.so
 
   test-scaffolding-go:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/nordsecurity/uniffi-bindgen-cpp-test-runner:v0.3.0
+    needs: build
     steps:
     - uses: actions/checkout@v3
       with:
         submodules: recursive
+    - uses: actions/download-artifact@v3
+      with:
+        name: scaffolding_lib
+        path: cpp-tests/build/
     - name: Test scaffolding Go
       shell: bash
       env:
-        # Github sets HOME to /github/home and breaks dependencies in Docker image..
-        # https://github.com/actions/runner/issues/863
         HOME: /root
       run: |
         source ~/.bashrc

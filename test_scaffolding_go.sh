@@ -1,13 +1,6 @@
 #!/bin/bash
 set -euxo pipefail
 
-mkdir -p cpp-tests/build
-pushd cpp-tests/build
-cmake -DCMAKE_BUILD_TYPE=Debug ..
-make uniffi_fixtures
-
-popd
-
 SCRIPT_DIR="${SCRIPT_DIR:-$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )}"
 ROOT_DIR="$SCRIPT_DIR"
 
@@ -19,9 +12,7 @@ pushd $GENERATOR_DIR
 cargo build
 ./build_bindings.sh
 
-
 pushd $BINDINGS_DIR
-
 # We exclude tests that are not part of the main Rust fixtures
 EXCLUDE_LIST="custom_types_test\
 |destroy_test\
