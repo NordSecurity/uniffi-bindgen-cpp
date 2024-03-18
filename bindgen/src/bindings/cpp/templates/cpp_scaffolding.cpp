@@ -17,6 +17,7 @@
 #include <map>
 #include <mutex>
 #include <cstring>
+#include <vector>
 
 {% let namespace = ci.namespace() %}
 {% match config.namespace %}

@@ -15,19 +15,19 @@ RustBuffer {{ ffi_converter_name }}::lower(const std::string &val) {
 
 std::string {{ ffi_converter_name }}::read(RustStream &stream) {
     int32_t len;
-    std::string string;
-
     stream >> len;
 
-    string.resize(len);
-    stream.read(reinterpret_cast<uint8_t *>(string.data()), len);
+    std::vector<uint8_t> buf(len);
+    stream.read(buf.data(), len);
 
-    return string;
+    return std::string(reinterpret_cast<char *>(buf.data()), len);
 }
 
 void {{ ffi_converter_name }}::write(RustStream &stream, const std::string &val) {
     stream << static_cast<int32_t>(val.length());
-    stream.write(reinterpret_cast<const uint8_t *>(val.data()), val.length());
+
+    uint8_t *buf = reinterpret_cast<uint8_t *>(const_cast<char *>(val.data()));
+    stream.write(buf, val.length());
 }
 
 int32_t {{ ffi_converter_name }}::allocation_size(const std::string &val) {
