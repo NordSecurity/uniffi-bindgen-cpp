@@ -40,6 +40,40 @@ To ensure that the generated code is able to interface with the target C++ libra
 - When exposing callback interfaces, it is recommended to not have any processing-intensive or global data modifying logic in the constructors and destructors of the backing C++ class, as due to the way uniffi internally handles callback interfaces, callback instances may be dynamically constructed multiple times during the runtime of the application.
 - All of the exports mentioned in the UDL file should be under the same namespace that is specified in the `Cargo.toml` file in the C++ library.
 
+### Custom types
+
+Custom types allow the library to use types not directly exposed in the UDL file, more information can be found in the [Official documentation](https://mozilla.github.io/uniffi-rs/udl/custom_types.html).
+
+Similar to Rust, the library code should contain a converter exposed that converts a custom type to a builtin type, the converter should follow these requirements:
+
+- The converter should be a class or a struct named after the custom type with the prefix `UniffiCustomTypeConverter`
+- The converter should contain two static public-accessible methods:
+    - 'custom_type into_custom(builtin_type)' for converting a builtin type into the custom type
+    - 'builtin_value from_custom(custom_type)' for converting a custom type into a builtin type
+
+For example, having a custom converter for type `Handle` to `uint64_t` could look like this:
+```cpp
+struct Handle {
+    uint64_t inner;
+
+    // rest of the implementation ...
+};
+
+struct UniffiCustomTypeConverterHandle {
+    static Handle into_custom(uint64_t val) {
+        Handle handle = Handle { .inner = val } // or some other more intricate logic
+
+        return handle;
+    }
+
+    static uint64_t from_custom(Handle handle) {
+        return handle.inner; // or some other more intricate logic
+    }
+};
+```
+
+### Additional notes
+
 Some of the types in the UDL file might not have a direct mapping to a C++ type. To see the full list of mappings, refer to the [UDL to C++ type mapping](#udl-to-c-type-mapping-table) table.
 
 Additionally, for examples of how to use the C++ scaffolding, refer to the [C++ scaffolding tests](../cpp-tests/scaffolding_tests).
@@ -68,6 +102,5 @@ Additionally, for examples of how to use the C++ scaffolding, refer to the [C++ 
 
 The following features are currently not supported in the C++ scaffolding:
 
-- Custom types
 - Async
 - Default argument values
