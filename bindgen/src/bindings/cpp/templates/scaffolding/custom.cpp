@@ -1,5 +1,5 @@
 {%- let converter = typ|ffi_converter_name -%}
-{%- let custom_converter = typ|custom_converter_name -%}
+{%- let custom_converter = "UniffiCustomTypeConverter{}"|format(typ|type_name) -%}
 {{ type_name }} {{ converter }}::lift(RustBuffer buff) {
     auto stream = RustStream(&buff);
     auto builtin_val = {{ builtin|read_fn }}(stream);

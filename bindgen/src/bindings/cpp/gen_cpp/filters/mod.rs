@@ -95,10 +95,6 @@ pub(crate) fn ffi_converter_name(as_ct: &impl AsCodeType) -> Result<String> {
     Ok(as_ct.as_codetype().ffi_converter_name())
 }
 
-pub(crate) fn custom_converter_name(as_ct: &impl AsCodeType) -> Result<String> {
-    Ok(format!("UniffiCustomTypeConverter{}", as_ct.as_codetype().type_label()))
-}
-
 pub(crate) fn canonical_name(as_ct: &impl AsCodeType) -> Result<String> {
     Ok(as_ct.as_codetype().canonical_name())
 }

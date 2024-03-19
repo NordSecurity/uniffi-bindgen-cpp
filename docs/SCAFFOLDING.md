@@ -48,8 +48,8 @@ Similar to Rust, the library code should contain a converter exposed that conver
 
 - The converter should be a class or a struct named after the custom type with the prefix `UniffiCustomTypeConverter`
 - The converter should contain two static public-accessible methods:
-    - 'custom_type into_custom(builtin_type)' for converting a builtin type into the custom type
-    - 'builtin_value from_custom(custom_type)' for converting a custom type into a builtin type
+    - `custom_type into_custom(builtin_type)` for converting a builtin type into the custom type
+    - `builtin_value from_custom(custom_type)` for converting a custom type into a builtin type
 
 For example, having a custom converter for type `Handle` to `uint64_t` could look like this:
 ```cpp
