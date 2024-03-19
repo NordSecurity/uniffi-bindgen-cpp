@@ -2,6 +2,8 @@
 
 ----
 
+- Scaffolding: Add support for custom types
+- Scaffolding: Allow multiple scaffolding implementations to exist in a compiled library/executable
 - Scaffolding: Add support for errors
 - Scaffolding: Add internal ref counts for object types
 - Scaffolding: Add support for associated enums

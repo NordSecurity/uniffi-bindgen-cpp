@@ -21,7 +21,7 @@ dotnet test --filter \
     & FullyQualifiedName!~Disposable \
     & FullyQualifiedName!~TestTraitMethods \
     & FullyQualifiedName!~OptionalParameterTests \
-    & FullyQualifiedName!~TestCustomTypes \
+    & FullyQualifiedName!~TestCustomTypesBuiltin \
     & FullyQualifiedName!~TestGlobalMethodsClassName \
     & FullyQualifiedName!~DateTimeMinMax \
     & FullyQualifiedName!~ChronologicalWorks \
