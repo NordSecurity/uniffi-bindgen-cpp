@@ -13,7 +13,7 @@ jobs:
   build-scaffolding:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/nordsecurity/uniffi-bindgen-cpp-test-runner:v0.3.0
+      image: ghcr.io/nordsecurity/uniffi-bindgen-cpp-test-runner:v0.4.0
     steps:
     - uses: actions/checkout@v3
     - name: Build scaffolding
@@ -34,7 +34,7 @@ jobs:
   run-tests:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/nordsecurity/uniffi-bindgen-cpp-test-runner:v0.3.0
+      image: ghcr.io/nordsecurity/uniffi-bindgen-cpp-test-runner:v0.4.0
     steps:
     - uses: actions/checkout@v3
     - name: Run tests
@@ -49,7 +49,7 @@ jobs:
   test-scaffolding-go:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/nordsecurity/uniffi-bindgen-cpp-test-runner:v0.3.0
+      image: golang:1.20
     needs: build-scaffolding
     steps:
     - uses: actions/checkout@v3
