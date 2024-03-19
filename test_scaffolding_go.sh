@@ -14,8 +14,7 @@ pushd $GENERATOR_DIR
 
 pushd $BINDINGS_DIR
 # We exclude tests that are not part of the main Rust fixtures
-EXCLUDE_LIST="custom_types_test\
-|destroy_test\
+EXCLUDE_LIST="destroy_test\
 |docstring_test\
 |errors_test\
 |ext_types_test\

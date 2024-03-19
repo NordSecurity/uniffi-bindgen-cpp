@@ -111,6 +111,8 @@ typedef int ForeignCallback(uint64_t handle, uint32_t method, uint8_t *args_data
 ObjectMap<{{ typ|canonical_name }}> {{ name }}_map;
 {%- when Type::CallbackInterface { module_path, name } %}
 {% include "scaffolding/callback.hpp" %}
+{%- when Type::Custom { module_path, name, builtin } %}
+{% include "scaffolding/custom.hpp" %}
 {% else %}
 {%- endmatch %}
 {%- endfor %}
@@ -327,6 +329,8 @@ void rustbuffer_free(RustBuffer& buf) {
 {% include "scaffolding/obj.cpp" %}
 {%- when Type::CallbackInterface { module_path, name } %}
 {% include "scaffolding/callback.cpp" %}
+{%- when Type::Custom { module_path, name, builtin } %}
+{% include "scaffolding/custom.cpp" %}
 {%- else %}
 {%- endmatch %}
 {%- endfor %}
