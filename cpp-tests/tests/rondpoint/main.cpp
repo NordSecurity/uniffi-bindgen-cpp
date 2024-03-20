@@ -51,7 +51,8 @@ void test_copy() {
     ASSERT_EQ(map.size(), copied_map.size());
     for (auto& [key, value] : map) {
         ASSERT_EQ(value.get_variant().index(), copied_map.at(key).get_variant().index());
-        std::visit([&value](auto&& arg) {
+        auto v = value;
+        std::visit([&v](auto&& arg) {
             using T = std::decay_t<decltype(arg)>;
             if constexpr (std::is_same_v<T, rondpoint::EnumerationAvecDonnees::ZERO>) {
             } else if constexpr (std::is_same_v<T, rondpoint::EnumerationAvecDonnees::UN>) {
