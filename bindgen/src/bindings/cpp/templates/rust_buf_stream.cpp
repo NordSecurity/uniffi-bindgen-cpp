@@ -1,7 +1,8 @@
-struct RustStreamBuffer: std::basic_streambuf<uint8_t> {
+struct RustStreamBuffer: std::basic_streambuf<char> {
     RustStreamBuffer(RustBuffer *buf) {
-        this->setg(buf->data, buf->data, buf->data + buf->len);
-        this->setp(buf->data, buf->data + buf->capacity);
+        char* data = reinterpret_cast<char*>(buf->data);
+        this->setg(data, data, data + buf->len);
+        this->setp(data, data + buf->capacity);
     }
     ~RustStreamBuffer() = default;
 
@@ -14,13 +15,13 @@ private:
     RustStreamBuffer &operator=(RustStreamBuffer &&) = delete;
 };
 
-struct RustStream: std::basic_iostream<uint8_t> {
+struct RustStream: std::basic_iostream<char> {
     RustStream(RustBuffer *buf):
-        streambuf(RustStreamBuffer(buf)), std::basic_iostream<uint8_t>(&streambuf) { }
+        streambuf(RustStreamBuffer(buf)), std::basic_iostream<char>(&streambuf) { }
 
     template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
     RustStream &operator>>(T &val) {
-        read(reinterpret_cast<uint8_t *>(&val), sizeof(T));
+        read(reinterpret_cast<char *>(&val), sizeof(T));
 
         if (std::endian::native != std::endian::big) {
             auto bytes = reinterpret_cast<char *>(&val);
@@ -39,7 +40,7 @@ struct RustStream: std::basic_iostream<uint8_t> {
             std::reverse(bytes, bytes + sizeof(T));
         }
 
-        write(reinterpret_cast<uint8_t *>(&val), sizeof(T));
+        write(reinterpret_cast<char *>(&val), sizeof(T));
 
         return *this;
     }

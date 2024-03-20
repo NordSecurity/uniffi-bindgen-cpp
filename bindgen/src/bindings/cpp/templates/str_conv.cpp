@@ -20,14 +20,14 @@ std::string {{ ffi_converter_name }}::read(RustStream &stream) {
     stream >> len;
 
     string.resize(len);
-    stream.read(reinterpret_cast<uint8_t *>(string.data()), len);
+    stream.read(string.data(), len);
 
     return string;
 }
 
 void {{ ffi_converter_name }}::write(RustStream &stream, const std::string &val) {
     stream << static_cast<int32_t>(val.length());
-    stream.write(reinterpret_cast<const uint8_t *>(val.data()), val.length());
+    stream.write(val.data(), val.length());
 }
 
 int32_t {{ ffi_converter_name }}::allocation_size(const std::string &val) {
