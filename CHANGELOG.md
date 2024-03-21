@@ -7,6 +7,7 @@
 - Scaffolding: Add support for errors
 - Scaffolding: Add internal ref counts for object types
 - Scaffolding: Add support for associated enums
+- Core: Change the underlying type of `RustStream` and `RustStreamBuffer` to `char` from `uint8_t`
 
 #### v0.4.1+v0.25.0
 

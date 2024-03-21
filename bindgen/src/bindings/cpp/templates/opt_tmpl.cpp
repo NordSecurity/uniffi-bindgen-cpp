@@ -17,7 +17,7 @@ RustBuffer {{ ffi_converter_name }}::lower(const {{ type_name }}& val) {
 }
 
 {{ type_name }} {{ ffi_converter_name }}::read(RustStream &stream) {
-    uint8_t has_value;
+    char has_value;
 
     stream.get(has_value);
 

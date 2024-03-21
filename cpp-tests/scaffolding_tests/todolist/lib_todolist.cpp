@@ -17,7 +17,7 @@ todolist::TodoEntry todolist::create_entry_with(const std::string &todo) {
         throw todolist::todo_error::EmptyString("Cannot add empty string as entry");
     }
 
-    return todolist::TodoEntry(todo);
+    return todolist::TodoEntry{todo};
 }
 
 void todolist::TodoList::add_item(const std::string &todo) {
@@ -41,7 +41,7 @@ std::vector<todolist::TodoEntry> todolist::TodoList::get_entries() {
     std::lock_guard<std::mutex> lock(this->items_mutex);
     std::vector<todolist::TodoEntry> entries;
     for (const auto &item : this->items) {
-        entries.push_back(todolist::TodoEntry(item));
+        entries.push_back(todolist::TodoEntry{item});
     }
     return entries;
 }
@@ -69,7 +69,7 @@ todolist::TodoEntry todolist::TodoList::get_last_entry() {
         throw todolist::todo_error::EmptyTodoList("List is empty");
     }
 
-    return todolist::TodoEntry(this->items.back());
+    return todolist::TodoEntry{this->items.back()};
 }
 
 std::string todolist::TodoList::get_last() {
