@@ -26,7 +26,7 @@ macro_rules! impl_code_type_for_miscellany {
 
 impl_code_type_for_miscellany!(
     TimestampCodeType,
-    "std::chrono::time_point<std::chrono::system_clock>",
+    "std::chrono::time_point<std::chrono::system_clock, std::chrono::nanoseconds>",
     "Timestamp"
 );
 impl_code_type_for_miscellany!(

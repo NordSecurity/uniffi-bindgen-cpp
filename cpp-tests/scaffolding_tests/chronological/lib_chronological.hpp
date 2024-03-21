@@ -5,7 +5,7 @@
 
 namespace {
     namespace chronological {
-        typedef std::chrono::time_point<std::chrono::system_clock> timestamp;
+        typedef std::chrono::time_point<std::chrono::system_clock, std::chrono::nanoseconds> timestamp;
         typedef std::chrono::duration<int64_t, std::nano> duration;
 
         namespace chronological_error {
