@@ -80,23 +80,23 @@ Additionally, for examples of how to use the C++ scaffolding, refer to the [C++ 
 
 ## UDL to C++ type mapping table
 
-| UDL Type                       | C++ Type                                             |
-|--------------------------------|------------------------------------------------------|
-| `i8/i16/i32/i64`               | `int8_t/int16_t/int32_t/int64_t`                     |
-| `u8/u16/u32/u64`               | `uint8_t/uint16_t/uint32_t/uint64_t`                 |
-| `f32/float`                    | `float`                                              |
-| `f64/double`                   | `double`                                             |
-| `boolean`                      | `bool`                                               |
-| `string`                       | `std::string`                                        |
-| `bytes`                        | `std::vector<uint8_t>`                               |
-| `timestamp`                    | `std::chrono::time_point<std::chrono::system_clock>` |
-| `duration`                     | `std::chrono::duration<int64_t, std::nano>`          |
-| `T?`                           | `std::optional<T>`                                   |
-| `sequence<T>`                  | `std::vector<T>`                                     |
-| `record<string, T>`            | `std::unordered_map<std::string, T>`                 |
-| `enum`                         | `enum class`                                         |
-| `dictionary`                   | `struct/class`                                       |
-| `interface`                    | `std::shared_ptr<struct/class>`                      |
+| UDL Type                       | C++ Type                                                                       |
+|--------------------------------|--------------------------------------------------------------------------------|
+| `i8/i16/i32/i64`               | `int8_t/int16_t/int32_t/int64_t`                                               |
+| `u8/u16/u32/u64`               | `uint8_t/uint16_t/uint32_t/uint64_t`                                           |
+| `f32/float`                    | `float`                                                                        |
+| `f64/double`                   | `double`                                                                       |
+| `boolean`                      | `bool`                                                                         |
+| `string`                       | `std::string`                                                                  |
+| `bytes`                        | `std::vector<uint8_t>`                                                         |
+| `timestamp`                    | `std::chrono::time_point<std::chrono::system_clock, std::chrono::nanoseconds>` |
+| `duration`                     | `std::chrono::duration<int64_t, std::nano>`                                    |
+| `T?`                           | `std::optional<T>`                                                             |
+| `sequence<T>`                  | `std::vector<T>`                                                               |
+| `record<string, T>`            | `std::unordered_map<std::string, T>`                                           |
+| `enum`                         | `enum class`                                                                   |
+| `dictionary`                   | `struct/class`                                                                 |
+| `interface`                    | `std::shared_ptr<struct/class>`                                                |
 
 ## Unsupported features
 
