@@ -12,7 +12,7 @@
 
 namespace {
     namespace coverall {
-        typedef std::chrono::time_point<std::chrono::system_clock> timestamp;
+        typedef std::chrono::time_point<std::chrono::system_clock, std::chrono::nanoseconds> timestamp;
 
         class IFirst {
         public:

@@ -5,7 +5,7 @@ std::string callbacks::Telephone::call(std::shared_ptr<CallAnswerer> answerer)  
         return answerer->answer();
     } catch (telephone_error::Busy& e) {
         throw e;
-    } catch (std::runtime_error& e) {
+    } catch (std::runtime_error&) {
         throw telephone_error::InternalTelephoneError();
     }
 }

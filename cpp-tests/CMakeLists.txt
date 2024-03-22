@@ -12,14 +12,28 @@ find_package(Threads REQUIRED)
 set(BINDINGS_BUILD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../target/debug)
 set(BINDINGS_SRC_DIR ${BINDINGS_BUILD_DIR}/bindings)
 
+if (WIN32)
+    set(UNIFFI_FIXTURES_LIB uniffi_bindgen_cpp_fixtures.dll)
+    set(ADDITIONAL_LIBS ws2_32 userenv advapi32 ntdll crypt32 Bcrypt)
+elseif(UNIX AND NOT APPLE)
+    set(UNIFFI_FIXTURES_LIB libuniffi_bindgen_cpp_fixtures.so)
+    set(ADDITIONAL_LIBS)
+else()
+    set(UNIFFI_FIXTURES_LIB libuniffi_bindgen_cpp_fixtures.dylib)
+    set(ADDITIONAL_LIBS)
+endif()
+
+find_program(VALGRIND "valgrind")
 macro(memcheck_test TEST_NAME)
-add_test(NAME ${TEST_NAME}-test-memcheck
-  COMMAND valgrind
-    --error-exitcode=1
-    --tool=memcheck
-    --leak-check=full
-    --errors-for-leak-kinds=definite
-    --show-leak-kinds=definite $<TARGET_FILE:${TEST_NAME}>)
+if (VALGRIND)
+    add_test(NAME ${TEST_NAME}-test-memcheck
+    COMMAND valgrind
+        --error-exitcode=1
+        --tool=memcheck
+        --leak-check=full
+        --errors-for-leak-kinds=definite
+        --show-leak-kinds=definite $<TARGET_FILE:${TEST_NAME}>)
+endif()
 endmacro(memcheck_test)
 
 # Add a bindings test case
@@ -28,7 +42,7 @@ add_executable(${TEST_NAME}-test tests/${TEST_NAME}/main.cpp ${BINDINGS_SRC_DIR}
 
 target_include_directories(${TEST_NAME}-test PRIVATE ${BINDINGS_SRC_DIR} include)
 target_link_directories(${TEST_NAME}-test PRIVATE ${BINDINGS_BUILD_DIR})
-target_link_libraries(${TEST_NAME}-test uniffi_bindgen_cpp_fixtures Threads::Threads)
+target_link_libraries(${TEST_NAME}-test uniffi_bindgen_cpp_fixtures Threads::Threads ${ADDITIONAL_LIBS})
 target_compile_definitions(${TEST_NAME}-test PRIVATE UNIFFI_BINDING_DIR="${BINDINGS_SRC_DIR}")
 
 add_test(NAME ${TEST_NAME}-test COMMAND ${TEST_NAME}-test)
@@ -101,7 +115,7 @@ add_custom_target(libs ALL
 
 add_custom_target(bindings ALL
     DEPENDS libs
-    COMMAND ./uniffi-bindgen-cpp --library libuniffi_bindgen_cpp_fixtures.so --out-dir bindings
+    COMMAND ./uniffi-bindgen-cpp --library ${UNIFFI_FIXTURES_LIB} --out-dir bindings
     WORKING_DIRECTORY ${BINDINGS_BUILD_DIR}
     COMMENT "Generating bindings"
 )
@@ -109,7 +123,7 @@ add_custom_target(bindings ALL
 add_custom_target(scaffolding ALL
     BYPRODUCTS ${SCAFFOLDING_FILES}
     DEPENDS libs
-    COMMAND ./uniffi-bindgen-cpp --scaffolding --library libuniffi_bindgen_cpp_fixtures.so --out-dir bindings
+    COMMAND ./uniffi-bindgen-cpp --scaffolding --library ${UNIFFI_FIXTURES_LIB} --out-dir bindings
     WORKING_DIRECTORY ${BINDINGS_BUILD_DIR}
     COMMENT "Generating scaffolding"
 )

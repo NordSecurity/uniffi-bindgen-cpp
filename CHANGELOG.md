@@ -1,3 +1,10 @@
+#### v0.5.0+v0.25.0
+
+----
+
+- Core: **POTENTIALLY BREAKING** changed `timestamp` type from `time_point<system_clock>`, to `time_point<system_clock, nanoseconds>`
+
+
 #### v0.4.2+v0.25.0
 
 ----

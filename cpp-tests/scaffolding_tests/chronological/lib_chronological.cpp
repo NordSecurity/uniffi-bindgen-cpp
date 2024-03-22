@@ -13,7 +13,8 @@ chronological::duration chronological::return_duration(chronological::duration a
 }
 
 std::string chronological::to_string_timestamp(chronological::timestamp a) {
-    std::time_t time = std::chrono::system_clock::to_time_t(a);
+    using time_point = std::chrono::system_clock::time_point;
+    std::time_t time = std::chrono::system_clock::to_time_t(time_point {std::chrono::duration_cast<time_point::duration>(a.time_since_epoch())});
     auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(a.time_since_epoch()).count() % 1000000000;
     if (ns < 0) {
         ns += 1000000000;

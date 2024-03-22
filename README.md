@@ -1,4 +1,4 @@
-# uniffi-bindgen-cpp - UniFFI C++ bindings generator
+# uniffi-bindgen-cpp - UniFFI C++ bindings/scaffolding generator
 
 Generate [UniFFI](https://github.com/mozilla/uniffi-rs) bindings for C++. `uniffi-bindgen-cpp` lives
 as a separate project from `uniffi-rs`, as per
@@ -56,9 +56,9 @@ Note: configuration is not supported when using library mode
 uniffi-bindgen-cpp path/to/definitions.udl --config path/to/uniffi.toml
 ```
 
-# EXPERIMENTAL: C++ Scaffolding
+# C++ Scaffolding
 
-It is possible to generate experimental C++ uniffi scaffolding that allows bridging C++ code with any other uniffi supported language (except Rust).
+It is possible to generate C++ uniffi scaffolding that allows bridging C++ code with any other uniffi supported language (except Rust).
 More documentation and limitations can be found in the [scaffolding documentation](docs/SCAFFOLDING.md)
 
 # Versioning

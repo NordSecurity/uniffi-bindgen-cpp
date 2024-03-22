@@ -50,7 +50,7 @@ void {{ ffi_converter_name }}{{ variant.name() }}::write(RustStream &stream, con
 }
 
 int32_t {{ ffi_converter_name }}{{ variant.name() }}::allocation_size(const {{ namespace }}::{{ variant.name() }} &val) {
-    auto size = sizeof(int32_t);
+    int32_t size = sizeof(int32_t);
     {%- if e.is_flat() %}
     size += {{ Type::String.borrow()|allocation_size_fn }}(val.what());
     {%- else %}

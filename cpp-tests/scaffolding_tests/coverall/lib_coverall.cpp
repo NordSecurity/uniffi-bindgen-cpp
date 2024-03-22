@@ -160,10 +160,9 @@ std::unordered_map<uint32_t, uint64_t> coverall::Coveralls::get_dict3(uint32_t k
 }
 
 void coverall::Coveralls::add_patch(std::shared_ptr<Patch> patch) {
-    auto repair = Repair {
-        .when = std::chrono::high_resolution_clock::now(),
-        .patch = patch
-    };
+    auto repair = Repair();
+    repair.when = std::chrono::system_clock::now();
+    repair.patch = patch;
 
     std::lock_guard<std::mutex> lock(this->repairs_mutex);
     this->repairs.push_back(repair);
@@ -205,8 +204,8 @@ coverall::SimpleDict coverall::create_some_dict() {
         .maybe_signed8 = 0,
         .signed64 = std::numeric_limits<int64_t>::max(),
         .maybe_signed64 = 0,
-        .float32 = 1.2345,
-        .maybe_float32 = 22.0 / 7.0,
+        .float32 = 1.2345f,
+        .maybe_float32 = 22.0f / 7.0f,
         .float64 = 0.0,
         .maybe_float64 = 1.0,
         .coveralls = std::make_shared<Coveralls>("some_dict"),

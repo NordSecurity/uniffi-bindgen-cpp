@@ -10,13 +10,64 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build-scaffolding:
+  run-tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # Ubuntu-20.04 is being used here on purpose instead of ubuntu-latest due to a bug with clang and libstdc++
+        # https://github.com/actions/runner-images/issues/8659
+        os: [ubuntu-20.04, windows-latest, macos-13]
+        build_type: [Release]
+        cpp_compiler: [g++, clang++, cl]
+        exclude:
+          - os: windows-latest
+            cpp_compiler: clang++
+          - os: windows-latest
+            cpp_compiler: g++
+          - os: ubuntu-20.04
+            cpp_compiler: cl
+          - os: macos-13
+            cpp_compiler: cl
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set reusable strings
+      id: strings
+      shell: bash
+      run: |
+        echo "build-output-dir=${{ github.workspace }}/cpp-tests/build" >> "$GITHUB_OUTPUT"
+        echo "build-source-dir=${{ github.workspace }}/cpp-tests" >> "$GITHUB_OUTPUT"
+
+    - name: Install additional dependencies
+      shell: bash
+      run: |
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          sudo apt update && sudo apt install -y valgrind
+        fi
+
+    - name: Configure CMake
+      run: >
+        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -S ${{ steps.strings.outputs.build-source-dir }}
+
+    - name: Build
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+
+    - name: Run tests
+      working-directory: ${{ steps.strings.outputs.build-output-dir }}
+      run: ctest --build-config ${{ matrix.build_type }}
+
+  build-scaffolding-lib:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/nordsecurity/uniffi-bindgen-cpp-test-runner:v0.3.0
     steps:
     - uses: actions/checkout@v3
-    - name: Build scaffolding
+
+    - name: Build scaffolding library
       shell: bash
       env:
         # Github sets HOME to /github/home and breaks dependencies in Docker image..
@@ -24,33 +75,17 @@ jobs:
         HOME: /root
       run: |
         source ~/.bashrc
-        ./build_bindgen.sh
-        ./build_scaffolding.sh
+        ./build_scaffolding_lib.sh
     - uses: actions/upload-artifact@v3
       with:
         name: scaffolding_lib
         path: cpp-tests/build/libuniffi_fixtures.so
 
-  run-tests:
-    runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/nordsecurity/uniffi-bindgen-cpp-test-runner:v0.3.0
-    steps:
-    - uses: actions/checkout@v3
-    - name: Run tests
-      shell: bash
-      env:
-        HOME: /root
-      run: |
-        source ~/.bashrc
-        ./build_bindgen.sh
-        ./test_bindings.sh
-
   test-scaffolding-go:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/nordsecurity/uniffi-bindgen-cpp-test-runner:v0.3.0
-    needs: build-scaffolding
+    needs: build-scaffolding-lib
     steps:
     - uses: actions/checkout@v3
       with:
@@ -71,7 +106,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/nordsecurity/uniffi-bindgen-cs-test-runner:v0.1.0
-    needs: build-scaffolding
+    needs: build-scaffolding-lib
     steps:
     - uses: actions/checkout@v3
       with:
