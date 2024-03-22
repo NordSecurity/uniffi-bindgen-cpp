@@ -13,21 +13,20 @@ jobs:
   run-tests:
     runs-on: ${{ matrix.os }}
     strategy:
-      # TODO: remove this when the workflow is stable
-      fail-fast: false
-
       matrix:
         # Ubuntu-20.04 is being used here on purpose instead of ubuntu-latest due to a bug with clang and libstdc++
         # https://github.com/actions/runner-images/issues/8659
-        os: [ubuntu-20.04, windows-latest]
+        os: [ubuntu-20.04, windows-latest, macos-13]
         build_type: [Release]
         cpp_compiler: [g++, clang++, cl]
         exclude:
           - os: windows-latest
-            cpp_compiler: g++
-          - os: windows-latest
             cpp_compiler: clang++
+          - os: windows-latest
+            cpp_compiler: g++
           - os: ubuntu-20.04
+            cpp_compiler: cl
+          - os: macos-13
             cpp_compiler: cl
 
     steps:
@@ -53,6 +52,7 @@ jobs:
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -S ${{ steps.strings.outputs.build-source-dir }}
+
     - name: Build
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
