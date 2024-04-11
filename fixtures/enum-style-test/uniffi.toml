@@ -1,0 +1,5 @@
+[bindings.cpp]
+enum_style = "Capitalized"
+
+[scaffolding.cpp]
+enum_style = "Capitalized"

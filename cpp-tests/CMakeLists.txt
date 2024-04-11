@@ -86,6 +86,7 @@ test_case(coverall)
 test_case(uniffi_docstring)
 test_case(trait_methods)
 test_case(custom_types_builtin)
+test_case(enum_style_test)
 
 scaffolding_test_case(arithmetic)
 scaffolding_test_case(callbacks)
@@ -99,6 +100,7 @@ scaffolding_test_case(todolist)
 scaffolding_test_case(traits)
 scaffolding_test_case(coverall)
 scaffolding_test_case(custom_types_builtin)
+scaffolding_test_case(enum_style_test)
 
 add_library(uniffi_fixtures SHARED
     ${SCAFFOLDING_LIB_FILES})

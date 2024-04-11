@@ -21,3 +21,4 @@ uniffi-fixture-docstring = { git = "https://github.com/NordSecurity/uniffi-rs.gi
 uniffi-fixture-time = { git = "https://github.com/NordSecurity/uniffi-rs.git", tag = "v0.3.1+v0.25.0" }
 uniffi-fixture-trait-methods = { git = "https://github.com/NordSecurity/uniffi-rs.git", tag = "v0.3.1+v0.25.0" }
 uniffi-custom-types-builtin = { path = "custom-types-builtin" }
+uniffi-enum-style-test = { path = "enum-style-test" }
