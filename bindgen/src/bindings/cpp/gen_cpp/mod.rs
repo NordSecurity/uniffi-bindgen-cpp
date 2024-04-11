@@ -25,7 +25,7 @@ use uniffi_bindgen::{
 };
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-enum EnumStyle {
+pub enum EnumStyle {
     Capitalized,
     Google,
 }
