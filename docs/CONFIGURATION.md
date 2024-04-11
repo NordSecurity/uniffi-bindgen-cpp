@@ -30,3 +30,9 @@ uniffi-bindgen-cpp path/to/definitions.udl --config path/to/uniffi.toml
   - `from_custom` (required) - an expression to convert from the custom type into underlying type. `{}` will
         will be expanded into variable containing the custom value. The expression is used in a
         return statement, i.e. `return <expression(value);>`.
+
+- `enum_style` - style for enum variant naming, possible options are:
+  - `"Capitalized"` - producing enum variants named `ENUM_VARIANT`
+  - `"Google"` - producing enum variants name `kEnumVariant` (default)
+
+NOTE: the `enum_style` option is separate for bindings and scaffolding generators, to apply this to the scaffolding generator, use the section `[scaffolding.cpp]` instead.

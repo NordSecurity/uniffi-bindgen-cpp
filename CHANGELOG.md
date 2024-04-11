@@ -1,3 +1,9 @@
+#### v0.6.0+v0.25.0
+
+----
+- Core: Added ability to customize enum variant naming styles
+- Core: **BREAKING** Changed default enum variant naming style to `kEnumVariant`
+
 #### v0.5.0+v0.25.0
 
 ----
