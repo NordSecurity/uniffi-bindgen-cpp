@@ -51,9 +51,9 @@ namespace {
         };
 
         enum class Color {
-            RED,
-            BLUE,
-            GREEN
+            kRed,
+            kBlue,
+            kGreen
         };
 
         class Patch {
@@ -150,48 +150,48 @@ namespace {
 
         class MaybeSimpleDict {
         public:
-            struct YEAH {
+            struct kYeah {
                 SimpleDict d;
             };
 
-            struct NAH {};
+            struct kNah {};
 
-            MaybeSimpleDict(MaybeSimpleDict::YEAH value) { this->variant = value; }
-            MaybeSimpleDict(MaybeSimpleDict::NAH value) { this->variant = value; }
+            MaybeSimpleDict(MaybeSimpleDict::kYeah value) { this->variant = value; }
+            MaybeSimpleDict(MaybeSimpleDict::kNah value) { this->variant = value; }
 
-            std::variant<YEAH, NAH> variant;
+            std::variant<kYeah, kNah> variant;
         };
 
         class SimpleFlatEnum {
         public:
-            struct FIRST {
+            struct kFirst {
                 std::string val;
             };
 
-            struct SECOND {
+            struct kSecond {
                 uint16_t num;
             };
 
-            SimpleFlatEnum(SimpleFlatEnum::FIRST value) { this->variant = value; }
-            SimpleFlatEnum(SimpleFlatEnum::SECOND value) { this->variant = value; }
+            SimpleFlatEnum(SimpleFlatEnum::kFirst value) { this->variant = value; }
+            SimpleFlatEnum(SimpleFlatEnum::kSecond value) { this->variant = value; }
 
-            std::variant<FIRST, SECOND> variant;
+            std::variant<kFirst, kSecond> variant;
         };
 
         class SimpleFlatMacroEnum {
         public:
-            struct FIRST {
+            struct kFirst {
                 std::string val;
             };
 
-            struct SECOND {
+            struct kSecond {
                 uint16_t num;
             };
 
-            SimpleFlatMacroEnum(SimpleFlatMacroEnum::FIRST value) { this->variant = value; }
-            SimpleFlatMacroEnum(SimpleFlatMacroEnum::SECOND value) { this->variant = value; }
+            SimpleFlatMacroEnum(SimpleFlatMacroEnum::kFirst value) { this->variant = value; }
+            SimpleFlatMacroEnum(SimpleFlatMacroEnum::kSecond value) { this->variant = value; }
 
-            std::variant<FIRST, SECOND> variant;
+            std::variant<kFirst, kSecond> variant;
         };
 
         namespace coverall_error {

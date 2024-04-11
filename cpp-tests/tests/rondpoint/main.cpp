@@ -26,7 +26,7 @@ void affirm_enchaine(const T& c, const F& func, Args&& ...arg) {
 
 void test_copy() {
     auto dict = rondpoint::Dictionnaire {
-        .un = rondpoint::Enumeration::DEUX,
+        .un = rondpoint::Enumeration::kDeux,
         .deux = true,
         .petit_nombre = 0,
         .gros_nombre = 123456789u
@@ -37,15 +37,15 @@ void test_copy() {
     ASSERT_EQ(dict.petit_nombre, copied_dict.petit_nombre);
     ASSERT_EQ(dict.gros_nombre, copied_dict.gros_nombre);
 
-    auto list = std::vector<rondpoint::Enumeration> { rondpoint::Enumeration::UN, rondpoint::Enumeration::DEUX };
+    auto list = std::vector<rondpoint::Enumeration> { rondpoint::Enumeration::kUn, rondpoint::Enumeration::kDeux};
     auto copied_list = rondpoint::copie_enumerations(list);
     ASSERT_EQ(list.size(), copied_list.size());
     ASSERT_TRUE(std::equal(list.begin(), list.end(), copied_list.begin()));
 
     auto map = std::unordered_map<std::string, rondpoint::EnumerationAvecDonnees> {
-        { "zero",  rondpoint::EnumerationAvecDonnees::ZERO {}},
-        { "un",  rondpoint::EnumerationAvecDonnees::UN {.premier = 2}},
-        { "deux", rondpoint::EnumerationAvecDonnees::DEUX {.premier= 1, .second = "test"}}
+        { "zero",  rondpoint::EnumerationAvecDonnees::kZero {}},
+        { "un",  rondpoint::EnumerationAvecDonnees::kUn {.premier = 2}},
+        { "deux", rondpoint::EnumerationAvecDonnees::kDeux {.premier= 1, .second = "test"}}
     };
     auto copied_map = rondpoint::copie_carte(map);
     ASSERT_EQ(map.size(), copied_map.size());
@@ -54,10 +54,10 @@ void test_copy() {
         auto v = value;
         std::visit([&v](auto&& arg) {
             using T = std::decay_t<decltype(arg)>;
-            if constexpr (std::is_same_v<T, rondpoint::EnumerationAvecDonnees::ZERO>) {
-            } else if constexpr (std::is_same_v<T, rondpoint::EnumerationAvecDonnees::UN>) {
+            if constexpr (std::is_same_v<T, rondpoint::EnumerationAvecDonnees::kZero>) {
+            } else if constexpr (std::is_same_v<T, rondpoint::EnumerationAvecDonnees::kUn>) {
                 ASSERT_EQ(2, arg.premier);
-            } else if constexpr (std::is_same_v<T, rondpoint::EnumerationAvecDonnees::DEUX>) {
+            } else if constexpr (std::is_same_v<T, rondpoint::EnumerationAvecDonnees::kDeux>) {
                 ASSERT_EQ(1, arg.premier);
                 ASSERT_EQ("test", arg.second);
             }
@@ -176,7 +176,7 @@ void test_default_parameter_literals_in_record() {
     ASSERT_EQ(default_dict.boolean_var, true);
     ASSERT_EQ(default_dict.string_var, "default");
     ASSERT_EQ(default_dict.list_var, std::vector<std::string>{});
-    ASSERT_EQ(default_dict.enumeration_var, rondpoint::Enumeration::DEUX);
+    ASSERT_EQ(default_dict.enumeration_var, rondpoint::Enumeration::kDeux);
     ASSERT_EQ(default_dict.dictionnaire_var, std::nullopt);
 
     auto rt = rondpoint::Retourneur::init();
@@ -194,7 +194,7 @@ void test_default_parameter_literals_in_record() {
         .boolean_var = true,
         .string_var = "default",
         .list_var = std::vector<std::string>{},
-        .enumeration_var = rondpoint::Enumeration::DEUX,
+        .enumeration_var = rondpoint::Enumeration::kDeux,
         .dictionnaire_var = std::nullopt
     };
     auto copied_dict = rt->identique_optionneur_dictionnaire(dict);

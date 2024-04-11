@@ -116,8 +116,8 @@ void test_complex_errors() {
 void test_interface_in_dicts() {
     auto coveralls = coverall::Coveralls::init("test_interface_in_dicts");
 
-    coveralls->add_patch(coverall::Patch::init(coverall::Color::RED));
-    coveralls->add_repair(coverall::Repair {.when = std::chrono::system_clock::now(), .patch = coverall::Patch::init(coverall::Color::GREEN)});
+    coveralls->add_patch(coverall::Patch::init(coverall::Color::kRed));
+    coveralls->add_repair(coverall::Repair {.when = std::chrono::system_clock::now(), .patch = coverall::Patch::init(coverall::Color::kGreen)});
     ASSERT_EQ(2, coveralls->get_repairs().size());
 }
 

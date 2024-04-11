@@ -227,10 +227,10 @@ std::vector<std::shared_ptr<coverall::TestTrait>> coverall::get_traits() {
 
 coverall::MaybeSimpleDict coverall::get_maybe_simple_dict(int8_t index) {
     if (index == 0) {
-        return { coverall::MaybeSimpleDict::YEAH {} };
+        return { coverall::MaybeSimpleDict::kYeah {} };
     }
     else if (index == 1) {
-        return { coverall::MaybeSimpleDict::NAH {} };
+        return { coverall::MaybeSimpleDict::kNah {} };
     }
 
     throw std::runtime_error("invalid index");
@@ -238,10 +238,10 @@ coverall::MaybeSimpleDict coverall::get_maybe_simple_dict(int8_t index) {
 
 coverall::SimpleFlatMacroEnum coverall::get_simple_flat_macro_enum(int8_t index) {
     if (index == 0) {
-        return { coverall::SimpleFlatMacroEnum::FIRST { "the first" } };
+        return { coverall::SimpleFlatMacroEnum::kFirst { "the first" } };
     }
     else if (index == 1) {
-        return { coverall::SimpleFlatMacroEnum::SECOND { 2 } };
+        return { coverall::SimpleFlatMacroEnum::kSecond { 2 } };
     }
 
     throw std::runtime_error("invalid index");
