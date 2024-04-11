@@ -6,7 +6,7 @@ struct {{ type_name }} {
     {%- call macros::docstring(field, 4) %}
     {{ field|type_name }} {{ field.name()|var_name }}
     {%- match field.default_value() %}
-    {%- when Some with (literal) %} = {{ literal|literal_cpp(field) }};{%- else -%};
+    {%- when Some with (literal) %} = {{ literal|literal_cpp(field, config.enum_style) }};{%- else -%};
     {%- endmatch %}
     {%- endfor %}
 };

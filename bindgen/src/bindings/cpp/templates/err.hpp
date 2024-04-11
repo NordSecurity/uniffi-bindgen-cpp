@@ -31,7 +31,7 @@ struct {{ variant.name()|class_name }}: {{ class_name }} {
     {%- for field in variant.fields() %}
     {{ field|type_name }} {{ field.name()|var_name }}
     {%- match field.default_value() %}
-    {% when Some with (literal) %} = {{ literal|literal_cpp(field) }};{% else %};
+    {% when Some with (literal) %} = {{ literal|literal_cpp(field, config.enum_style) }};{% else %};
     {%- endmatch %}
     {%- endfor %}
 

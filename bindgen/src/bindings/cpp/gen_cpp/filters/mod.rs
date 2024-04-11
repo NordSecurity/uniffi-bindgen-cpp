@@ -11,6 +11,8 @@ use crate::bindings::cpp::gen_cpp::{
     callback_interface, compounds, custom, enum_, miscellany, object, primitives, record,
 };
 
+use super::EnumStyle;
+
 type Result<T> = std::result::Result<T, askama::Error>;
 
 #[derive(Clone)]
@@ -25,8 +27,11 @@ impl CppCodeOracle {
         nm.to_string().to_upper_camel_case()
     }
 
-    pub(crate) fn enum_variant_name(&self, nm: &str) -> String {
-        nm.to_string().to_shouty_snake_case()
+    pub(crate) fn enum_variant_name(&self, nm: &str, style: &EnumStyle) -> String {
+        match style {
+            EnumStyle::Capitalized => nm.to_string().to_shouty_snake_case(),
+            EnumStyle::Google => format!("k{}", nm.to_string().to_upper_camel_case()),
+        }
     }
 
     pub(crate) fn fn_name(&self, nm: &str) -> String {
@@ -107,8 +112,19 @@ pub(crate) fn var_name(nm: &str) -> Result<String> {
     Ok(CppCodeOracle.var_name(nm))
 }
 
-pub(crate) fn literal_cpp(literal: &Literal, as_ct: &impl AsCodeType) -> Result<String> {
-    Ok(as_ct.as_codetype().literal(literal))
+pub(crate) fn literal_cpp(
+    literal: &Literal,
+    as_ct: &impl AsCodeType,
+    enum_style: &EnumStyle,
+) -> Result<String> {
+    match literal {
+        Literal::Enum(name, _) => Ok(format!(
+            "{}::{}",
+            as_ct.as_codetype().type_label(),
+            CppCodeOracle.enum_variant_name(&name, enum_style),
+        )),
+        _ => Ok(as_ct.as_codetype().literal(literal)),
+    }
 }
 
 pub(crate) fn lift_fn(as_ct: &impl AsCodeType) -> Result<String> {
@@ -146,8 +162,8 @@ pub(crate) fn allocation_size_fn(as_ct: &impl AsCodeType) -> Result<String> {
     ))
 }
 
-pub(crate) fn variant_name(v: &Variant) -> Result<String> {
-    Ok(CppCodeOracle.enum_variant_name(v.name()))
+pub(crate) fn variant_name(v: &Variant, enum_style: &EnumStyle) -> Result<String> {
+    Ok(CppCodeOracle.enum_variant_name(v.name(), enum_style))
 }
 
 pub(crate) fn ffi_type_name(ffi_type: &FfiType) -> Result<String> {
