@@ -4,7 +4,7 @@
 enum class {{ type_name }}: int32_t {
     {%- for variant in e.variants() %}
     {%- call macros::docstring(variant, 4) %}
-    {{ variant|variant_name }} = {{ loop.index }}
+    {{ variant|variant_name(config.enum_style) }} = {{ loop.index }}
     {%- if !loop.last %},
     {%- endif %}
     {%- endfor %}
@@ -20,19 +20,19 @@ struct {{ type_name }} {
 
     {%- for variant in e.variants() %}
     {%- call macros::docstring(variant, 4) %}
-    struct {{ variant|variant_name }} {
+    struct {{ variant|variant_name(config.enum_style) }} {
         {%- for field in variant.fields() %}
         {%- call macros::docstring(field, 8) %}
         {{ field|type_name }} {{ field.name()|var_name }}
         {%- match field.default_value() %}
-        {%- when Some with (literal) %} = {{ literal|literal_cpp(field) }};{%- else -%};
+        {%- when Some with (literal) %} = {{ literal|literal_cpp(field, config.enum_style) }};{%- else -%};
         {%- endmatch %}
         {%- endfor %}
     };
     {%- endfor %}
 
     {%- for variant in e.variants() %}
-    {{ type_name }}({{ variant|variant_name }} variant): variant(variant) {}
+    {{ type_name }}({{ variant|variant_name(config.enum_style) }} variant): variant(variant) {}
     {%- endfor %}
 
     {{ type_name }}(const {{ type_name }} &other): variant(other.variant) {}
@@ -51,12 +51,12 @@ struct {{ type_name }} {
     /**
      * Returns the variant of this enum
      */
-    const std::variant<{% for variant in e.variants() %}{{ variant|variant_name }}{% if !loop.last %}, {% endif %}{% endfor %}> &get_variant() const {
+    const std::variant<{% for variant in e.variants() %}{{ variant|variant_name(config.enum_style) }}{% if !loop.last %}, {% endif %}{% endfor %}> &get_variant() const {
         return variant;
     }
 
 private:
-    std::variant<{% for variant in e.variants() %}{{ variant|variant_name }}{% if !loop.last %}, {% endif %}{% endfor %}> variant;
+    std::variant<{% for variant in e.variants() %}{{ variant|variant_name(config.enum_style) }}{% if !loop.last %}, {% endif %}{% endfor %}> variant;
 
     {{ type_name }}();
 };

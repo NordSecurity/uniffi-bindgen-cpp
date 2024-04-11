@@ -12,32 +12,32 @@ namespace {
         };
 
         enum class MinusculeMajusculeEnum {
-            MINUSCULE_MAJUSCULE_VARIANT
+            kMinusculeMajusculeVariant
         };
 
         enum class Enumeration {
-            UN,
-            DEUX,
-            TROIS
+            kUn,
+            kDeux,
+            kTrois
         };
 
         class EnumerationAvecDonnees {
         public:
-            struct ZERO {};
-            struct UN {
+            struct kZero {};
+            struct kUn {
                 uint32_t premier;
             };
-            struct DEUX {
+            struct kDeux {
                 uint32_t premier;
                 std::string second;
             };
 
-            EnumerationAvecDonnees(EnumerationAvecDonnees::ZERO variant) { this->variant = variant; }
-            EnumerationAvecDonnees(EnumerationAvecDonnees::UN variant) { this->variant = variant; }
-            EnumerationAvecDonnees(EnumerationAvecDonnees::DEUX variant) { this->variant = variant; }
+            EnumerationAvecDonnees(EnumerationAvecDonnees::kZero variant) { this->variant = variant; }
+            EnumerationAvecDonnees(EnumerationAvecDonnees::kUn variant) { this->variant = variant; }
+            EnumerationAvecDonnees(EnumerationAvecDonnees::kDeux variant) { this->variant = variant; }
 
 
-            std::variant<ZERO, UN, DEUX> variant;
+            std::variant<kZero, kUn, kDeux> variant;
         };
 
         struct Dictionnaire {
@@ -82,7 +82,7 @@ namespace {
             std::string string_var = "default";
             std::vector<std::string> list_var = {};
 
-            Enumeration enumeration_var = Enumeration::DEUX;
+            Enumeration enumeration_var = Enumeration::kDeux;
             std::optional<MinusculeMajusculeEnum> dictionnaire_var = std::nullopt;
         };
 

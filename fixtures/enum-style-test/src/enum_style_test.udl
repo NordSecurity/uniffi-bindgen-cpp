@@ -1,0 +1,19 @@
+enum SimpleEnum {
+    "VariantOne",
+    "VariantTwo",
+    "VariantThree",
+};
+
+[Enum]
+interface ComplexEnum {
+    VariantOne(u32 num);
+    VariantTwo(f32 flt);
+};
+
+namespace enum_style_test {
+    SimpleEnum get_simple_enum();
+    void set_simple_enum(SimpleEnum e);
+
+    ComplexEnum get_complex_enum();
+    void set_complex_enum(ComplexEnum e);
+};

@@ -22,15 +22,7 @@ impl CodeType for EnumCodeType {
         format!("Type{}", self.id)
     }
 
-    fn literal(&self, literal: &Literal) -> String {
-        if let Literal::Enum(v, _) = literal {
-            format!(
-                "{}::{}",
-                self.type_label(),
-                CppCodeOracle.enum_variant_name(v)
-            )
-        } else {
-            unreachable!();
-        }
+    fn literal(&self, _: &Literal) -> String {
+        unreachable!();
     }
 }

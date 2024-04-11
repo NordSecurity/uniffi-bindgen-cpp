@@ -24,6 +24,18 @@ use uniffi_bindgen::{
     BindingsConfig, ComponentInterface,
 };
 
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub enum EnumStyle {
+    Capitalized,
+    Google,
+}
+
+impl Default for EnumStyle {
+    fn default() -> Self {
+        EnumStyle::Google
+    }
+}
+
 #[derive(Clone, Deserialize, Serialize, Debug, Default)]
 struct CustomTypesConfig {
     imports: Option<Vec<String>>,
@@ -36,12 +48,16 @@ struct CustomTypesConfig {
 pub(crate) struct Config {
     #[serde(default)]
     custom_types: HashMap<String, CustomTypesConfig>,
+    #[serde(default)]
+    enum_style: EnumStyle,
 }
 
 #[derive(Clone, Deserialize, Serialize, Debug, Default)]
 pub(crate) struct ScaffoldingConfig {
     #[serde(default)]
     namespace: Option<String>,
+    #[serde(default)]
+    enum_style: EnumStyle,
 }
 
 impl BindingsConfig for Config {
