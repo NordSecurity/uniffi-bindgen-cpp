@@ -1,3 +1,8 @@
+#### v0.6.1+v0.25.0
+
+----
+- Core: Added header guard for internal FFI structs in scaffolding header
+
 #### v0.6.0+v0.25.0
 
 ----
