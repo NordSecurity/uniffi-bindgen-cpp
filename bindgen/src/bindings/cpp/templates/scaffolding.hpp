@@ -6,6 +6,8 @@
 extern "C" {
 #endif
 
+#ifndef UNIFFI_CPP_INTERNALSTRUCTS
+#define UNIFFI_CPP_INTERNALSTRUCTS
 struct ForeignBytes {
     int32_t len;
     uint8_t *data;
@@ -21,6 +23,8 @@ struct RustCallStatus {
     int8_t code;
     RustBuffer error_buf;
 };
+
+#endif
 
 typedef int ForeignCallback(uint64_t handle, uint32_t method, uint8_t *args_data, int32_t args_len, RustBuffer *buf_ptr);
 
