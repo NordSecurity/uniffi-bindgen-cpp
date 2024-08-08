@@ -17,7 +17,7 @@ private:
 
 struct RustStream: std::basic_iostream<char> {
     RustStream(RustBuffer *buf):
-        streambuf(RustStreamBuffer(buf)), std::basic_iostream<char>(&streambuf) { }
+        std::basic_iostream<char>(&streambuf), streambuf(RustStreamBuffer(buf)) { }
 
     template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
     RustStream &operator>>(T &val) {
