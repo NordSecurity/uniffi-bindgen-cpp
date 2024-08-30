@@ -1,3 +1,9 @@
+#### v0.6.2+v0.25.0
+
+----
+- Core: Fix constructor argument ordering for `RustStream`
+- Core: Fix topological sorting not taking into account structurally recursive types #43
+
 #### v0.6.1+v0.25.0
 
 ----
