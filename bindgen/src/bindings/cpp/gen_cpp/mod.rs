@@ -17,7 +17,7 @@ use std::{
 use anyhow::{Context, Result};
 use askama::Template;
 use serde::{Deserialize, Serialize};
-use topological_sort::TopologicalSort;
+use topological_sort::{DependencyLink, TopologicalSort};
 use uniffi_bindgen::{
     backend::TemplateExpression,
     interface::{AsType, FfiType, Type, UniffiTrait},
@@ -150,61 +150,33 @@ impl<'a> CppWrapperHeader<'a> {
         &self,
         types: impl Iterator<Item = &'a Type>,
     ) -> impl Iterator<Item = Type> {
-        let mut definition_topology = TopologicalSort::<String>::new();
-
-        // We take into account only the Record and Enum types, as they are the
-        // only types that can have member variables that reference other structures
-        for type_ in self.ci.iter_types() {
-            match type_ {
-                Type::Record { name, .. } => {
-                    if let Some(record) = self.ci.get_record_definition(name) {
-                        for field in record.iter_types() {
-                            match field.as_type() {
-                                Type::Record {
-                                    name: field_name, ..
-                                }
-                                | Type::Enum {
-                                    name: field_name, ..
-                                }
-                                | Type::Object {
-                                    name: field_name, ..
-                                }
-                                | Type::Custom {
-                                    name: field_name, ..
-                                } => {
-                                    definition_topology.add_dependency(field_name, name);
-                                }
-                                _ => {}
-                            }
-                        }
-                    }
+        let mut definition_topology = self
+            .ci
+            .iter_types()
+            .filter_map(|type_| {
+                // We take into account only the Record and Enum types, as they are the
+                // only types that can have member variables that reference other structures
+                match type_ {
+                    Type::Record { name, .. } => self
+                        .ci
+                        .get_record_definition(name)
+                        .map(|record| (name, record.iter_types())),
+                    Type::Enum { name, .. } => self
+                        .ci
+                        .get_enum_definition(name)
+                        .map(|enum_| (name, enum_.iter_types())),
+                    _ => None,
                 }
-                Type::Enum { name, .. } => {
-                    if let Some(enum_) = self.ci.get_enum_definition(name) {
-                        enum_.variants().iter().for_each(|v| {
-                            v.fields().iter().for_each(|f| match f.as_type() {
-                                Type::Record {
-                                    name: field_name, ..
-                                }
-                                | Type::Enum {
-                                    name: field_name, ..
-                                }
-                                | Type::Object {
-                                    name: field_name, ..
-                                }
-                                | Type::Custom {
-                                    name: field_name, ..
-                                } => {
-                                    definition_topology.add_dependency(field_name, name);
-                                }
-                                _ => {}
-                            });
-                        });
-                    }
-                }
-                _ => {}
-            }
-        }
+            })
+            .flat_map(|(name, types)| {
+                types
+                    .filter_map(type_name)
+                    .map(|field_name| DependencyLink {
+                        prec: field_name,
+                        succ: name,
+                    })
+            })
+            .collect::<TopologicalSort<_>>();
 
         let mut sorted: Vec<Type> = Vec::new();
         while !definition_topology.peek_all().is_empty() {
@@ -233,6 +205,17 @@ impl<'a> CppWrapperHeader<'a> {
 
     pub(crate) fn includes(&self) -> Vec<String> {
         self.includes.borrow().iter().cloned().collect()
+    }
+}
+
+fn type_name(ty: &Type) -> Option<&str> {
+    match ty {
+        Type::Record { name, .. }
+        | Type::Object { name, .. }
+        | Type::Enum { name, .. }
+        | Type::External { name, .. }
+        | Type::Custom { name, .. } => Some(name),
+        _ => None,
     }
 }
 
