@@ -30,14 +30,12 @@ namespace {{ namespace }} {
 {%- match typ %}
 {%- when Type::Enum { module_path, name } %}
 {%- let e = ci|get_enum_definition(name) %}
-{%- if ci.is_name_used_as_error(name) %}
+{%- if ci.is_name_used_as_error(name) || !e.is_flat() %}
 struct {{ name }};
 {%- else %}
-{%- if e.is_flat() %}
 enum class {{ name }};
 {%- endif %}
-{%- endif %}
-{%- when Type::Record { module_path, name } %} 
+{%- when Type::Record { module_path, name } %}
 struct {{ name }};
 {%- when Type::Object { module_path, name, imp } %}
 struct {{ name }};
