@@ -871,6 +871,7 @@ name = "uniffi-bindgen-cpp-fixtures"
 version = "1.0.0"
 dependencies = [
  "uniffi-custom-types-builtin",
+ "uniffi-empty-type",
  "uniffi-enum-style-test",
  "uniffi-example-arithmetic",
  "uniffi-example-callbacks",
@@ -894,6 +895,13 @@ dependencies = [
  "once_cell",
  "paste",
  "thiserror",
+ "uniffi",
+]
+
+[[package]]
+name = "uniffi-empty-type"
+version = "0.1.0"
+dependencies = [
  "uniffi",
 ]
 

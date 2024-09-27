@@ -33,7 +33,11 @@ void {{ ffi_converter_name }}::write(RustStream &stream, const {{ class_name }} 
 }
 
 int32_t {{ ffi_converter_name }}::allocation_size(const {{ class_name }} &val) {
+    {% if rec.fields().is_empty() %}
+    return 0;
+    {% else %}
     return {% for field in rec.fields() %}
         {{ field|allocation_size_fn}}(val.{{ field.name()|var_name() }}){% if !loop.last %} +{% else -%};{%- endif %}
     {%- endfor %}
+    {% endif %}
 }
