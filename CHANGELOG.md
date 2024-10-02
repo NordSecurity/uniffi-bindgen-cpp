@@ -1,3 +1,10 @@
+#### v0.6.3+v0.25.0
+
+----
+- Core: Forward-declare non-flat uniffi enums #46
+- Core: Fix invalid allocation_size code generation when dealing with empty records #45
+
+
 #### v0.6.2+v0.25.0
 
 ----
