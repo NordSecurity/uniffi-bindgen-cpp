@@ -1,0 +1,6 @@
+dictionary Empty {};
+
+namespace empty_type{
+    Empty get_empty_type();
+    void send_empty_type(Empty e);
+};
