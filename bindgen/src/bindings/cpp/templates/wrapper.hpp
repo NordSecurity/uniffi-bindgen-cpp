@@ -13,6 +13,7 @@
 #include <streambuf>
 #include <type_traits>
 #include <variant>
+#include <vector>
 
 {%- for include in self.includes() %}
 #include <{{ include }}>
