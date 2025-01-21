@@ -3,7 +3,7 @@ use heck::{ToShoutySnakeCase, ToSnakeCase, ToUpperCamelCase};
 pub(crate) use uniffi_bindgen::backend::filters::*;
 use uniffi_bindgen::{
     backend::CodeType,
-    interface::{Argument, AsType, FfiType, Literal, Type, Variant},
+    interface::{Argument, AsType, FfiType, Literal, Type, Variant, Object},
     ComponentInterface,
 };
 
@@ -41,6 +41,16 @@ impl CppCodeOracle {
     pub(crate) fn var_name(&self, nm: &str) -> String {
         nm.to_string().to_snake_case()
     }
+
+    pub(crate) fn object_names(&self, obj: &Object) -> (String, String) {
+        let class_name = self.class_name(obj.name());
+        if obj.has_callback_interface() {
+            let impl_name = format!("{class_name}Impl");
+            (class_name, impl_name)
+        } else {
+            (format!("I{class_name}"), class_name)
+        }
+    }
 }
 
 pub(crate) trait AsCodeType {
@@ -65,8 +75,7 @@ impl<T: AsType> AsCodeType for T {
             Type::Bytes => Box::new(primitives::BytesCodeType),
             Type::Timestamp => Box::new(miscellany::TimestampCodeType),
             Type::Duration => Box::new(miscellany::DurationCodeType),
-            Type::Object { name, .. } => Box::new(object::ObjectCodeType::new(name)),
-            Type::ForeignExecutor => todo!(),
+            Type::Object { name, imp, .. } => Box::new(object::ObjectCodeType::new(name, imp)),
             Type::Record { name, .. } => Box::new(record::RecordCodeType::new(name)),
             Type::Enum { name, .. } => Box::new(enum_::EnumCodeType::new(name)),
             Type::CallbackInterface { name, .. } => {
@@ -100,6 +109,10 @@ pub(crate) fn ffi_converter_name(as_ct: &impl AsCodeType) -> Result<String> {
     Ok(as_ct.as_codetype().ffi_converter_name())
 }
 
+pub(crate) fn ffi_struct_name(nm: &str) -> Result<String> {
+    Ok(format!("Uniffi{}", nm))
+}
+
 pub(crate) fn canonical_name(as_ct: &impl AsCodeType) -> Result<String> {
     Ok(as_ct.as_codetype().canonical_name())
 }
@@ -110,6 +123,10 @@ pub(crate) fn fn_name(nm: &str) -> Result<String> {
 
 pub(crate) fn var_name(nm: &str) -> Result<String> {
     Ok(CppCodeOracle.var_name(nm))
+}
+
+pub (crate) fn object_names(obj: &Object) -> Result<(String, String)>  {
+    Ok(CppCodeOracle.object_names(obj))
 }
 
 pub(crate) fn literal_cpp(
@@ -174,19 +191,17 @@ pub(crate) fn ffi_type_name(ffi_type: &FfiType) -> Result<String> {
         FfiType::Int16 => "int16_t".into(),
         FfiType::UInt32 => "uint32_t".into(),
         FfiType::Int32 => "int32_t".into(),
-        FfiType::UInt64 => "uint64_t".into(),
+        FfiType::UInt64 | FfiType::Handle => "uint64_t".into(),
         FfiType::Int64 => "int64_t".into(),
         FfiType::Float32 => "float".into(),
         FfiType::Float64 => "double".into(),
-        FfiType::RustArcPtr(_) => "void *".into(),
+        FfiType::RustArcPtr(_) | FfiType::VoidPointer => "void *".into(),
         FfiType::RustBuffer(_) => "RustBuffer".into(),
         FfiType::ForeignBytes => "ForeignBytes".into(),
-        FfiType::ForeignCallback => "ForeignCallback".into(),
-        FfiType::ForeignExecutorHandle => unimplemented!("Async is not implemented"),
-        FfiType::ForeignExecutorCallback => unimplemented!("Async is not implemented"),
-        FfiType::RustFutureHandle => "intptr_t".into(),
-        FfiType::RustFutureContinuationCallback => "intptr_t".into(),
-        FfiType::RustFutureContinuationData => "intptr_t".into(),
+        FfiType::Callback(_) => "void *".into(),
+        FfiType::Struct(name) => ffi_struct_name(name)?,
+        FfiType::RustCallStatus => "RustCallStatus*".into(),
+        FfiType::Reference(typ) => format!("{} &", ffi_type_name(typ)?),
     })
 }
 

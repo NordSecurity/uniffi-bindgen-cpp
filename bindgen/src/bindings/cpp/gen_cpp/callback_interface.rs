@@ -25,4 +25,8 @@ impl CodeType for CallbackInterfaceCodeType {
     fn literal(&self, _literal: &Literal) -> String {
         unreachable!();
     }
+
+    fn initialization_fn(&self) -> Option<String> {
+        Some(format!("uniffi::UniffiCallbackInterface{}::init", self.id))
+    }
 }

@@ -23,6 +23,10 @@ void ensure_initialized() {
         throw std::runtime_error("UniFFI API checksum mismatch: try cleaning and rebuilding your project");
     }
     {%- endfor %}
+
+    {% for fn in self.initialization_fns() -%}
+    {{ fn }}();
+    {% endfor -%}
 }
 
 // Note: we need this indirection here and can't inline this code in the rust_call function
@@ -72,6 +76,48 @@ R rust_call(F f, EF error_cb, Args... args) {
         return ret;
     }
 }
+
+template <typename F, typename W>
+void rust_call_trait_interface(RustCallStatus* status, F make_call, W write_value) {
+    initialize();
+
+    constexpr bool has_return_type = std::negation<std::is_same<void, std::invoke_result_t<F>>>::value;
+
+    try {
+        if constexpr(has_return_type) {
+            write_value(make_call());
+        } else {
+            make_call();
+        }
+    } catch (std::exception &e) {
+        status->code = 2;
+        status->error_buf = {{ Type::String.borrow()|lower_fn }}(e.what());
+    }
+}
+
+template <typename E, typename W, typename F, typename EF>
+void rust_call_trait_interface_with_error(RustCallStatus* status, F make_call, W write_value, EF error_cb) {
+    initialize();
+
+    constexpr bool has_return_type = std::negation<std::is_same<void, std::invoke_result_t<F>>>::value;
+
+    try {
+        try {
+            if constexpr(has_return_type) {
+                write_value(make_call());
+            } else {
+                make_call();
+            }
+        } catch (E &e) {
+            status->code = 1;
+            status->error_buf = error_cb(e);
+        }
+    } catch (std::exception &e) {
+        status->code = 2;
+        status->error_buf = {{ Type::String.borrow()|lower_fn }}(e.what());
+    }
+}
+
 
 {% include "rust_buf_tmpl.cpp" %}
 

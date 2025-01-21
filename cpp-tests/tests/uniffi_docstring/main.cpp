@@ -5,9 +5,11 @@
 
 #include <uniffi_docstring.hpp>
 
+// TODO: Current checking implementation cannot find the `<second-line>` entry
 const std::vector<std::string> expected_docstrings = {
     "<docstring-namespace>",
     "<docstring-function>",
+    "<docstring-multiline-function>",
     "<docstring-enum>",
     "<docstring-enum-variant>",
     "<docstring-enum-variant-2>",
