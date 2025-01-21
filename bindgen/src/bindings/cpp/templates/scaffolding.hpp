@@ -1,5 +1,7 @@
 #pragma once
 
+{%- import "macros.cpp" as macros %}
+
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -14,8 +16,8 @@ struct ForeignBytes {
 };
 
 struct RustBuffer {
-    int32_t capacity;
-    int32_t len;
+    uint64_t capacity;
+    uint64_t len;
     uint8_t *data;
 };
 
@@ -26,9 +28,19 @@ struct RustCallStatus {
 
 #endif
 
-typedef int ForeignCallback(uint64_t handle, uint32_t method, uint8_t *args_data, int32_t args_len, RustBuffer *buf_ptr);
-
-{% for func in ci.iter_ffi_function_definitions() %}
+{%- for def in ci.ffi_definitions() %}
+{%- match def %}
+{%- when FfiDefinition::CallbackFunction(callback) %}
+{% call macros::ffi_return_type(callback) %} {{ callback.name()}}(
+    {% call macros::arg_list_ffi_decl_xx(callback) %}
+);
+{%- when FfiDefinition::Struct(ffi_struct) %}
+struct {{ ffi_struct.name()|ffi_struct_name }} {
+    {%- for field in ffi_struct.fields() %}
+    {{ field.type_().borrow()|ffi_type_name }} {{ field.name()|var_name }};
+    {%- endfor %}
+};
+{%- when FfiDefinition::Function(func) %}
 {%- match func.return_type() -%}
 {% when Some with (return_type) %}{{ return_type|ffi_type_name }} {% when None %}void {% endmatch %}{{ func.name() }}(
 {%- for arg in func.arguments() %}
@@ -36,7 +48,8 @@ typedef int ForeignCallback(uint64_t handle, uint32_t method, uint8_t *args_data
 {% endfor %}
 {%- if func.has_rust_call_status_arg() %}RustCallStatus *out_status{% endif -%}
 );
-{% endfor %}
+{%- endmatch %}
+{%- endfor %}
 #ifdef __cplusplus
 }
 #endif

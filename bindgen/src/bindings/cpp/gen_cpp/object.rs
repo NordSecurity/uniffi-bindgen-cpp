@@ -1,15 +1,19 @@
-use uniffi_bindgen::backend::{CodeType, Literal};
+use uniffi_bindgen::{
+    backend::{CodeType, Literal},
+    interface::ObjectImpl,
+};
 
 use crate::bindings::cpp::gen_cpp::filters::CppCodeOracle;
 
 #[derive(Debug)]
 pub(crate) struct ObjectCodeType {
     id: String,
+    imp: ObjectImpl,
 }
 
 impl ObjectCodeType {
-    pub(crate) fn new(id: String) -> Self {
-        Self { id }
+    pub(crate) fn new(id: String, imp: ObjectImpl) -> Self {
+        Self { id, imp }
     }
 }
 
@@ -24,5 +28,11 @@ impl CodeType for ObjectCodeType {
 
     fn literal(&self, _literal: &Literal) -> String {
         unreachable!();
+    }
+
+    fn initialization_fn(&self) -> Option<String> {
+        self.imp
+            .has_callback_interface()
+            .then(|| format!("uniffi::UniffiCallbackInterface{}::init", self.canonical_name()))
     }
 }

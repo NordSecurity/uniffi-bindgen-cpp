@@ -39,10 +39,37 @@ uniffi::{{ arg|lower_fn }}({{ arg.name()|var_name }})
 {% endfor -%}
 {% endmacro %}
 
-{%- macro docstring(defn, indent_spaces) %}
-{%- match defn.docstring() %}
+{%- macro arg_list_ffi_decl(func) %}
+    {%- if func.is_object_clone_function() %}
+    SafeHandle ptr,
+    {%- if func.has_rust_call_status_arg() %}RustCallStatus *out_status{% endif %}
+    {%- else %}
+    {%- call arg_list_ffi_decl_xx(func) %}
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro arg_list_ffi_decl_xx(func) %}
+    {%- for arg in func.arguments() %}
+        {{- arg.type_().borrow()|ffi_type_name }} {{ arg.name()|var_name -}}{%- if !loop.last || func.has_rust_call_status_arg() -%},{%- endif -%}
+    {%- endfor %}
+    {%- if func.has_rust_call_status_arg() %}RustCallStatus *out_status{% endif %}
+{%- endmacro -%}
+
+{%- macro ffi_return_type(func) %}
+    {%- match func.return_type() %}
+    {%- when Some(return_type) %}{{ return_type|ffi_type_name }}
+    {%- when None %}{{ "void" }}
+    {%- endmatch %}
+{%- endmacro %}
+
+{%- macro docstring_value(maybe_docstring, indent_spaces) %}
+{%- match maybe_docstring %}
 {%- when Some(docstring) %}
 {{ docstring|docstring(indent_spaces) }}
 {%- else %}
 {%- endmatch %}
+{%- endmacro %}
+
+{%- macro docstring(defn, indent_spaces) %}
+{%- call docstring_value(defn.docstring(), indent_spaces) %}
 {%- endmacro %}

@@ -42,8 +42,8 @@ struct ForeignBytes {
 };
 
 struct RustBuffer {
-    int32_t capacity;
-    int32_t len;
+    uint64_t capacity;
+    uint64_t len;
     uint8_t *data;
 };
 
@@ -218,19 +218,6 @@ UNIFFI_EXPORT {%- call macros::fn_definition(ffi_func) %} {
     {%- call macros::fn_epilogue(ci, func, ffi_func) %}
 }
 {% endfor %}
-{% endfor %}
-
-{% for func in ci.iter_futures_ffi_function_definitons() %}
-UNIFFI_EXPORT {%- call macros::fn_definition(func) %} {
-    {%- match func.return_type() %}{% when Some with (return_type) %}
-        {% match return_type %}
-        {% when FfiType::RustArcPtr(_) %}
-        return nullptr;
-        {% else %}
-        return {{ return_type|ffi_type_name }}{};
-        {% endmatch %}
-    {% when None %}{% endmatch -%}
-}
 {% endfor %}
 
 {% for checksum in ci.iter_checksums() %}

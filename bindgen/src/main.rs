@@ -1,9 +1,11 @@
 mod bindings;
 
+use anyhow::Context;
 use camino::Utf8PathBuf;
 use clap::Parser;
 
 use bindings::cpp::CppBindingGenerator;
+use uniffi_bindgen::{cargo_metadata, BindgenCrateConfigSupplier};
 
 #[derive(Parser)]
 struct Args {
@@ -26,19 +28,29 @@ fn main() {
     let args = Args::parse();
 
     if args.library_mode {
-        uniffi_bindgen::library_mode::generate_external_bindings(
-            CppBindingGenerator {
-                scaffolding_mode: args.scaffolding_mode,
-            },
+        let config_supplier = {
+            use uniffi_bindgen::cargo_metadata::CrateConfigSupplier;
+            let cmd = ::cargo_metadata::MetadataCommand::new();
+            let metadata = cmd.exec().context("error running cargo metadata").unwrap();
+            CrateConfigSupplier::from(metadata)
+        };
+
+        uniffi_bindgen::library_mode::generate_bindings(
             &args.source,
             args.crate_name,
+            &CppBindingGenerator {
+                scaffolding_mode: args.scaffolding_mode,
+            },
+            &config_supplier,
             args.config.as_deref(),
             &args.out_dir.unwrap(),
+            false,
         )
+        .context("Failed to generate bindings using library mode")
         .unwrap();
     } else {
         uniffi_bindgen::generate_external_bindings(
-            CppBindingGenerator {
+            &CppBindingGenerator {
                 scaffolding_mode: args.scaffolding_mode,
             },
             args.source,
@@ -46,7 +58,9 @@ fn main() {
             args.out_dir,
             args.lib_file,
             args.crate_name.as_deref(),
+            false,
         )
+        .context("Failed to generate external bindings")
         .unwrap();
     }
 }

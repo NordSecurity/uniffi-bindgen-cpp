@@ -19,11 +19,21 @@ public:
     }
 };
 
+class DiscountSim: public callbacks::SimCard {
+public:
+    std::string name() {
+        return "C++";
+    }
+};
+
 int main() {
     auto telephone = callbacks::Telephone::init();
-    ASSERT_EQ(telephone->call(std::make_shared<CallAnswererImpl>("normal")), "Hello");
-    EXPECT_EXCEPTION(telephone->call(std::make_shared<CallAnswererImpl>("busy")), callbacks::telephone_error::Busy);
-    EXPECT_EXCEPTION(telephone->call(std::make_shared<CallAnswererImpl>("unknown")), callbacks::telephone_error::InternalTelephoneError);    
+    auto default_sim = callbacks::get_sim_cards()[0];
+
+    ASSERT_EQ(telephone->call(default_sim, std::make_shared<CallAnswererImpl>("normal")), "Hello");
+    EXPECT_EXCEPTION(telephone->call(default_sim, std::make_shared<CallAnswererImpl>("busy")), callbacks::telephone_error::Busy);
+    EXPECT_EXCEPTION(telephone->call(default_sim, std::make_shared<CallAnswererImpl>("unknown")), callbacks::telephone_error::InternalTelephoneError);
+    ASSERT_EQ(telephone->call(std::make_shared<DiscountSim>(), std::make_shared<CallAnswererImpl>("normal")), "C++ est bon marché");
 
     return 0;
 }

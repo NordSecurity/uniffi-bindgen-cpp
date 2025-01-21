@@ -1,11 +1,10 @@
 pub(crate) mod gen_cpp;
 
-use std::{collections::HashMap, fs};
+use std::fs;
 
-use anyhow::{bail, Result};
-use camino::Utf8Path;
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
-use uniffi_bindgen::{BindingGenerator, BindingsConfig, ComponentInterface};
+use uniffi_bindgen::{BindingGenerator, Component, GenerationSettings};
 
 use self::gen_cpp::{generate_cpp_bindings, generate_cpp_scaffolding, Bindings, Scaffolding};
 
@@ -33,71 +32,57 @@ pub struct ConfigScaffolding {
     cpp: gen_cpp::ScaffoldingConfig,
 }
 
-impl BindingsConfig for ConfigRoot {
-    fn update_from_ci(&mut self, ci: &ComponentInterface) {
-        self.bindings.cpp.update_from_ci(ci);
-    }
-
-    fn update_from_cdylib_name(&mut self, cdylib_name: &str) {
-        self.bindings.cpp.update_from_cdylib_name(cdylib_name);
-    }
-
-    fn update_from_dependency_configs(&mut self, config_map: HashMap<&str, &Self>) {
-        self.bindings.cpp.update_from_dependency_configs(
-            config_map
-                .iter()
-                .map(|(key, config)| (*key, &config.bindings.cpp))
-                .collect(),
-        );
-    }
-}
-
 impl BindingGenerator for CppBindingGenerator {
-    type Config = ConfigRoot;
+    type Config = gen_cpp::Config;
+
+    fn new_config(&self, root_toml: &toml::Value) -> Result<Self::Config> {
+        Ok(match root_toml.get("bindings").and_then(|b| b.get("cpp")) {
+            Some(v) => v.clone().try_into()?,
+            None => Default::default(),
+        })
+    }
+
+    fn update_component_configs(
+        &self,
+        settings: &GenerationSettings,
+        components: &mut Vec<uniffi_bindgen::Component<Self::Config>>,
+    ) -> Result<()> {
+        return Ok(());
+    }
 
     fn write_bindings(
         &self,
-        ci: &ComponentInterface,
-        config: &Self::Config,
-        out_dir: &Utf8Path,
+        settings: &GenerationSettings,
+        components: &[uniffi_bindgen::Component<Self::Config>],
     ) -> Result<()> {
-        if self.scaffolding_mode {
-            let Scaffolding {
-                cpp_scaffolding_source,
-            } = generate_cpp_scaffolding(ci, &config.scaffolding.cpp)?;
+        for Component { ci, config, .. } in components {
+            if self.scaffolding_mode {
+                // let Scaffolding {
+                //     cpp_scaffolding_source,
+                // } = generate_cpp_scaffolding(ci, &scaffolding_config)?;
+                //
+                // let cpp_scaffolding_path = settings
+                //     .out_dir
+                //     .join(format!("{}_cpp_scaffolding.cpp", ci.namespace()));
+                //
+                // fs::write(&cpp_scaffolding_path, cpp_scaffolding_source)?;
+            } else {
+                let Bindings {
+                    scaffolding_header,
+                    header,
+                    source,
+                } = generate_cpp_bindings(&ci, &config)?;
 
-            let cpp_scaffolding_path =
-                out_dir.join(format!("{}_cpp_scaffolding.cpp", ci.namespace()));
+                let scaffolding_header_path = settings
+                    .out_dir
+                    .join(format!("{}_scaffolding.hpp", ci.namespace()));
+                let header_path = settings.out_dir.join(format!("{}.hpp", ci.namespace()));
+                let source_path = settings.out_dir.join(format!("{}.cpp", ci.namespace()));
 
-            fs::write(&cpp_scaffolding_path, cpp_scaffolding_source)?;
-
-            Ok(())
-        } else {
-            let Bindings {
-                scaffolding_header,
-                header,
-                source,
-            } = generate_cpp_bindings(&ci, &config.bindings.cpp)?;
-            let scaffolding_header_path =
-                out_dir.join(format!("{}_scaffolding.hpp", ci.namespace()));
-            let header_path = out_dir.join(format!("{}.hpp", ci.namespace()));
-            let source_path = out_dir.join(format!("{}.cpp", ci.namespace()));
-
-            fs::write(&scaffolding_header_path, scaffolding_header)?;
-            fs::write(&header_path, header)?;
-            fs::write(&source_path, source)?;
-
-            Ok(())
-        }
-    }
-
-    fn check_library_path(
-        &self,
-        _library_path: &Utf8Path,
-        cdylib_name: Option<&str>,
-    ) -> Result<()> {
-        if cdylib_name.is_none() {
-            bail!("A path to a library file is required to generate bindings");
+                fs::write(&scaffolding_header_path, scaffolding_header)?;
+                fs::write(&header_path, header)?;
+                fs::write(&source_path, source)?;
+            }
         }
 
         Ok(())
