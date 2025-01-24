@@ -1,3 +1,10 @@
+#### v0.6.4+v0.25.0
+
+----
+- Core: Explicitly include `vector` in the generated wrapper header
+- Core: Explicitly include `algorithm` in the generated wrapper header
+
+
 #### v0.6.3+v0.25.0
 
 ----
