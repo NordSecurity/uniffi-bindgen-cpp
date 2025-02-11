@@ -3,7 +3,6 @@
 {%- let class_name = type_name|class_name %}
 {%- let ffi_converter_name = typ|ffi_converter_name %}
 {%- let canonical_type_name = typ|canonical_name %}
-{%- let type_name = typ|type_name %}
 {%- if obj.has_callback_interface() %}
 {%- let vtable = obj.vtable().expect("trait interface should have a vtable") %}
 {%- let vtable_methods = obj.vtable_methods() %}
@@ -12,17 +11,24 @@
 {%- let interface_docstring = obj.docstring() %}
 {% include "callback.hpp" %}
 {%- endif %}
+
 namespace uniffi {
     struct {{ ffi_converter_name|class_name }};
 } // namespace uniffi
 
+// TODO: clean the inheritance logic
 {%~ call macros::docstring(obj, 0) %}
-struct {{ impl_class_name }} {% if obj.has_callback_interface() %} : public {{ interface_name }} {% endif %} {
+struct {{ impl_class_name }} {% if obj.has_callback_interface() %} : public {{ interface_name }} {% endif %}
+{% if ci.is_name_used_as_error(name) %} : public std::exception {% endif %} {
     friend uniffi::{{ ffi_converter_name|class_name }};
+
+    // TODO: probably shouldn't be public
+    {% if ci.is_name_used_as_error(name) %}
+    void throw_underlying();
+    {%- endif -%}
 
     {{ impl_class_name }}() = delete;
 
-    {{ impl_class_name }}(const {{ impl_class_name }} &) = delete;
     {{ impl_class_name }}({{ impl_class_name }} &&) = delete;
 
     {{ impl_class_name }} &operator=(const {{ impl_class_name }} &) = delete;
@@ -44,7 +50,7 @@ struct {{ impl_class_name }} {% if obj.has_callback_interface() %} : public {{ i
 
     {%- for method in obj.methods() %}
     {%- call macros::docstring(method, 4) %}
-    {% match method.return_type() %}{% when Some with (return_type) %}{{ return_type|type_name }} {% else %}void {% endmatch %}
+    {% match method.return_type() %}{% when Some with (return_type) %}{{ return_type|type_name(ci) }} {% else %}void {% endmatch %}
     {{- method.name()|fn_name }}({% call macros::param_list(method) %});
     {%- endfor %}
 
@@ -78,9 +84,11 @@ struct {{ impl_class_name }} {% if obj.has_callback_interface() %} : public {{ i
     {%- endfor %}
 
 private:
+    {{ impl_class_name }}(const {{ impl_class_name }} &);
+
     {{ impl_class_name }}(void *);
 
     void *uniffi_clone_pointer() const;
 
-    void *instance;
+    void *instance = nullptr;
 };

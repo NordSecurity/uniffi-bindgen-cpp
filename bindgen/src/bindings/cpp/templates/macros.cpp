@@ -3,7 +3,7 @@
         {{ func.ffi_func().name() }},
 {%- match func.throws_type() %}
 {% when Some with (e) %}
-        uniffi::{{ e|ffi_converter_name }}::lift
+        uniffi::{{ e|ffi_error_converter_name }}::lift
 {%- else %}
         nullptr
 {%- endmatch %}
@@ -16,7 +16,7 @@
         {{ func.ffi_func().name() }},
 {%- match func.throws_type() %}
 {% when Some with (e) %}
-        uniffi::{{ e|ffi_converter_name }}::lift,
+        uniffi::{{ e|ffi_error_converter_name }}::lift,
 {%- else %}
         nullptr,
 {%- endmatch %}
@@ -31,6 +31,14 @@
 {%- if !loop.last -%}, {% endif -%}
 {% endfor -%}
 {% endmacro %}
+
+{% macro field_name(field, field_num) %}
+{%- if field.name().is_empty() -%}
+v{{- field_num -}}
+{%- else -%}
+{{ field.name()|var_name }}
+{%- endif -%}
+{%- endmacro %}
 
 {% macro arg_list_lowered(func) %}
 {%- for arg in func.arguments() -%}

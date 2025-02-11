@@ -28,7 +28,7 @@
 {% call macros::docstring_value(ci.namespace_docstring(), 0) %}
 namespace {{ namespace }} {
 {%- for typ in ci.iter_types() %}
-{%- let type_name = typ|type_name %}
+{%- let type_name = typ|type_name(ci) %}
 {%- match typ %}
 {%- when Type::Enum { module_path, name } %}
 {%- let e = ci|get_enum_definition(name) %}
@@ -46,7 +46,7 @@ struct {{ name }};
 {%- when Type::Custom { module_path, name, builtin } %}
 {%- match config.custom_types.get(name.as_str()) %}
 {%- when None %}
-typedef {{ builtin|type_name }} {{ name }};
+typedef {{ builtin|type_name(ci) }} {{ name }};
 {%- when Some with (type_config) %}
 {%- match type_config.type_name %}
 {%- when Some with (type_name) %}
@@ -59,7 +59,7 @@ typedef {{ type_name }} {{ name }};
 {%- endfor %}
 
 {%- for typ in self.sorted_types(ci.iter_types()) %}
-{%- let type_name = typ|type_name %}
+{%- let type_name = typ|type_name(ci) %}
 {%- match typ %}
 {%- when Type::Enum { module_path, name } %}
 {%- let e = ci|get_enum_definition(name) %}
@@ -95,6 +95,7 @@ void rustbuffer_free(RustBuffer);
 {%- include "handle_map.cpp" %}
 
 {%- for typ in ci.iter_types() %}
+{%- let type_name = typ|type_name(ci) %}
 {%- match typ %}
 {%- when Type::Boolean %}
 {% include "bool_conv.hpp" %}
@@ -156,7 +157,7 @@ void rustbuffer_free(RustBuffer);
 {%- call macros::docstring(func, 0) %}
 {%- match func.return_type() %}
 {%- when Some with (return_type) %}
-{{ return_type|type_name }} {{ func.name()|fn_name }}({% call macros::param_list(func) %});
+{{ return_type|type_name(ci) }} {{ func.name()|fn_name }}({% call macros::param_list(func) %});
 {%- when None %}
 void {{ func.name()|fn_name }}({% call macros::param_list(func) %});
 {%- endmatch %}

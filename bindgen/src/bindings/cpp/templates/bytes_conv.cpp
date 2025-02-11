@@ -1,4 +1,3 @@
-{%- let type_name = typ|type_name %}
 {{ type_name }} {{ ffi_converter_name }}::lift(RustBuffer buf) {
     auto stream = RustStream(&buf);
     auto ret = read(stream);

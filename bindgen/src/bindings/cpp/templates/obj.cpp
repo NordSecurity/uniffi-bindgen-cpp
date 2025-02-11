@@ -1,6 +1,5 @@
 {%- let obj = ci|get_object_definition(name) %}
 {%- let (interface_name, impl_class_name) = obj|object_names %}
-{%- let type_name = typ|type_name %}
 {%- let class_name = type_name|class_name %}
 {%- let ffi_converter_name = typ|ffi_converter_name %}
 {%- let canonical_type_name = typ|canonical_name %}
@@ -16,6 +15,18 @@ namespace uniffi {
 
 
 {{ impl_class_name }}::{{ impl_class_name }}(void *ptr): instance(ptr) {}
+
+{{ impl_class_name }}::{{ impl_class_name }}(const {{ impl_class_name }} &other) : instance(nullptr) {
+    if (other.instance) {
+        instance = other.uniffi_clone_pointer();
+    }
+}
+
+{% if ci.is_name_used_as_error(name) %}
+    void {{ impl_class_name }}::throw_underlying() {
+        throw *this;
+    }
+{% endif %}
 
 {% match obj.primary_constructor() -%}
 {%- when Some with (ctor) %}
@@ -34,7 +45,7 @@ namespace uniffi {
 {% endfor %}
 
 {%- for method in obj.methods() %}
-{% match method.return_type() %}{% when Some with (return_type) %}{{ return_type|type_name }} {% else %}void {% endmatch -%}
+{% match method.return_type() %}{% when Some with (return_type) %}{{ return_type|type_name(ci) }} {% else %}void {% endmatch -%}
 {{ impl_class_name }}::{{ method.name()|fn_name }}({% call macros::param_list(method) %}) {
     auto ptr = this->uniffi_clone_pointer();
     {%- match method.return_type() %}

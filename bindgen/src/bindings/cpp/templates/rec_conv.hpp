@@ -1,4 +1,3 @@
-{%- let type_name = typ|type_name %}
 {%- let class_name = type_name|class_name %}
 struct {{ typ|ffi_converter_name }} {
     static {{ class_name }} lift(RustBuffer);

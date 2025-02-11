@@ -1,6 +1,6 @@
-use uniffi_bindgen::{backend::CodeType, interface::Literal};
+use uniffi_bindgen::{interface::Literal, ComponentInterface};
 
-use crate::bindings::cpp::gen_cpp::filters::CppCodeOracle;
+use crate::bindings::cpp::{gen_cpp::filters::CppCodeOracle, CodeType};
 
 #[derive(Debug)]
 pub(crate) struct CallbackInterfaceCodeType {
@@ -14,7 +14,7 @@ impl CallbackInterfaceCodeType {
 }
 
 impl CodeType for CallbackInterfaceCodeType {
-    fn type_label(&self) -> String {
+    fn type_label(&self, _ci: &ComponentInterface) -> String {
         format!("std::shared_ptr<{}>", self.canonical_name())
     }
 
@@ -22,7 +22,7 @@ impl CodeType for CallbackInterfaceCodeType {
         CppCodeOracle.class_name(&self.id)
     }
 
-    fn literal(&self, _literal: &Literal) -> String {
+    fn literal(&self, _literal: &Literal, _ci: &ComponentInterface) -> String {
         unreachable!();
     }
 

@@ -632,6 +632,7 @@ dependencies = [
  "uniffi-custom-types-builtin",
  "uniffi-empty-type",
  "uniffi-enum-style-test",
+ "uniffi-error-types-builtin",
  "uniffi-example-arithmetic",
  "uniffi-example-callbacks",
  "uniffi-example-custom-types",
@@ -668,6 +669,15 @@ dependencies = [
 name = "uniffi-enum-style-test"
 version = "0.1.0"
 dependencies = [
+ "uniffi",
+]
+
+[[package]]
+name = "uniffi-error-types-builtin"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "thiserror",
  "uniffi",
 ]
 

@@ -1,7 +1,5 @@
-{%- let type_name = typ|type_name %}
 {%- let ffi_converter_name = typ|ffi_converter_name %}
 {%- let class_name = ffi_converter_name|class_name %}
-
 
 {{ type_name }} {{ class_name }}::lift(uint64_t handle) {
     return handle_map.at(handle);

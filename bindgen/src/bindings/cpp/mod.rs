@@ -1,12 +1,14 @@
 pub(crate) mod gen_cpp;
 
-use std::fs;
+use std::{fmt::Debug, fs};
 
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
-use uniffi_bindgen::{BindingGenerator, Component, GenerationSettings};
+use uniffi_bindgen::{
+    backend::Literal, BindingGenerator, Component, ComponentInterface, GenerationSettings,
+};
 
-use self::gen_cpp::{generate_cpp_bindings, generate_cpp_scaffolding, Bindings, Scaffolding};
+use self::gen_cpp::{generate_cpp_bindings, Bindings};
 
 pub(crate) struct CppBindingGenerator {
     pub scaffolding_mode: bool,
@@ -32,6 +34,40 @@ pub struct ConfigScaffolding {
     cpp: gen_cpp::ScaffoldingConfig,
 }
 
+/// A Trait to help render types in a language specific format.
+pub trait CodeType: Debug {
+    /// The language specific label used to reference this type. This will be used in
+    /// method signatures and property declarations.
+    fn type_label(&self, ci: &ComponentInterface) -> String;
+
+    /// A representation of this type label that can be used as part of another
+    /// identifier. e.g. `read_foo()`, or `FooInternals`.
+    ///
+    /// This is especially useful when creating specialized objects or methods to deal
+    /// with this type only.
+    fn canonical_name(&self) -> String;
+
+    fn literal(&self, _literal: &Literal, ci: &ComponentInterface) -> String {
+        unimplemented!("Unimplemented for {}", self.type_label(ci))
+    }
+
+    /// Name of the FfiConverter
+    fn ffi_converter_name(&self) -> String {
+        format!("FfiConverter{}", self.canonical_name())
+    }
+
+    /// A list of imports that are needed if this type is in use.
+    /// Classes are imported exactly once.
+    fn imports(&self) -> Option<Vec<String>> {
+        None
+    }
+
+    /// Function to run at startup
+    fn initialization_fn(&self) -> Option<String> {
+        None
+    }
+}
+
 impl BindingGenerator for CppBindingGenerator {
     type Config = gen_cpp::Config;
 
@@ -44,8 +80,8 @@ impl BindingGenerator for CppBindingGenerator {
 
     fn update_component_configs(
         &self,
-        settings: &GenerationSettings,
-        components: &mut Vec<uniffi_bindgen::Component<Self::Config>>,
+        _settings: &GenerationSettings,
+        _components: &mut Vec<uniffi_bindgen::Component<Self::Config>>,
     ) -> Result<()> {
         return Ok(());
     }

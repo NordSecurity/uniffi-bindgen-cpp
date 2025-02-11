@@ -1,0 +1,16 @@
+[package]
+name = "uniffi-error-types-builtin"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["lib", "cdylib"]
+name = "uniffi_cpp_error_types_builtin"
+
+[dependencies]
+uniffi = { workspace = true }
+anyhow = "1"
+thiserror = "1.0"
+
+[build-dependencies]
+uniffi = { workspace = true, features = ["build"] }

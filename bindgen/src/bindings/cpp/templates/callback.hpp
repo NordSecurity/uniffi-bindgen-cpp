@@ -1,4 +1,3 @@
-{%- let type_name = typ|type_name %}
 {%- let class_name = type_name|class_name %}
 {%- let canonical_type_name = typ|canonical_name %}
 {%- let trait_impl=format!("UniffiCallbackInterface{}", canonical_type_name) %}
@@ -10,7 +9,7 @@ struct {{ interface_name }} {
     {%- for method in methods.iter() %}
     {%- call macros::docstring(method, 4) %}
     virtual
-    {% match method.return_type() %}{% when Some with (return_type) %}{{ return_type|type_name }} {% else %}void {% endmatch %}
+    {% match method.return_type() %}{% when Some with (return_type) %}{{ return_type|type_name(ci) }} {% else %}void {% endmatch %}
     {{- method.name()|fn_name }}({% call macros::param_list(method) %}) = 0;
     {%- endfor %}
 };

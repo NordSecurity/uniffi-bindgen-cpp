@@ -2,13 +2,15 @@ use askama;
 use heck::{ToShoutySnakeCase, ToSnakeCase, ToUpperCamelCase};
 pub(crate) use uniffi_bindgen::backend::filters::*;
 use uniffi_bindgen::{
-    backend::CodeType,
-    interface::{Argument, AsType, FfiType, Literal, Type, Variant, Object},
+    interface::{Argument, AsType, FfiType, Literal, Object, Type, Variant},
     ComponentInterface,
 };
 
-use crate::bindings::cpp::gen_cpp::{
-    callback_interface, compounds, custom, enum_, miscellany, object, primitives, record,
+use crate::bindings::cpp::{
+    gen_cpp::{
+        callback_interface, compounds, custom, enum_, miscellany, object, primitives, record,
+    },
+    CodeType,
 };
 
 use super::EnumStyle;
@@ -101,12 +103,22 @@ pub(crate) fn to_lower_snake_case(s: &str) -> Result<String> {
     Ok(s.to_string().to_snake_case())
 }
 
-pub(crate) fn type_name(as_ct: &impl AsCodeType) -> Result<String> {
-    Ok(as_ct.as_codetype().type_label())
+pub(crate) fn type_name(as_ct: &impl AsCodeType, ci: &ComponentInterface) -> Result<String> {
+    Ok(as_ct.as_codetype().type_label(ci))
 }
 
 pub(crate) fn ffi_converter_name(as_ct: &impl AsCodeType) -> Result<String> {
     Ok(as_ct.as_codetype().ffi_converter_name())
+}
+
+pub(crate) fn ffi_error_converter_name(as_type: &impl AsType) -> Result<String> {
+    let mut name = ffi_converter_name(as_type)?;
+
+    if matches!(&as_type.as_type(), Type::Object { .. }) {
+        name.push_str("__as_error");
+    }
+
+    Ok(name)
 }
 
 pub(crate) fn ffi_struct_name(nm: &str) -> Result<String> {
@@ -125,7 +137,7 @@ pub(crate) fn var_name(nm: &str) -> Result<String> {
     Ok(CppCodeOracle.var_name(nm))
 }
 
-pub (crate) fn object_names(obj: &Object) -> Result<(String, String)>  {
+pub(crate) fn object_names(obj: &Object) -> Result<(String, String)> {
     Ok(CppCodeOracle.object_names(obj))
 }
 
@@ -133,14 +145,15 @@ pub(crate) fn literal_cpp(
     literal: &Literal,
     as_ct: &impl AsCodeType,
     enum_style: &EnumStyle,
+    ci: &ComponentInterface,
 ) -> Result<String> {
     match literal {
         Literal::Enum(name, _) => Ok(format!(
             "{}::{}",
-            as_ct.as_codetype().type_label(),
+            as_ct.as_codetype().type_label(ci),
             CppCodeOracle.enum_variant_name(&name, enum_style),
         )),
-        _ => Ok(as_ct.as_codetype().literal(literal)),
+        _ => Ok(as_ct.as_codetype().literal(literal, ci)),
     }
 }
 
@@ -236,8 +249,8 @@ pub(crate) fn by_ref(ci: &ComponentInterface, arg: &Argument) -> bool {
 
 pub(crate) fn parameter(arg: &Argument, ci: &ComponentInterface) -> Result<String> {
     Ok(match by_ref(ci, arg) {
-        true => format!("const {} &{}", arg.as_codetype().type_label(), arg.name()),
-        false => format!("{} {}", arg.as_codetype().type_label(), arg.name()),
+        true => format!("const {} &{}", arg.as_codetype().type_label(ci), arg.name()),
+        false => format!("{} {}", arg.as_codetype().type_label(ci), arg.name()),
     })
 }
 
@@ -248,10 +261,19 @@ pub(crate) fn docstring(docstring: &str, spaces: &i32) -> Result<String> {
     Ok(textwrap::indent(&wrapped, &" ".repeat(*spaces as usize)))
 }
 
-pub(crate) fn can_dereference_optional(type_: &Type) -> Result<bool> {
+pub(crate) fn can_dereference_optional(type_: &Type, ci: &ComponentInterface) -> Result<bool> {
     let result = match type_ {
-        Type::Optional { inner_type } => compounds::OptionalCodeType::can_dereference(inner_type),
+        Type::Optional { inner_type } => compounds::OptionalCodeType::can_dereference(inner_type, ci),
         _ => false,
     };
     Ok(result)
+}
+
+pub(crate) fn deref(type_: Type, ci: &ComponentInterface) -> Result<String> {
+    if let Type::Enum { name, .. } = type_ {
+        if ci.is_name_used_as_error(&name) {
+            return Ok("*".to_string());
+        }
+    }
+    Ok("".to_string())
 }

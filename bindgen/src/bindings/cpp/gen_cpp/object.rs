@@ -1,9 +1,6 @@
-use uniffi_bindgen::{
-    backend::{CodeType, Literal},
-    interface::ObjectImpl,
-};
+use uniffi_bindgen::{backend::Literal, interface::ObjectImpl, ComponentInterface};
 
-use crate::bindings::cpp::gen_cpp::filters::CppCodeOracle;
+use crate::bindings::cpp::{gen_cpp::filters::CppCodeOracle, CodeType};
 
 #[derive(Debug)]
 pub(crate) struct ObjectCodeType {
@@ -18,7 +15,7 @@ impl ObjectCodeType {
 }
 
 impl CodeType for ObjectCodeType {
-    fn type_label(&self) -> String {
+    fn type_label(&self, _ci: &ComponentInterface) -> String {
         format!("std::shared_ptr<{}>", self.canonical_name())
     }
 
@@ -26,13 +23,16 @@ impl CodeType for ObjectCodeType {
         CppCodeOracle.class_name(&self.id)
     }
 
-    fn literal(&self, _literal: &Literal) -> String {
+    fn literal(&self, _literal: &Literal, _ci: &ComponentInterface) -> String {
         unreachable!();
     }
 
     fn initialization_fn(&self) -> Option<String> {
-        self.imp
-            .has_callback_interface()
-            .then(|| format!("uniffi::UniffiCallbackInterface{}::init", self.canonical_name()))
+        self.imp.has_callback_interface().then(|| {
+            format!(
+                "uniffi::UniffiCallbackInterface{}::init",
+                self.canonical_name()
+            )
+        })
     }
 }

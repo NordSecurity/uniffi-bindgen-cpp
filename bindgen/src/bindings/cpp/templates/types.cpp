@@ -1,7 +1,7 @@
 {%- import "macros.cpp" as macros %}
 
 {%- for typ in ci.iter_types() %}
-{%- let type_name = typ|type_name %}
+{%- let type_name = typ|type_name(ci) %}
 {%- let ffi_converter_name = typ|ffi_converter_name %}
 {%- let canonical_type_name = typ|canonical_name %}
 {%- let contains_object_references = ci.item_contains_object_references(typ) %}
@@ -16,7 +16,7 @@
 
 namespace uniffi {
 {%- for typ in ci.iter_types() %}
-{%- let type_name = typ|type_name %}
+{%- let type_name = typ|type_name(ci) %}
 {%- let ffi_converter_name = typ|ffi_converter_name %}
 {%- let canonical_type_name = typ|canonical_name %}
 {%- let contains_object_references = ci.item_contains_object_references(typ) %}

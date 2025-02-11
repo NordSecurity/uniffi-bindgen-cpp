@@ -1,4 +1,3 @@
-{%- let type_name = typ|type_name %}
 struct {{ typ|ffi_converter_name }} {
     static {{ type_name }} lift(RustBuffer buf);
     static RustBuffer lower(const {{ type_name }}& val);

@@ -1,4 +1,6 @@
-use uniffi_bindgen::backend::CodeType;
+use uniffi_bindgen::ComponentInterface;
+
+use crate::bindings::cpp::CodeType;
 
 #[derive(Debug)]
 pub struct CustomCodeType {
@@ -12,7 +14,7 @@ impl CustomCodeType {
 }
 
 impl CodeType for CustomCodeType {
-    fn type_label(&self) -> String {
+    fn type_label(&self, _ci: &ComponentInterface) -> String {
         self.name.clone()
     }
 

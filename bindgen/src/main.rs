@@ -5,7 +5,6 @@ use camino::Utf8PathBuf;
 use clap::Parser;
 
 use bindings::cpp::CppBindingGenerator;
-use uniffi_bindgen::{cargo_metadata, BindgenCrateConfigSupplier};
 
 #[derive(Parser)]
 struct Args {

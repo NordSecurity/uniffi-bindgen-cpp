@@ -58,6 +58,7 @@ typedef int ForeignCallback(uint64_t handle, uint32_t method, uint8_t *args_data
 {%- include "scaffolding/object_map.cpp" %}
 
 {%- for typ in ci.iter_types() %}
+{%- let type_name = typ|type_name(ci) %}
 {%- match typ %}
 {%- when Type::Boolean %}
 {% include "bool_conv.hpp" %}
@@ -259,7 +260,7 @@ void rustbuffer_free(RustBuffer& buf) {
 }
 
 {%- for typ in ci.iter_types() %}
-{%- let type_name = typ|type_name %}
+{%- let type_name = typ|type_name(ci) %}
 {%- let ffi_converter_name = typ|ffi_converter_name %}
 {%- let canonical_type_name = typ|canonical_name %}
 {%- let contains_object_references = ci.item_contains_object_references(typ) %}
