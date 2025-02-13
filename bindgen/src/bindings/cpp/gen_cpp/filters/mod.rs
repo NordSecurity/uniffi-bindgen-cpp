@@ -263,7 +263,9 @@ pub(crate) fn docstring(docstring: &str, spaces: &i32) -> Result<String> {
 
 pub(crate) fn can_dereference_optional(type_: &Type, ci: &ComponentInterface) -> Result<bool> {
     let result = match type_ {
-        Type::Optional { inner_type } => compounds::OptionalCodeType::can_dereference(inner_type, ci),
+        Type::Optional { inner_type } => {
+            compounds::OptionalCodeType::can_dereference(inner_type, ci)
+        }
         _ => false,
     };
     Ok(result)
