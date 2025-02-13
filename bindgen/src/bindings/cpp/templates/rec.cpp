@@ -32,7 +32,7 @@ void {{ ffi_converter_name }}::write(RustStream &stream, const {{ class_name }} 
     {%- endfor %}
 }
 
-int32_t {{ ffi_converter_name }}::allocation_size(const {{ class_name }} &val) {
+uint64_t {{ ffi_converter_name }}::allocation_size(const {{ class_name }} &val) {
     {% if rec.fields().is_empty() %}
     return 0;
     {% else %}

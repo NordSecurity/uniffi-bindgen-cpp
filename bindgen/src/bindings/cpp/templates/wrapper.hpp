@@ -88,7 +88,7 @@ typedef {{ type_name }} {{ name }};
 namespace uniffi {
 {%- include "rust_buf_stream.cpp" %}
 
-RustBuffer rustbuffer_alloc(int32_t);
+RustBuffer rustbuffer_alloc(uint64_t);
 RustBuffer rustbuffer_from_bytes(const ForeignBytes &);
 void rustbuffer_free(RustBuffer);
 

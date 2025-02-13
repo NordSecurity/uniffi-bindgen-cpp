@@ -17,6 +17,6 @@ void {{ ffi_converter_name }}::write(RustStream &stream, {{ type_name }} val) {
     stream << val;
 }
 
-int32_t {{ ffi_converter_name }}::allocation_size({{ type_name }}) {
-    return static_cast<int32_t>(sizeof({{ type_name }}));
+uint64_t {{ ffi_converter_name }}::allocation_size({{ type_name }}) {
+    return static_cast<uint64_t>(sizeof({{ type_name }}));
 }

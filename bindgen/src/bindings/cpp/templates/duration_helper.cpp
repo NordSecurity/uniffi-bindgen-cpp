@@ -33,6 +33,6 @@ void {{ ffi_converter_name }}::write(RustStream &stream, const {{ type_name }} &
     stream << secs.count() << static_cast<uint32_t>(nanos);
 }
 
-int32_t {{ ffi_converter_name }}::allocation_size(const {{ type_name }} &) {
-    return static_cast<int32_t>(sizeof(uint64_t) + sizeof(uint32_t));
+uint64_t {{ ffi_converter_name }}::allocation_size(const {{ type_name }} &) {
+    return static_cast<uint64_t>(sizeof(uint64_t) + sizeof(uint32_t));
 }

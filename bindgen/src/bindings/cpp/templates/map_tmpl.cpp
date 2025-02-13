@@ -41,8 +41,8 @@ void {{ class_name }}::write(RustStream &stream, const {{ type_name }} &val) {
     }
 }
 
-int32_t {{ class_name }}::allocation_size(const {{ type_name }} &val) {
-    int32_t size = sizeof(int32_t);
+uint64_t {{ class_name }}::allocation_size(const {{ type_name }} &val) {
+    uint64_t size = sizeof(int32_t);
 
     for (auto &entry : val) {
         size += {{ key_type|allocation_size_fn }}({{ key_type.as_type()|deref(ci) }}entry.first);

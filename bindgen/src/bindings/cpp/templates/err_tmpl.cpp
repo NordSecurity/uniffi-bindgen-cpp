@@ -63,16 +63,16 @@ void {{ ffi_converter_name }}::write(RustStream &stream, const {{ class_name }} 
     {%- endif %}
 }
 
-int32_t {{ ffi_converter_name }}::allocation_size(const {{ class_name }} &val) {
+uint64_t {{ ffi_converter_name }}::allocation_size(const {{ class_name }} &val) {
     {%- if e.is_flat() %}
-    return static_cast<int32_t>(sizeof(int32_t));
+    return static_cast<uint64_t>(sizeof(int32_t));
     {%- else %}
     switch (val.get_variant_idx()) {
     {%- for variant in e.variants() %}
     case {{ loop.index }}:
     {
         auto var = static_cast<const {{ class_name|to_lower_snake_case }}::{{ variant.name() }}&>(val);
-        return static_cast<int32_t>(sizeof(int32_t)
+        return static_cast<uint64_t>(sizeof(int32_t)
         {%- for field in variant.fields() %}
             + {{ field|allocation_size_fn }}({{ field.as_type()|deref(ci) }}var.{% call macros::field_name(field, loop.index) %})
         {%- endfor %});

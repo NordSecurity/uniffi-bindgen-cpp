@@ -48,8 +48,8 @@ void {{ ffi_converter_name }}::write(RustStream &stream, const {{ type_name }}& 
     }
 }
 
-int32_t {{ ffi_converter_name }}::allocation_size(const {{ type_name }} &val) {
-    int32_t ret = 1;
+uint64_t {{ ffi_converter_name }}::allocation_size(const {{ type_name }} &val) {
+    uint64_t ret = 1;
 
     if (val) {
         {%- if typ|can_dereference_optional(ci) %}
