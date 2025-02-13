@@ -58,6 +58,7 @@ pub trait CodeType: Debug {
 
     /// A list of imports that are needed if this type is in use.
     /// Classes are imported exactly once.
+    #[allow(dead_code)]
     fn imports(&self) -> Option<Vec<String>> {
         None
     }
@@ -93,15 +94,7 @@ impl BindingGenerator for CppBindingGenerator {
     ) -> Result<()> {
         for Component { ci, config, .. } in components {
             if self.scaffolding_mode {
-                // let Scaffolding {
-                //     cpp_scaffolding_source,
-                // } = generate_cpp_scaffolding(ci, &scaffolding_config)?;
-                //
-                // let cpp_scaffolding_path = settings
-                //     .out_dir
-                //     .join(format!("{}_cpp_scaffolding.cpp", ci.namespace()));
-                //
-                // fs::write(&cpp_scaffolding_path, cpp_scaffolding_source)?;
+                unimplemented!("Cpp scaffolding is not supported yet!");
             } else {
                 let Bindings {
                     scaffolding_header,

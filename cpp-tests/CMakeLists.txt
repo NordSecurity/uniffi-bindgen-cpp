@@ -125,10 +125,10 @@ add_custom_target(bindings ALL
     COMMENT "Generating bindings"
 )
 
-add_custom_target(scaffolding ALL
-    BYPRODUCTS ${SCAFFOLDING_FILES}
-    DEPENDS libs
-    COMMAND ./uniffi-bindgen-cpp --scaffolding --library ${UNIFFI_FIXTURES_LIB} --out-dir bindings
-    WORKING_DIRECTORY ${BINDINGS_BUILD_DIR}
-    COMMENT "Generating scaffolding"
-)
+# add_custom_target(scaffolding ALL
+#     BYPRODUCTS ${SCAFFOLDING_FILES}
+#     DEPENDS libs
+#     COMMAND ./uniffi-bindgen-cpp --scaffolding --library ${UNIFFI_FIXTURES_LIB} --out-dir bindings
+#     WORKING_DIRECTORY ${BINDINGS_BUILD_DIR}
+#     COMMENT "Generating scaffolding"
+# )

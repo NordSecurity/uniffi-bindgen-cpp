@@ -259,10 +259,12 @@ pub(crate) fn generate_cpp_bindings(ci: &ComponentInterface, config: &Config) ->
     })
 }
 
+#[allow(unused)]
 pub(crate) struct Scaffolding {
     pub(crate) cpp_scaffolding_source: String,
 }
 
+#[allow(unused)]
 pub(crate) fn generate_cpp_scaffolding(
     ci: &ComponentInterface,
     config: &ScaffoldingConfig,
