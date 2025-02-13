@@ -8,6 +8,5 @@ struct {{ typ|ffi_converter_name }} {
     static void write(RustStream &, const {{ type_name }} &);
     static int32_t allocation_size(const {{ type_name }} &);
 
-    // TODO: don't expose this?
     inline static HandleMap<{{ canonical_type_name }}> handle_map = {};
 };

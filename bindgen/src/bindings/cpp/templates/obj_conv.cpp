@@ -21,7 +21,7 @@ void *{{ ffi_converter_name }}::lower(const {{ type_name }} &obj) {
     auto ptr = handle_map.insert(obj);
     return reinterpret_cast<void*>(ptr);
     {%- else %}
-    return reinterpret_cast<{{ impl_class_name}}*>(obj.get())->uniffi_clone_pointer();
+    return reinterpret_cast<{{ impl_class_name}}*>(obj.get())->_uniffi_internal_clone_pointer();
     {%- endif %}
 }
 

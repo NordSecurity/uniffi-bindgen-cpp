@@ -16,16 +16,16 @@ namespace uniffi {
     struct {{ ffi_converter_name|class_name }};
 } // namespace uniffi
 
-// TODO: clean the inheritance logic
 {%~ call macros::docstring(obj, 0) %}
-struct {{ impl_class_name }} {% if obj.has_callback_interface() %} : public {{ interface_name }} {% endif %}
-{% if ci.is_name_used_as_error(name) %} : public std::exception {% endif %} {
+struct {{ impl_class_name }}
+{#
+    Since an interface being a callback interface or an error is mutually exclusive,
+    we don't need to complex branching for multiple inheritance
+#}
+{% if obj.has_callback_interface() %} : public {{ interface_name }} {% endif %}
+{% if ci.is_name_used_as_error(name) %} : public std::exception {% endif %}
+{
     friend uniffi::{{ ffi_converter_name|class_name }};
-
-    // TODO: probably shouldn't be public
-    {% if ci.is_name_used_as_error(name) %}
-    void throw_underlying();
-    {%- endif -%}
 
     {{ impl_class_name }}() = delete;
 
@@ -83,12 +83,16 @@ struct {{ impl_class_name }} {% if obj.has_callback_interface() %} : public {{ i
     {%- endmatch %}
     {%- endfor %}
 
+    {% if ci.is_name_used_as_error(name) %}
+    // UniFFI internal function - do not call this manually!
+    void _uniffi_internal_throw_underlying();
+    {%- endif -%}
 private:
     {{ impl_class_name }}(const {{ impl_class_name }} &);
 
     {{ impl_class_name }}(void *);
 
-    void *uniffi_clone_pointer() const;
+    void *_uniffi_internal_clone_pointer() const;
 
     void *instance = nullptr;
 };
