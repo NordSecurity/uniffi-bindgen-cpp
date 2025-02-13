@@ -42,7 +42,7 @@ void test_none_dict() {
     ASSERT_EQ(std::nullopt, dict.maybe_unsigned8);
     ASSERT_EQ(3, dict.unsigned16);
     ASSERT_EQ(std::nullopt, dict.maybe_unsigned16);
-    ASSERT_EQ(18446744073709551615, dict.unsigned64);
+    ASSERT_EQ(18446744073709551615ul, dict.unsigned64);
     ASSERT_EQ(std::nullopt, dict.maybe_unsigned64);
     ASSERT_EQ(8, dict.signed8);
     ASSERT_EQ(std::nullopt, dict.maybe_signed8);

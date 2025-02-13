@@ -141,11 +141,22 @@ void test_void_callback_exceptions() {
     EXPECT_EXCEPTION(rust_callback->get_nothing(callback, "unexpected-error"), fixture_callbacks::simple_error::UnexpectedError);
 }
 
+void test_callback_lifetime() {
+    auto stringifier = std::make_shared<CppStringifier>();
+    auto rust_stringifier1 = fixture_callbacks::RustStringifier::init(stringifier);
+    {
+        auto rust_stringifier2 = fixture_callbacks::RustStringifier::init(stringifier);
+        ASSERT_EQ("C++: 123", rust_stringifier2->from_simple_type(123));
+    }
+    ASSERT_EQ("C++: 123", rust_stringifier1->from_simple_type(123));
+}
+
 int main() {
     test_callback_roundtrip();
     test_callback_roundtrip_errors();
     test_callback_stored_in_object();
     test_void_callback_exceptions();
+    test_callback_lifetime();
 
     return 0;
 }

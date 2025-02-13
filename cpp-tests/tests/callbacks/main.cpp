@@ -27,13 +27,26 @@ public:
 };
 
 int main() {
-    auto telephone = callbacks::Telephone::init();
-    auto default_sim = callbacks::get_sim_cards()[0];
+    {
+        auto telephone = callbacks::Telephone::init();
+        auto default_sim = callbacks::get_sim_cards()[0];
 
-    ASSERT_EQ(telephone->call(default_sim, std::make_shared<CallAnswererImpl>("normal")), "Hello");
-    EXPECT_EXCEPTION(telephone->call(default_sim, std::make_shared<CallAnswererImpl>("busy")), callbacks::telephone_error::Busy);
-    EXPECT_EXCEPTION(telephone->call(default_sim, std::make_shared<CallAnswererImpl>("unknown")), callbacks::telephone_error::InternalTelephoneError);
-    ASSERT_EQ(telephone->call(std::make_shared<DiscountSim>(), std::make_shared<CallAnswererImpl>("normal")), "C++ est bon marché");
+        ASSERT_EQ(telephone->call(default_sim, std::make_shared<CallAnswererImpl>("normal")), "Hello");
+        EXPECT_EXCEPTION(telephone->call(default_sim, std::make_shared<CallAnswererImpl>("busy")), callbacks::telephone_error::Busy);
+        EXPECT_EXCEPTION(telephone->call(default_sim, std::make_shared<CallAnswererImpl>("unknown")), callbacks::telephone_error::InternalTelephoneError);
+        ASSERT_EQ(telephone->call(std::make_shared<DiscountSim>(), std::make_shared<CallAnswererImpl>("normal")), "C++ est bon marché");
+    }
+
+    // Technically not required to test this, as it's the same implementation in Rust, but done with proc macros
+    {
+        auto telephone = callbacks::FancyTelephone::init();
+        auto default_sim = callbacks::get_sim_cards()[0];
+
+        ASSERT_EQ(telephone->call(default_sim, std::make_shared<CallAnswererImpl>("normal")), "Hello");
+        EXPECT_EXCEPTION(telephone->call(default_sim, std::make_shared<CallAnswererImpl>("busy")), callbacks::telephone_error::Busy);
+        EXPECT_EXCEPTION(telephone->call(default_sim, std::make_shared<CallAnswererImpl>("unknown")), callbacks::telephone_error::InternalTelephoneError);
+        ASSERT_EQ(telephone->call(std::make_shared<DiscountSim>(), std::make_shared<CallAnswererImpl>("normal")), "C++ est bon marché");
+    }
 
     return 0;
 }

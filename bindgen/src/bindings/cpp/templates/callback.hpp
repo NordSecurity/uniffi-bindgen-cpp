@@ -25,9 +25,9 @@ namespace uniffi {
     private:
         static inline {{ vtable|ffi_type_name }} vtable = {{ vtable|ffi_type_name}} {
             {%- for (ffi_callback, meth) in vtable_methods.iter() %}
-            .{{ meth.name()|var_name }} = (void*)&{{ meth.name()|var_name }},
+            .{{ meth.name()|var_name }} = reinterpret_cast<void *>(&{{ meth.name()|var_name }}),
             {%- endfor %}
-            .uniffi_free = (void*)&uniffi_free
+            .uniffi_free = reinterpret_cast<void *>(&uniffi_free)
         };
     };
 }
