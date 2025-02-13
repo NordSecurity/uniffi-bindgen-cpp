@@ -11,13 +11,14 @@ struct {{ class_name }}: std::runtime_error {
     {{ class_name }}() : std::runtime_error("") {}
     {{ class_name }}(const std::string &what_arg) : std::runtime_error(what_arg) {}
 
-    // TODO: probably shouldn't be public
-    virtual void throw_underlying() {
-        throw *this;
-    };
-
     virtual ~{{ class_name }}() = default;
 
+    // UniFFI internal function - do not call this manually!
+    virtual void _uniffi_internal_throw_underlying() {
+        throw *this;
+    }
+
+protected:
     virtual int32_t get_variant_idx() const {
         return 0;
     };
@@ -41,10 +42,12 @@ struct {{ variant.name()|class_name }}: {{ class_name }} {
     {{ variant.name()|class_name }}() : {{ class_name }}("") {}
     {{ variant.name()|class_name }}(const std::string &what_arg) : {{ class_name }}(what_arg) {}
 
-    void throw_underlying() override {
+    // UniFFI internal function - do not call this manually!
+    void _uniffi_internal_throw_underlying() override {
         throw *this;
     }
 
+protected:
     int32_t get_variant_idx() const override {
         return {{ loop.index }};
     }
