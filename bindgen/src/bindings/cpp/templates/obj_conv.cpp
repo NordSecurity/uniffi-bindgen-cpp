@@ -36,6 +36,6 @@ void {{ ffi_converter_name }}::write(RustStream &stream, const {{ type_name }} &
     stream << reinterpret_cast<std::uintptr_t>({{ ffi_converter_name }}::lower(obj));
 }
 
-int32_t {{ ffi_converter_name }}::allocation_size(const {{ type_name }} &) {
+uint64_t {{ ffi_converter_name }}::allocation_size(const {{ type_name }} &) {
     return 8;
 }

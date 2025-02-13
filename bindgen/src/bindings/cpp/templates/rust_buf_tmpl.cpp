@@ -1,4 +1,4 @@
-RustBuffer rustbuffer_alloc(int32_t len) {
+RustBuffer rustbuffer_alloc(uint64_t len) {
     RustCallStatus status = { 0 };
     auto buffer = {{ ci.ffi_rustbuffer_alloc().name() }}(len, &status);
 

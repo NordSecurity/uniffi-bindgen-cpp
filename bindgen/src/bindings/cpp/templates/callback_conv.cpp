@@ -20,6 +20,6 @@ void uniffi::{{ class_name }}::write(RustStream &stream, const {{ type_name }} &
     stream << lower(impl);
 }
 
-int32_t uniffi::{{ class_name }}::allocation_size(const {{ type_name }} &impl) {
-    return static_cast<int32_t>(sizeof(uint64_t));
+uint64_t uniffi::{{ class_name }}::allocation_size(const {{ type_name }} &impl) {
+    return static_cast<uint64_t>(sizeof(uint64_t));
 }
