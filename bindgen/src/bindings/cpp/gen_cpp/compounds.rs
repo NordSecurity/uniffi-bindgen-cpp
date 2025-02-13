@@ -1,7 +1,5 @@
-use uniffi_bindgen::{
-    backend::{CodeType, Type},
-    interface::Literal,
-};
+use crate::bindings::cpp::CodeType;
+use uniffi_bindgen::{backend::Type, interface::Literal, ComponentInterface};
 
 use crate::bindings::cpp::gen_cpp::filters::CppCodeOracle;
 
@@ -15,22 +13,23 @@ impl OptionalCodeType {
         Self { inner }
     }
 
-    pub(crate) fn can_dereference(inner_type: &Type) -> bool {
+    pub(crate) fn can_dereference(inner_type: &Type, ci: &ComponentInterface) -> bool {
         match inner_type {
             Type::Object { .. } | Type::CallbackInterface { .. } => true,
+            Type::Enum { name, .. } => ci.is_name_used_as_error(name),
             _ => false,
         }
     }
 }
 
 impl CodeType for OptionalCodeType {
-    fn type_label(&self) -> String {
-        if OptionalCodeType::can_dereference(&self.inner) {
-            CppCodeOracle.find(&self.inner).type_label()
+    fn type_label(&self, ci: &ComponentInterface) -> String {
+        if OptionalCodeType::can_dereference(&self.inner, ci) {
+            CppCodeOracle.find(&self.inner).type_label(ci)
         } else {
             format!(
                 "std::optional<{}>",
-                CppCodeOracle.find(&self.inner).type_label()
+                CppCodeOracle.find(&self.inner).type_label(ci)
             )
         }
     }
@@ -42,10 +41,10 @@ impl CodeType for OptionalCodeType {
         )
     }
 
-    fn literal(&self, literal: &Literal) -> String {
+    fn literal(&self, literal: &Literal, ci: &ComponentInterface) -> String {
         match literal {
-            Literal::Null => "std::nullopt".into(),
-            _ => CppCodeOracle.find(&self.inner).literal(literal),
+            Literal::None => "std::nullopt".into(),
+            _ => CppCodeOracle.find(&self.inner).literal(literal, ci),
         }
     }
 }
@@ -62,10 +61,10 @@ impl SequenceCodeType {
 }
 
 impl CodeType for SequenceCodeType {
-    fn type_label(&self) -> String {
+    fn type_label(&self, ci: &ComponentInterface) -> String {
         format!(
             "std::vector<{}>",
-            CppCodeOracle.find(&self.inner).type_label()
+            CppCodeOracle.find(&self.inner).type_label(ci)
         )
     }
 
@@ -76,10 +75,10 @@ impl CodeType for SequenceCodeType {
         )
     }
 
-    fn literal(&self, literal: &Literal) -> String {
+    fn literal(&self, literal: &Literal, ci: &ComponentInterface) -> String {
         match literal {
             Literal::EmptySequence => "{}".into(),
-            _ => CppCodeOracle.find(&self.inner).literal(literal),
+            _ => CppCodeOracle.find(&self.inner).literal(literal, ci),
         }
     }
 }
@@ -105,11 +104,11 @@ impl MapCodeType {
 }
 
 impl CodeType for MapCodeType {
-    fn type_label(&self) -> String {
+    fn type_label(&self, ci: &ComponentInterface) -> String {
         format!(
             "std::unordered_map<{}, {}>",
-            CppCodeOracle.find(self.key()).type_label(),
-            CppCodeOracle.find(self.value()).type_label(),
+            CppCodeOracle.find(self.key()).type_label(ci),
+            CppCodeOracle.find(self.value()).type_label(ci),
         )
     }
 
@@ -121,10 +120,10 @@ impl CodeType for MapCodeType {
         )
     }
 
-    fn literal(&self, literal: &Literal) -> String {
+    fn literal(&self, literal: &Literal, ci: &ComponentInterface) -> String {
         match literal {
             Literal::EmptyMap => "{}".into(),
-            _ => CppCodeOracle.find(&self.value).literal(literal),
+            _ => CppCodeOracle.find(&self.value).literal(literal, ci),
         }
     }
 }

@@ -1,6 +1,6 @@
-use uniffi_bindgen::backend::{CodeType, Literal};
+use uniffi_bindgen::{backend::Literal, ComponentInterface};
 
-use crate::bindings::cpp::gen_cpp::filters::CppCodeOracle;
+use crate::bindings::cpp::{gen_cpp::filters::CppCodeOracle, CodeType};
 
 #[derive(Debug)]
 pub(crate) struct RecordCodeType {
@@ -14,7 +14,7 @@ impl RecordCodeType {
 }
 
 impl CodeType for RecordCodeType {
-    fn type_label(&self) -> String {
+    fn type_label(&self, _ci: &ComponentInterface) -> String {
         CppCodeOracle.class_name(&self.id)
     }
 
@@ -22,7 +22,7 @@ impl CodeType for RecordCodeType {
         format!("Type{}", self.id)
     }
 
-    fn literal(&self, _literal: &Literal) -> String {
+    fn literal(&self, _literal: &Literal, _ci: &ComponentInterface) -> String {
         unreachable!();
     }
 }

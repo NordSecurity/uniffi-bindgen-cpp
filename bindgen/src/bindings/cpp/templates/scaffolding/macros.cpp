@@ -8,7 +8,7 @@
 {% macro fn_epilogue(ci, func, ffi_func) -%}
 {%- if ffi_func.has_rust_call_status_arg() %}
 {%- if func.throws() %}
-{%- let err_type = func.throws_type().unwrap()|type_name %}
+{%- let err_type = func.throws_type().unwrap()|type_name(ci) %}
 {%- let err_enum = ci.get_enum_definition(err_type).unwrap() %}
 {%- for variant in err_enum.variants() %}
 {%- let converter_name = err_enum|ffi_converter_name %}

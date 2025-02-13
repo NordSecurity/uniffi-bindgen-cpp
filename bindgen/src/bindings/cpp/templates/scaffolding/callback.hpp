@@ -1,5 +1,5 @@
 {%- let ffi_converter_name = typ|ffi_converter_name %}
-{%- let type_name = typ|type_name %}
+{%- let type_name = typ|type_name(ci) %}
 {%- let class_name = type_name|class_name %}
 {%- let canonical_type_name = typ|canonical_name %}
 struct {{ ffi_converter_name|class_name }} {

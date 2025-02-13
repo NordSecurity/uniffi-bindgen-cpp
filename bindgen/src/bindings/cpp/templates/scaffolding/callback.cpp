@@ -1,5 +1,5 @@
 {%- let ffi_converter_name = typ|ffi_converter_name %}
-{%- let type_name = typ|type_name %}
+{%- let type_name = typ|type_name(ci) %}
 {%- let class_name = type_name|class_name %}
 {%- let canonical_type_name = typ|canonical_name %}
 {%- let iface = ci|get_callback_interface_definition(name) %}
@@ -24,9 +24,9 @@ class {{ iface.name() }}Proxy: public {{ iface.name() }} {
 
             {% for m in iface.methods() %}
             {%- match m.return_type() -%}
-            {% when Some with (return_type) %}{{ return_type|type_name }} {% when None %}void {% endmatch %}{{ m.name() }}(
+            {% when Some with (return_type) %}{{ return_type|type_name(ci) }} {% when None %}void {% endmatch %}{{ m.name() }}(
             {%- for arg in m.arguments() %}
-            {{- arg.as_type().borrow()|type_name }} {{ arg.name() }}{% if !loop.last %}, {% endif -%}
+            {{- arg.as_type().borrow()|type_name(ci) }} {{ arg.name() }}{% if !loop.last %}, {% endif -%}
             {% endfor %}) override {
                 ForeignCallback *callback_stub = reinterpret_cast<ForeignCallback *>({{ ffi_converter_name|class_name }}::fn_handle.load());
                 if (callback_stub == nullptr) {
@@ -71,7 +71,7 @@ class {{ iface.name() }}Proxy: public {{ iface.name() }} {
                     out_stream >> v;
                     {%- if m.throws() %}
                     switch (v) {
-                    {%- let err_type = m.throws_type().unwrap()|type_name %}
+                    {%- let err_type = m.throws_type().unwrap()|type_name(ci) %}
                     {%- let err_enum = ci.get_enum_definition(err_type).unwrap() %}
                     {%- for variant in err_enum.variants() %}
                     {%- let converter_name = err_enum|ffi_converter_name %}

@@ -1,6 +1,5 @@
 {%- let ffi_converter_name = typ|ffi_converter_name %}
 {%- let class_name = ffi_converter_name|class_name %}
-{%- let type_name = typ|type_name %}
 {{ type_name }} {{ class_name }}::lift(RustBuffer buf) {
     auto stream = RustStream(&buf);
     auto ret = read(stream);
@@ -37,17 +36,17 @@ void {{ class_name }}::write(RustStream &stream, const {{ type_name }} &val) {
     stream << static_cast<int32_t>(val.size());
 
     for (auto &entry : val) {
-        {{ key_type|write_fn }}(stream, entry.first);
-        {{ value_type|write_fn }}(stream, entry.second);
+        {{ key_type|write_fn }}(stream, {{ key_type.as_type()|deref(ci) }}entry.first);
+        {{ value_type|write_fn }}(stream, {{ value_type.as_type()|deref(ci) }}entry.second);
     }
 }
 
-int32_t {{ class_name }}::allocation_size(const {{ type_name }} &val) {
-    int32_t size = sizeof(int32_t);
+uint64_t {{ class_name }}::allocation_size(const {{ type_name }} &val) {
+    uint64_t size = sizeof(int32_t);
 
     for (auto &entry : val) {
-        size += {{ key_type|allocation_size_fn }}(entry.first);
-        size += {{ value_type|allocation_size_fn }}(entry.second);
+        size += {{ key_type|allocation_size_fn }}({{ key_type.as_type()|deref(ci) }}entry.first);
+        size += {{ value_type|allocation_size_fn }}({{ value_type.as_type()|deref(ci) }}entry.second);
     }
 
     return size;

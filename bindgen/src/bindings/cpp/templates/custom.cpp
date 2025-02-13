@@ -27,7 +27,7 @@ void {{ ffi_converter_name }}::write(RustStream &stream, const {{ type_name }} &
     {{ builtin|write_fn }}(stream, builtin_val);
 }
 
-int32_t {{ ffi_converter_name }}::allocation_size(const {{ type_name }} &val) {
+uint64_t {{ ffi_converter_name }}::allocation_size(const {{ type_name }} &val) {
     auto builtin_val = {{ type_config.from_custom.render("val") }};
 
     return {{ builtin|allocation_size_fn }}(builtin_val);

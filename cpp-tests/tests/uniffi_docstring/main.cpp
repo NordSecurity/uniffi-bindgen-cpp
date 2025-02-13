@@ -8,6 +8,8 @@
 const std::vector<std::string> expected_docstrings = {
     "<docstring-namespace>",
     "<docstring-function>",
+    "<docstring-multiline-function>",
+    "<second-line>",
     "<docstring-enum>",
     "<docstring-enum-variant>",
     "<docstring-enum-variant-2>",
@@ -37,12 +39,14 @@ int main() {
     auto source = std::string(std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>());
     ASSERT_FALSE(source.empty());
 
-    std::regex docstring_reg("\\<docstring-(.*?)\\>");
+    std::regex docstring_reg("\\*\\s(\\<[\\s\\S]*?\\>)");
     std::smatch match;
     std::vector<std::string> extracted_docstrings;
 
     while (std::regex_search(source, match, docstring_reg)) {
-        extracted_docstrings.push_back(match[0].str());
+        if (match.size() >= 2) {
+            extracted_docstrings.push_back(match[1].str());
+        }
         source = match.suffix().str();
     }
 

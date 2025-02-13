@@ -18,6 +18,6 @@ void {{ class_name }}::write(RustStream &stream, bool val) {
     stream << val;
 }
 
-int32_t {{ class_name }}::allocation_size(bool) {
+uint64_t {{ class_name }}::allocation_size(bool) {
     return 1;
 }

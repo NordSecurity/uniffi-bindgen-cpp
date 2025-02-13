@@ -16,12 +16,13 @@ use std::{
 
 use anyhow::{Context, Result};
 use askama::Template;
+use filters::CppCodeOracle;
 use serde::{Deserialize, Serialize};
 use topological_sort::{DependencyLink, TopologicalSort};
 use uniffi_bindgen::{
     backend::TemplateExpression,
-    interface::{AsType, FfiType, Type, UniffiTrait},
-    BindingsConfig, ComponentInterface,
+    interface::{AsType, FfiDefinition, Type, UniffiTrait},
+    ComponentInterface,
 };
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -58,14 +59,6 @@ pub(crate) struct ScaffoldingConfig {
     namespace: Option<String>,
     #[serde(default)]
     enum_style: EnumStyle,
-}
-
-impl BindingsConfig for Config {
-    fn update_from_ci(&mut self, _ci: &ComponentInterface) {}
-
-    fn update_from_cdylib_name(&mut self, _cdylib_name: &str) {}
-
-    fn update_from_dependency_configs(&mut self, _config_map: HashMap<&str, &Self>) {}
 }
 
 #[derive(Template)]
@@ -131,12 +124,6 @@ impl<'a> CppWrapperHeader<'a> {
             config,
             includes: includes.into(),
         }
-    }
-
-    pub(crate) fn contains_callbacks(&self, types: impl Iterator<Item = &'a Type>) -> bool {
-        types
-            .into_iter()
-            .any(|t| matches!(t, Type::CallbackInterface { .. }))
     }
 
     // XXX: This is somewhat evil, but necessary.
@@ -238,6 +225,14 @@ impl<'a> CppWrapper<'a> {
             type_helper_code: TypeRenderer { ci, config }.render().unwrap(),
         }
     }
+
+    pub(crate) fn initialization_fns(&self) -> Vec<String> {
+        self.ci
+            .iter_types()
+            .map(|t| CppCodeOracle.find(t))
+            .filter_map(|ct| ct.initialization_fn())
+            .collect()
+    }
 }
 
 pub(crate) struct Bindings {
@@ -264,10 +259,12 @@ pub(crate) fn generate_cpp_bindings(ci: &ComponentInterface, config: &Config) ->
     })
 }
 
+#[allow(unused)]
 pub(crate) struct Scaffolding {
     pub(crate) cpp_scaffolding_source: String,
 }
 
+#[allow(unused)]
 pub(crate) fn generate_cpp_scaffolding(
     ci: &ComponentInterface,
     config: &ScaffoldingConfig,
