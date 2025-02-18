@@ -1,7 +1,7 @@
 {%- let ffi_converter_name = typ|ffi_converter_name %}
 {%- let class_name = ffi_converter_name|class_name %}
 {%- let canonical_type_name = typ|canonical_name %}
-{%- let trait_impl=format!("UniffiCallbackInterface{}", canonical_type_name) %}
+{%- let trait_impl = canonical_type_name|callback_interface_name %}
 
 {%- for (ffi_callback, method) in vtable_methods.iter() %}
  {% call macros::ffi_return_type(ffi_callback) %} {{ trait_impl}}::{{ method.name()|var_name }}({% call macros::arg_list_ffi_decl_xx(ffi_callback) %}) {

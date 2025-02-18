@@ -1,6 +1,6 @@
 {%- let obj = ci|get_object_definition(name) %}
 {%- let canonical_type_name = typ|canonical_name %}
-{%- let trait_impl=format!("UniffiCallbackInterface{}", canonical_type_name) %}
+{%- let trait_impl = canonical_type_name|callback_interface_name %}
 
 {%- let is_error = ci.is_name_used_as_error(name) %}
 {%- if is_error %}

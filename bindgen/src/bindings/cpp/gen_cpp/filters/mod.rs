@@ -125,6 +125,10 @@ pub(crate) fn ffi_struct_name(nm: &str) -> Result<String> {
     Ok(format!("Uniffi{}", nm))
 }
 
+pub(crate) fn callback_interface_name(nm: &str) -> Result<String> {
+    Ok(format!("UniffiCallbackInterface{}", nm))
+}
+
 pub(crate) fn canonical_name(as_ct: &impl AsCodeType) -> Result<String> {
     Ok(as_ct.as_codetype().canonical_name())
 }

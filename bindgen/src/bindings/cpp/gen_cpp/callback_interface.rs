@@ -1,6 +1,8 @@
 use uniffi_bindgen::{interface::Literal, ComponentInterface};
 
-use crate::bindings::cpp::{gen_cpp::filters::CppCodeOracle, CodeType};
+use crate::bindings::cpp::{
+    gen_cpp::filters::callback_interface_name, gen_cpp::filters::CppCodeOracle, CodeType,
+};
 
 #[derive(Debug)]
 pub(crate) struct CallbackInterfaceCodeType {
@@ -27,6 +29,9 @@ impl CodeType for CallbackInterfaceCodeType {
     }
 
     fn initialization_fn(&self) -> Option<String> {
-        Some(format!("uniffi::UniffiCallbackInterface{}::init", self.id))
+        Some(format!(
+            "uniffi::{}::init",
+            callback_interface_name(&self.id).unwrap()
+        ))
     }
 }
