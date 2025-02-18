@@ -47,15 +47,6 @@ uniffi::{{ arg|lower_fn }}({{ arg.name()|var_name }})
 {% endfor -%}
 {% endmacro %}
 
-{%- macro arg_list_ffi_decl(func) %}
-    {%- if func.is_object_clone_function() %}
-    SafeHandle ptr,
-    {%- if func.has_rust_call_status_arg() %}RustCallStatus *out_status{% endif %}
-    {%- else %}
-    {%- call arg_list_ffi_decl_xx(func) %}
-    {%- endif %}
-{%- endmacro -%}
-
 {%- macro arg_list_ffi_decl_xx(func) %}
     {%- for arg in func.arguments() %}
         {{- arg.type_().borrow()|ffi_type_name }} {{ arg.name()|var_name -}}{%- if !loop.last || func.has_rust_call_status_arg() -%},{%- endif -%}
