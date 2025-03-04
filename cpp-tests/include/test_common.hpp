@@ -1,5 +1,7 @@
 #include <cassert>
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 #define ASSERT_EQ(a, b) assert((a) == (b))
 #define ASSERT_NE(a, b) assert((a) != (b))

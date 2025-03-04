@@ -1,6 +1,6 @@
 {%- match func.return_type() %}
 {%- when Some with (return_type) %}
-{{ return_type|type_name }} {{ func.name()|fn_name }}({% call macros::param_list(func) %}) {
+{{ return_type|type_name(ci) }} {{ func.name()|fn_name }}({% call macros::param_list(func) %}) {
     auto ret = {% call macros::rust_call(func) %};
 
     return uniffi::{{ return_type|lift_fn }}(ret);

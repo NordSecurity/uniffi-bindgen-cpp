@@ -43,8 +43,8 @@ void {{ ffi_converter_name }}::write(RustStream &stream, const {{ type_name }} &
     }
 }
 
-int32_t {{ ffi_converter_name }}::allocation_size(const {{ type_name|class_name }} &) {
-    return static_cast<int32_t>(sizeof(int32_t));
+uint64_t {{ ffi_converter_name }}::allocation_size(const {{ type_name|class_name }} &) {
+    return static_cast<uint64_t>(sizeof(int32_t));
 }
 {%- else %}
 {{ type_name }} {{ ffi_converter_name }}::lift(RustBuffer buf) {
@@ -68,7 +68,7 @@ RustBuffer {{ ffi_converter_name }}::lower(const {{ type_name }} &val) {
 {{ type_name }} {{ ffi_converter_name }}::read(RustStream &stream) {
     int32_t variant_id;
     stream >> variant_id;
-    
+
     switch (variant_id) {
         {% for variant in e.variants() %}
     case {{ loop.index }}:
@@ -93,7 +93,7 @@ void {{ ffi_converter_name }}::write(RustStream &stream, const {{ type_name }} &
         {%- for variant in e.variants() %}
         {% if !loop.first %}else {% endif %}if constexpr (std::is_same_v<T, {{ type_name }}::{{ variant|variant_name(config.enum_style) }}>) {
             {%- for field in variant.fields() %}
-            {{ field|write_fn }}(stream, arg.{{ field.name()|var_name }});
+            {{ field|write_fn }}(stream, {{ field.as_type()|deref(ci) }}arg.{{ field.name()|var_name }});
             {%- endfor %}
         }
         {%- endfor %}
@@ -102,19 +102,19 @@ void {{ ffi_converter_name }}::write(RustStream &stream, const {{ type_name }} &
             static_assert(always_false_v<T>, "non-exhaustive {{ type_name }} visitor");
         }
         {%- endif %}
-    }, val.variant); 
+    }, val.variant);
 }
 
-int32_t {{ ffi_converter_name }}::allocation_size(const {{ type_name|class_name }} &val) {
-    int32_t size = sizeof(int32_t);
+uint64_t {{ ffi_converter_name }}::allocation_size(const {{ type_name|class_name }} &val) {
+    uint64_t size = sizeof(int32_t);
 
     size += std::visit([&](auto &&arg) {
         using T = std::decay_t<decltype(arg)>;
         {%- for variant in e.variants() %}
         {% if !loop.first %}else {% endif %}if constexpr (std::is_same_v<T, {{ type_name }}::{{ variant|variant_name(config.enum_style) }}>) {
-            int32_t size = 0;
+            uint64_t size = 0;
             {%- for field in variant.fields() %}
-            size += {{ field|allocation_size_fn }}(arg.{{ field.name()|var_name }});
+            size += {{ field|allocation_size_fn }}({{ field.as_type()|deref(ci) }}arg.{{ field.name()|var_name }});
             {%- endfor %}
             return size;
         }
@@ -124,8 +124,6 @@ int32_t {{ ffi_converter_name }}::allocation_size(const {{ type_name|class_name 
             static_assert(always_false_v<T>, "non-exhaustive {{ type_name }} visitor");
         }
         {%- endif %}
-
-        return 0;
     }, val.variant);
 
     return size;

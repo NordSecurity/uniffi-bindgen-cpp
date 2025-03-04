@@ -1,5 +1,6 @@
+use crate::bindings::cpp::CodeType;
 use paste::paste;
-use uniffi_bindgen::backend::{CodeType, Literal};
+use uniffi_bindgen::{backend::Literal, ComponentInterface};
 
 macro_rules! impl_code_type_for_miscellany {
     ($T:ty, $label:literal, $canonical_name:literal) => {
@@ -8,7 +9,7 @@ macro_rules! impl_code_type_for_miscellany {
             pub(crate) struct $T;
 
             impl CodeType for $T  {
-                fn type_label(&self) -> String {
+                fn type_label(&self, _ci: &ComponentInterface) -> String {
                     format!("{}", $label)
                 }
 
@@ -16,7 +17,7 @@ macro_rules! impl_code_type_for_miscellany {
                     format!("{}", $canonical_name)
                 }
 
-                fn literal(&self, _literal: &Literal) -> String {
+                fn literal(&self, _literal: &Literal, _ci: &ComponentInterface) -> String {
                     unreachable!()
                 }
             }

@@ -3,6 +3,8 @@
 #include <arithmetic.hpp>
 
 int main() {
+    EXPECT_EXCEPTION(arithmetic::add(18446744073709551615ul, 1), arithmetic::arithmetic_error::IntegerOverflow);
+
     ASSERT_EQ(arithmetic::add(2, 4), 6ul);
     ASSERT_EQ(arithmetic::add(4, 8), 12ul);
 

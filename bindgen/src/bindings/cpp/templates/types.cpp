@@ -1,7 +1,7 @@
 {%- import "macros.cpp" as macros %}
 
 {%- for typ in ci.iter_types() %}
-{%- let type_name = typ|type_name %}
+{%- let type_name = typ|type_name(ci) %}
 {%- let ffi_converter_name = typ|ffi_converter_name %}
 {%- let canonical_type_name = typ|canonical_name %}
 {%- let contains_object_references = ci.item_contains_object_references(typ) %}
@@ -16,7 +16,7 @@
 
 namespace uniffi {
 {%- for typ in ci.iter_types() %}
-{%- let type_name = typ|type_name %}
+{%- let type_name = typ|type_name(ci) %}
 {%- let ffi_converter_name = typ|ffi_converter_name %}
 {%- let canonical_type_name = typ|canonical_name %}
 {%- let contains_object_references = ci.item_contains_object_references(typ) %}
@@ -41,6 +41,13 @@ namespace uniffi {
 {%- when Type::Map { key_type, value_type } %}
 {% include "map_tmpl.cpp" %}
 {%- when Type::CallbackInterface { module_path, name } %}
+{%- let cbi = ci|get_callback_interface_definition(name) %}
+{%- let ffi_init_callback = cbi.ffi_init_callback() %}
+{%- let interface_name = name %}
+{%- let methods = cbi.methods() %}
+{%- let vtable = cbi.vtable() %}
+{%- let vtable_methods = cbi.vtable_methods() %}
+{% include "callback_conv.cpp" %}
 {% include "callback_iface_tmpl.cpp" %}
 {%- when Type::Timestamp %}
 {% include "timestamp_helper.cpp" %}

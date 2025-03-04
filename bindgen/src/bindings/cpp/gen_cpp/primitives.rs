@@ -1,8 +1,6 @@
+use crate::bindings::cpp::CodeType;
 use paste::paste;
-use uniffi_bindgen::{
-    backend::{CodeType, Literal},
-    interface::Radix,
-};
+use uniffi_bindgen::{backend::Literal, interface::Radix, ComponentInterface};
 
 fn render_literal(literal: &Literal) -> String {
     match literal {
@@ -36,7 +34,7 @@ macro_rules! impl_code_type_for_primitive {
             #[derive(Debug)]
             pub(crate) struct $T;
             impl CodeType for $T  {
-                fn type_label(&self) -> String {
+                fn type_label(&self, _ci: &ComponentInterface) -> String {
                     $cpp_name.into()
                 }
 
@@ -44,7 +42,7 @@ macro_rules! impl_code_type_for_primitive {
                     $canonical_name.into()
                 }
 
-                fn literal(&self, literal: &Literal) -> String {
+                fn literal(&self, literal: &Literal, _ci: &ComponentInterface) -> String {
                     render_literal(&literal)
                 }
             }

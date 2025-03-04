@@ -21,7 +21,7 @@ RustBuffer {{ ffi_converter_name }}::lower(const {{ type_name }}& val) {
 
     stream.get(has_value);
 
-    {%- if typ|can_dereference_optional() %}
+    {%- if typ|can_dereference_optional(ci) %}
     if (has_value) {
         return {{ inner_type|read_fn }}(stream);
     } else {
@@ -40,20 +40,20 @@ void {{ ffi_converter_name }}::write(RustStream &stream, const {{ type_name }}& 
     stream.put(static_cast<uint8_t>(!!value));
 
     if (value) {
-        {%- if typ|can_dereference_optional() %}
-        {{ inner_type|write_fn }}(stream, value);
+        {%- if typ|can_dereference_optional(ci) %}
+        {{ inner_type|write_fn }}(stream, {{ inner_type.as_type()|deref(ci) }}value);
         {%- else %}
         {{ inner_type|write_fn }}(stream, value.value());
         {%- endif %}
     }
 }
 
-int32_t {{ ffi_converter_name }}::allocation_size(const {{ type_name }} &val) {
-    int32_t ret = 1;
+uint64_t {{ ffi_converter_name }}::allocation_size(const {{ type_name }} &val) {
+    uint64_t ret = 1;
 
     if (val) {
-        {%- if typ|can_dereference_optional() %}
-        ret += {{ inner_type|allocation_size_fn }}(val);
+        {%- if typ|can_dereference_optional(ci) %}
+        ret += {{ inner_type|allocation_size_fn }}({{ inner_type.as_type()|deref(ci) }}val);
         {%- else %}
         ret += {{ inner_type|allocation_size_fn }}(val.value());
         {%- endif %}

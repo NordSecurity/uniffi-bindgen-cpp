@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <bit>
+#include <chrono>
 #include <cstdint>
 #include <exception>
 #include <functional>
@@ -25,10 +26,10 @@
 #include "{{ namespace }}_scaffolding.hpp"
 
 {%- import "macros.cpp" as macros %}
-{% call macros::docstring(ci.namespace_definition(), 0) %}
+{% call macros::docstring_value(ci.namespace_docstring(), 0) %}
 namespace {{ namespace }} {
 {%- for typ in ci.iter_types() %}
-{%- let type_name = typ|type_name %}
+{%- let type_name = typ|type_name(ci) %}
 {%- match typ %}
 {%- when Type::Enum { module_path, name } %}
 {%- let e = ci|get_enum_definition(name) %}
@@ -46,7 +47,7 @@ struct {{ name }};
 {%- when Type::Custom { module_path, name, builtin } %}
 {%- match config.custom_types.get(name.as_str()) %}
 {%- when None %}
-typedef {{ builtin|type_name }} {{ name }};
+typedef {{ builtin|type_name(ci) }} {{ name }};
 {%- when Some with (type_config) %}
 {%- match type_config.type_name %}
 {%- when Some with (type_name) %}
@@ -59,7 +60,7 @@ typedef {{ type_name }} {{ name }};
 {%- endfor %}
 
 {%- for typ in self.sorted_types(ci.iter_types()) %}
-{%- let type_name = typ|type_name %}
+{%- let type_name = typ|type_name(ci) %}
 {%- match typ %}
 {%- when Type::Enum { module_path, name } %}
 {%- let e = ci|get_enum_definition(name) %}
@@ -71,6 +72,13 @@ typedef {{ type_name }} {{ name }};
 {%- when Type::Record { module_path, name } %}
 {% include "rec.hpp" %}
 {%- when Type::CallbackInterface { module_path, name } %}
+{%- let cbi = ci|get_callback_interface_definition(name) %}
+{%- let ffi_init_callback = cbi.ffi_init_callback() %}
+{%- let interface_name = name %}
+{%- let methods = cbi.methods() %}
+{%- let vtable = cbi.vtable() %}
+{%- let vtable_methods = cbi.vtable_methods() %}
+{%- let interface_docstring = cbi.docstring() %}
 {% include "callback.hpp" %}
 {%- when Type::Object { module_path, name, imp } %}
 {% include "obj.hpp" %}
@@ -81,15 +89,14 @@ typedef {{ type_name }} {{ name }};
 namespace uniffi {
 {%- include "rust_buf_stream.cpp" %}
 
-RustBuffer rustbuffer_alloc(int32_t);
+RustBuffer rustbuffer_alloc(uint64_t);
 RustBuffer rustbuffer_from_bytes(const ForeignBytes &);
 void rustbuffer_free(RustBuffer);
 
-{%- if self.contains_callbacks(ci.iter_types()) %}
 {%- include "handle_map.cpp" %}
-{%- endif %}
 
 {%- for typ in ci.iter_types() %}
+{%- let type_name = typ|type_name(ci) %}
 {%- match typ %}
 {%- when Type::Boolean %}
 {% include "bool_conv.hpp" %}
@@ -151,7 +158,7 @@ void rustbuffer_free(RustBuffer);
 {%- call macros::docstring(func, 0) %}
 {%- match func.return_type() %}
 {%- when Some with (return_type) %}
-{{ return_type|type_name }} {{ func.name()|fn_name }}({% call macros::param_list(func) %});
+{{ return_type|type_name(ci) }} {{ func.name()|fn_name }}({% call macros::param_list(func) %});
 {%- when None %}
 void {{ func.name()|fn_name }}({% call macros::param_list(func) %});
 {%- endmatch %}

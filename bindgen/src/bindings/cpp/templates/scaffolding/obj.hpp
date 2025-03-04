@@ -1,4 +1,4 @@
-{%- let type_name = typ|type_name %}
+{%- let type_name = typ|type_name(ci) %}
 struct {{ typ|ffi_converter_name }} {
     static {{ type_name }} lift(void *);
     static void *lower(const {{ type_name }} &);

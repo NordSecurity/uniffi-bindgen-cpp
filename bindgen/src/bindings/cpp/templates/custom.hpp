@@ -7,7 +7,7 @@ struct {{ typ|ffi_converter_name }} {
     static RustBuffer lower(const {{ name }} &);
     static {{ name }} read(RustStream &);
     static void write(RustStream &, const {{ name }} &);
-    static int32_t allocation_size(const {{ name }} &);
+    static uint64_t allocation_size(const {{ name }} &);
 };
 {%- else %}
 {%- endmatch %}

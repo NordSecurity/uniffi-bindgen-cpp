@@ -42,8 +42,8 @@ struct ForeignBytes {
 };
 
 struct RustBuffer {
-    int32_t capacity;
-    int32_t len;
+    uint64_t capacity;
+    uint64_t len;
     uint8_t *data;
 };
 
@@ -58,6 +58,7 @@ typedef int ForeignCallback(uint64_t handle, uint32_t method, uint8_t *args_data
 {%- include "scaffolding/object_map.cpp" %}
 
 {%- for typ in ci.iter_types() %}
+{%- let type_name = typ|type_name(ci) %}
 {%- match typ %}
 {%- when Type::Boolean %}
 {% include "bool_conv.hpp" %}
@@ -220,19 +221,6 @@ UNIFFI_EXPORT {%- call macros::fn_definition(ffi_func) %} {
 {% endfor %}
 {% endfor %}
 
-{% for func in ci.iter_futures_ffi_function_definitons() %}
-UNIFFI_EXPORT {%- call macros::fn_definition(func) %} {
-    {%- match func.return_type() %}{% when Some with (return_type) %}
-        {% match return_type %}
-        {% when FfiType::RustArcPtr(_) %}
-        return nullptr;
-        {% else %}
-        return {{ return_type|ffi_type_name }}{};
-        {% endmatch %}
-    {% when None %}{% endmatch -%}
-}
-{% endfor %}
-
 {% for checksum in ci.iter_checksums() %}
 UNIFFI_EXPORT uint16_t {{ checksum.0 }}() { return {{ checksum.1 }}; }
 {% endfor %}
@@ -272,7 +260,7 @@ void rustbuffer_free(RustBuffer& buf) {
 }
 
 {%- for typ in ci.iter_types() %}
-{%- let type_name = typ|type_name %}
+{%- let type_name = typ|type_name(ci) %}
 {%- let ffi_converter_name = typ|ffi_converter_name %}
 {%- let canonical_type_name = typ|canonical_name %}
 {%- let contains_object_references = ci.item_contains_object_references(typ) %}

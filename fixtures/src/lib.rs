@@ -13,6 +13,7 @@ mod uniffi_fixtures {
     uniffi_fixture_docstring::uniffi_reexport_scaffolding!();
     uniffi_fixture_callbacks::uniffi_reexport_scaffolding!();
 
+    uniffi_cpp_error_types_builtin::uniffi_reexport_scaffolding!();
     uniffi_cpp_custom_types_builtin::uniffi_reexport_scaffolding!();
     uniffi_enum_style_test::uniffi_reexport_scaffolding!();
     uniffi_empty_type::uniffi_reexport_scaffolding!();
