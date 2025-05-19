@@ -54,24 +54,6 @@ list(APPEND BINDING_FILES ${BINDINGS_SRC_DIR}/${TEST_NAME}.cpp)
 
 endmacro(test_case)
 
-# Add a scaffolding test case
-macro(scaffolding_test_case TEST_NAME)
-
-add_executable(${TEST_NAME}-scaffolding-test tests/${TEST_NAME}/main.cpp ${BINDINGS_SRC_DIR}/${TEST_NAME}.cpp)
-target_include_directories(${TEST_NAME}-scaffolding-test PRIVATE ${BINDINGS_SRC_DIR} include)
-target_link_libraries(${TEST_NAME}-scaffolding-test uniffi_fixtures Threads::Threads)
-
-add_test(NAME ${TEST_NAME}-scaffolding-test COMMAND ${TEST_NAME}-scaffolding-test)
-memcheck_test(${TEST_NAME}-scaffolding-test)
-
-add_dependencies(${TEST_NAME}-scaffolding-test bindings scaffolding)
-
-list(APPEND SCAFFOLDING_FILES ${BINDINGS_SRC_DIR}/${TEST_NAME}_cpp_scaffolding.cpp)
-list(APPEND SCAFFOLDING_LIB_FILES scaffolding_tests/${TEST_NAME}/lib_${TEST_NAME}.cpp)
-list(APPEND SCAFFOLDING_LIB_INCLUDE_DIRS scaffolding_tests/${TEST_NAME})
-
-endmacro(scaffolding_test_case)
-
 test_case(arithmetic)
 test_case(callbacks)
 test_case(fixture_callbacks)
@@ -90,27 +72,6 @@ test_case(enum_style_test)
 test_case(empty_type)
 test_case(error_types_builtin)
 
-# scaffolding_test_case(arithmetic)
-# scaffolding_test_case(callbacks)
-# scaffolding_test_case(fixture_callbacks)
-# scaffolding_test_case(chronological)
-# scaffolding_test_case(custom_types)
-# scaffolding_test_case(geometry)
-# scaffolding_test_case(rondpoint)
-# scaffolding_test_case(sprites)
-# scaffolding_test_case(todolist)
-# scaffolding_test_case(traits)
-# scaffolding_test_case(coverall)
-# scaffolding_test_case(custom_types_builtin)
-# scaffolding_test_case(enum_style_test)
-# scaffolding_test_case(empty_type)
-
-# add_library(uniffi_fixtures SHARED
-#     ${SCAFFOLDING_LIB_FILES})
-# target_include_directories(uniffi_fixtures PRIVATE
-#     ${SCAFFOLDING_LIB_INCLUDE_DIRS} ${BINDINGS_SRC_DIR})
-# add_dependencies(uniffi_fixtures scaffolding)
-
 add_custom_target(libs ALL
     BYPRODUCTS ${BINDING_FILES}
     COMMAND cargo build
@@ -124,11 +85,3 @@ add_custom_target(bindings ALL
     WORKING_DIRECTORY ${BINDINGS_BUILD_DIR}
     COMMENT "Generating bindings"
 )
-
-# add_custom_target(scaffolding ALL
-#     BYPRODUCTS ${SCAFFOLDING_FILES}
-#     DEPENDS libs
-#     COMMAND ./uniffi-bindgen-cpp --scaffolding --library ${UNIFFI_FIXTURES_LIB} --out-dir bindings
-#     WORKING_DIRECTORY ${BINDINGS_BUILD_DIR}
-#     COMMENT "Generating scaffolding"
-# )
