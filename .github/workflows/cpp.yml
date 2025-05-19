@@ -14,9 +14,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        # Ubuntu-20.04 is being used here on purpose instead of ubuntu-latest due to a bug with clang and libstdc++
-        # https://github.com/actions/runner-images/issues/8659
-        os: [ubuntu-20.04, windows-latest, macos-13]
+        os: [ubuntu-22.04, windows-latest, macos-13]
         build_type: [Release]
         cpp_compiler: [g++, clang++, cl]
         exclude:
@@ -24,7 +22,7 @@ jobs:
             cpp_compiler: clang++
           - os: windows-latest
             cpp_compiler: g++
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             cpp_compiler: cl
           - os: macos-13
             cpp_compiler: cl
