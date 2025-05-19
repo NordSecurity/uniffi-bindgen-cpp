@@ -97,6 +97,25 @@ impl<'a> ScaffoldingHeader<'a> {
     fn new(ci: &'a ComponentInterface) -> Self {
         Self { ci }
     }
+
+    pub fn scaffolding_definitions(&self) -> impl Iterator<Item = FfiDefinition> + '_ {
+        self.ci
+            .callback_interface_definitions()
+            .into_iter()
+            .map(|cb| cb.vtable_definition())
+            .chain(
+                self.ci
+                    .object_definitions()
+                    .iter()
+                    .flat_map(|o| o.vtable_definition()),
+            )
+            .map(Into::into)
+            .chain(
+                self.ci
+                    .iter_ffi_function_definitions_non_async()
+                    .map(Into::into),
+            )
+    }
 }
 
 #[derive(Template)]

@@ -28,7 +28,7 @@ struct RustCallStatus {
 
 #endif
 
-{%- for def in ci.ffi_definitions() %}
+{%- for def in self.scaffolding_definitions() %}
 {%- match def %}
 {%- when FfiDefinition::CallbackFunction(callback) %}
 {% call macros::ffi_return_type(callback) %} {{ callback.name()}}(
@@ -41,7 +41,7 @@ struct {{ ffi_struct.name()|ffi_struct_name }} {
     {%- endfor %}
 };
 {%- when FfiDefinition::Function(func) %}
-{%- match func.return_type() -%}
+{% match func.return_type() -%}
 {% when Some with (return_type) %}{{ return_type|ffi_type_name }} {% when None %}void {% endmatch %}{{ func.name() }}(
 {%- for arg in func.arguments() %}
 {{- arg.type_().borrow()|ffi_type_name }} {{ arg.name() }}{% if !loop.last || func.has_rust_call_status_arg() %}, {% endif -%}
