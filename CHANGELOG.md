@@ -1,3 +1,8 @@
+#### v0.7.1+v0.28.3
+
+----
+- Core: Generate used code only in the scaffolding header
+
 #### v0.7.0+v0.28.3
 
 ----
