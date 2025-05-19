@@ -72,6 +72,18 @@ test_case(enum_style_test)
 test_case(empty_type)
 test_case(error_types_builtin)
 
+# Special multilib test that only needs to compile to check for potential symbol clashes
+add_executable(multilib-test 
+    tests/multilib/main.cpp
+    ${BINDINGS_SRC_DIR}/arithmetic.cpp
+    ${BINDINGS_SRC_DIR}/coverall.cpp
+    ${BINDINGS_SRC_DIR}/sprites.cpp
+)
+target_include_directories(multilib-test PRIVATE ${BINDINGS_SRC_DIR} include)
+target_link_directories(multilib-test PRIVATE ${BINDINGS_BUILD_DIR})
+target_link_libraries(multilib-test uniffi_bindgen_cpp_fixtures Threads::Threads ${ADDITIONAL_LIBS})
+add_dependencies(multilib-test bindings)
+
 add_custom_target(libs ALL
     BYPRODUCTS ${BINDING_FILES}
     COMMAND cargo build
