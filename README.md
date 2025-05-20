@@ -6,11 +6,11 @@ as a separate project from `uniffi-rs`, as per
 
 # How to install
 
-Minimum Rust version required to install `uniffi-bindgen-cpp` is `1.72`.
+Minimum Rust version required to install `uniffi-bindgen-cpp` is `1.74`.
 Newer Rust versions should also work fine.
 
 ```bash
-cargo install uniffi-bindgen-cpp --git https://github.com/NordSecurity/uniffi-bindgen-cpp --tag v0.7.0+v0.28.3
+cargo install uniffi-bindgen-cpp --git https://github.com/NordSecurity/uniffi-bindgen-cpp --tag v0.7.1+v0.28.3
 ```
 
 # How to generate bindings
