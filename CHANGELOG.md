@@ -1,3 +1,8 @@
+#### v0.7.2+v0.28.3
+
+----
+- Core: Remove `_uniffi_internal` prefix from the `throw_underlying` function
+
 #### v0.7.1+v0.28.3
 
 ----

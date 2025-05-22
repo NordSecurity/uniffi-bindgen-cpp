@@ -13,8 +13,7 @@ struct {{ class_name }}: std::runtime_error {
 
     virtual ~{{ class_name }}() = default;
 
-    // UniFFI internal function - do not call this manually!
-    virtual void _uniffi_internal_throw_underlying() {
+    virtual void throw_underlying() {
         throw *this;
     }
 
@@ -42,8 +41,7 @@ struct {{ variant.name()|class_name }}: {{ class_name }} {
     {{ variant.name()|class_name }}() : {{ class_name }}("") {}
     {{ variant.name()|class_name }}(const std::string &what_arg) : {{ class_name }}(what_arg) {}
 
-    // UniFFI internal function - do not call this manually!
-    void _uniffi_internal_throw_underlying() override {
+    void throw_underlying() override {
         throw *this;
     }
 

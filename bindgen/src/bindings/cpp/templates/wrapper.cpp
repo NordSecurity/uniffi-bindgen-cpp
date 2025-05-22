@@ -45,7 +45,7 @@ void check_rust_call(const RustCallStatus &status, F error_cb) {
 
     case 1:
         if constexpr (!std::is_null_pointer_v<F>) {
-            error_cb(status.error_buf)->_uniffi_internal_throw_underlying();
+            error_cb(status.error_buf)->throw_underlying();
         }
         break;
 
