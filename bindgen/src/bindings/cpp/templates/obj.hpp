@@ -84,8 +84,7 @@ struct {{ impl_class_name }}
     {%- endfor %}
 
     {% if ci.is_name_used_as_error(name) %}
-    // UniFFI internal function - do not call this manually!
-    void _uniffi_internal_throw_underlying();
+    void throw_underlying();
     {%- endif -%}
 private:
     {{ impl_class_name }}(const {{ impl_class_name }} &);

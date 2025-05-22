@@ -23,7 +23,7 @@ namespace uniffi {
 }
 
 {% if ci.is_name_used_as_error(name) %}
-    void {{ impl_class_name }}::_uniffi_internal_throw_underlying() {
+    void {{ impl_class_name }}::throw_underlying() {
         throw *this;
     }
 {% endif %}
