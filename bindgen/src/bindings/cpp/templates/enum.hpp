@@ -1,4 +1,5 @@
-{%- let ffi_converter_name = typ|ffi_converter_name|class_name %}
+{%- let ffi_converter_name = typ|ffi_converter_name %}
+{%- let ffi_converter_name = ffi_converter_name|class_name %}
 {%- if e.is_flat() %}
 {% call macros::docstring(e, 0) %}
 enum class {{ type_name }}: int32_t {

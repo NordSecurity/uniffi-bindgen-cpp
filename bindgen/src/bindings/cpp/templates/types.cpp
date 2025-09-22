@@ -1,6 +1,6 @@
 {%- import "macros.cpp" as macros %}
 
-{%- for typ in ci.iter_types() %}
+{%- for typ in ci.iter_local_types() %}
 {%- let type_name = typ|type_name(ci) %}
 {%- let ffi_converter_name = typ|ffi_converter_name %}
 {%- let canonical_type_name = typ|canonical_name %}
@@ -15,7 +15,7 @@
 {% endfor ~%}
 
 namespace uniffi {
-{%- for typ in ci.iter_types() %}
+{%- for typ in ci.iter_local_types() %}
 {%- let type_name = typ|type_name(ci) %}
 {%- let ffi_converter_name = typ|ffi_converter_name %}
 {%- let canonical_type_name = typ|canonical_name %}
@@ -24,7 +24,7 @@ namespace uniffi {
 
 {%- match typ %}
 {%- when Type::Enum { name, module_path } %}
-{%- let e = ci|get_enum_definition(name) %}
+{%- let e = ci.get_enum_definition(name).unwrap() %}
 {%- if ci.is_name_used_as_error(name) %}
 {% include "err_tmpl.cpp" %}
 {%- else %}
@@ -41,7 +41,7 @@ namespace uniffi {
 {%- when Type::Map { key_type, value_type } %}
 {% include "map_tmpl.cpp" %}
 {%- when Type::CallbackInterface { module_path, name } %}
-{%- let cbi = ci|get_callback_interface_definition(name) %}
+{%- let cbi = ci.get_callback_interface_definition(name).unwrap() %}
 {%- let ffi_init_callback = cbi.ffi_init_callback() %}
 {%- let interface_name = name %}
 {%- let methods = cbi.methods() %}
@@ -53,8 +53,6 @@ namespace uniffi {
 {% include "timestamp_helper.cpp" %}
 {%- when Type::Duration %}
 {% include "duration_helper.cpp" %}
-{%- when Type::External { module_path, name, namespace, kind, tagged } %}
-{% include "ext_typ_tmpl.cpp" %}
 {%- when Type::Custom { module_path, name, builtin } %}
 {%- include "custom.cpp" %}
 {%- else %}

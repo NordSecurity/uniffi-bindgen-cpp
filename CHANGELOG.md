@@ -1,3 +1,8 @@
+#### v0.8.0+v0.29.4
+
+----
+- Core: Update bindgen to UniFFI v0.29.4
+
 #### v0.7.2+v0.28.3
 
 ----
