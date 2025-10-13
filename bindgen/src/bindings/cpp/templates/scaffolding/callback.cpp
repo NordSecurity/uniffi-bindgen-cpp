@@ -2,7 +2,7 @@
 {%- let type_name = typ|type_name(ci) %}
 {%- let class_name = type_name|class_name %}
 {%- let canonical_type_name = typ|canonical_name %}
-{%- let iface = ci|get_callback_interface_definition(name) %}
+{%- let iface = ci.get_callback_interface_definition(name).unwrap() %}
 namespace {
 class {{ iface.name() }}Proxy: public {{ iface.name() }} {
         public:

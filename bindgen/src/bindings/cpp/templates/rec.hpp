@@ -1,4 +1,4 @@
-{%- let rec = ci|get_record_definition(name) %}
+{%- let rec = ci.get_record_definition(name).unwrap() %}
 {% call macros::docstring(rec, 0) %}
 struct {{ type_name }} {
     {%- for field in rec.fields() %}

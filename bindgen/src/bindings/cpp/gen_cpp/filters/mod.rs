@@ -1,6 +1,5 @@
 use askama;
 use heck::{ToShoutySnakeCase, ToSnakeCase, ToUpperCamelCase};
-pub(crate) use uniffi_bindgen::backend::filters::*;
 use uniffi_bindgen::{
     interface::{Argument, AsType, FfiType, Literal, Object, Type, Variant},
     ComponentInterface,
@@ -93,7 +92,6 @@ impl<T: AsType> AsCodeType for T {
                 key_type,
                 value_type,
             } => Box::new(compounds::MapCodeType::new(*key_type, *value_type)),
-            Type::External { .. } => todo!(),
             Type::Custom { name, .. } => Box::new(custom::CustomCodeType::new(name)),
         }
     }
@@ -218,7 +216,8 @@ pub(crate) fn ffi_type_name(ffi_type: &FfiType) -> Result<String> {
         FfiType::Callback(_) => "void *".into(),
         FfiType::Struct(name) => ffi_struct_name(name)?,
         FfiType::RustCallStatus => "RustCallStatus*".into(),
-        FfiType::Reference(typ) => format!("{} &", ffi_type_name(typ)?),
+        FfiType::Reference(typ) => format!("const {} &", ffi_type_name(typ)?),
+        FfiType::MutReference(typ) => format!("{} &", ffi_type_name(typ)?),
     })
 }
 
@@ -275,7 +274,7 @@ pub(crate) fn can_dereference_optional(type_: &Type, ci: &ComponentInterface) ->
     Ok(result)
 }
 
-pub(crate) fn deref(type_: Type, ci: &ComponentInterface) -> Result<String> {
+pub(crate) fn cpp_deref(type_: Type, ci: &ComponentInterface) -> Result<String> {
     if let Type::Enum { name, .. } = type_ {
         if ci.is_name_used_as_error(&name) {
             return Ok("*".to_string());

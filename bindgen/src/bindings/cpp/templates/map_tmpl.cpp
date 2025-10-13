@@ -36,8 +36,8 @@ void {{ class_name }}::write(RustStream &stream, const {{ type_name }} &val) {
     stream << static_cast<int32_t>(val.size());
 
     for (auto &entry : val) {
-        {{ key_type|write_fn }}(stream, {{ key_type.as_type()|deref(ci) }}entry.first);
-        {{ value_type|write_fn }}(stream, {{ value_type.as_type()|deref(ci) }}entry.second);
+        {{ key_type|write_fn }}(stream, {{ key_type.as_type()|cpp_deref(ci) }}entry.first);
+        {{ value_type|write_fn }}(stream, {{ value_type.as_type()|cpp_deref(ci) }}entry.second);
     }
 }
 
@@ -45,8 +45,8 @@ uint64_t {{ class_name }}::allocation_size(const {{ type_name }} &val) {
     uint64_t size = sizeof(int32_t);
 
     for (auto &entry : val) {
-        size += {{ key_type|allocation_size_fn }}({{ key_type.as_type()|deref(ci) }}entry.first);
-        size += {{ value_type|allocation_size_fn }}({{ value_type.as_type()|deref(ci) }}entry.second);
+        size += {{ key_type|allocation_size_fn }}({{ key_type.as_type()|cpp_deref(ci) }}entry.first);
+        size += {{ value_type|allocation_size_fn }}({{ value_type.as_type()|cpp_deref(ci) }}entry.second);
     }
 
     return size;

@@ -1,11 +1,11 @@
 [package]
 name = "uniffi-bindgen-cpp"
-version = "0.7.1+v.0.28.3"
+version = "0.8.0+v.0.29.4"
 edition = "2021"
 
 [dependencies]
 anyhow = "1.0.75"
-askama = "0.12.0"
+askama = "0.13.0"
 camino = "1.1.6"
 clap = { version = "4.4.2", features = ["derive"] }
 heck = "0.4.1"
@@ -15,4 +15,4 @@ topological-sort = "0.2.2"
 textwrap = "0.16.0"
 toml = "0.5"
 uniffi_bindgen = { workspace = true }
-cargo_metadata = "0.15"
+cargo_metadata = "0.19"

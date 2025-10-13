@@ -93,7 +93,7 @@ void {{ ffi_converter_name }}::write(RustStream &stream, const {{ type_name }} &
         {%- for variant in e.variants() %}
         {% if !loop.first %}else {% endif %}if constexpr (std::is_same_v<T, {{ type_name }}::{{ variant|variant_name(config.enum_style) }}>) {
             {%- for field in variant.fields() %}
-            {{ field|write_fn }}(stream, {{ field.as_type()|deref(ci) }}arg.{{ field.name()|var_name }});
+            {{ field|write_fn }}(stream, {{ field.as_type()|cpp_deref(ci) }}arg.{{ field.name()|var_name }});
             {%- endfor %}
         }
         {%- endfor %}
@@ -114,7 +114,7 @@ uint64_t {{ ffi_converter_name }}::allocation_size(const {{ type_name|class_name
         {% if !loop.first %}else {% endif %}if constexpr (std::is_same_v<T, {{ type_name }}::{{ variant|variant_name(config.enum_style) }}>) {
             uint64_t size = 0;
             {%- for field in variant.fields() %}
-            size += {{ field|allocation_size_fn }}({{ field.as_type()|deref(ci) }}arg.{{ field.name()|var_name }});
+            size += {{ field|allocation_size_fn }}({{ field.as_type()|cpp_deref(ci) }}arg.{{ field.name()|var_name }});
             {%- endfor %}
             return size;
         }

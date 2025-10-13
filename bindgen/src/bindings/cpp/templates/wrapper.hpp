@@ -28,11 +28,11 @@
 {%- import "macros.cpp" as macros %}
 {% call macros::docstring_value(ci.namespace_docstring(), 0) %}
 namespace {{ namespace }} {
-{%- for typ in ci.iter_types() %}
+{%- for typ in ci.iter_local_types() %}
 {%- let type_name = typ|type_name(ci) %}
 {%- match typ %}
 {%- when Type::Enum { module_path, name } %}
-{%- let e = ci|get_enum_definition(name) %}
+{%- let e = ci.get_enum_definition(name).unwrap() %}
 {%- if ci.is_name_used_as_error(name) || !e.is_flat() %}
 struct {{ name }};
 {%- else %}
@@ -59,11 +59,11 @@ typedef {{ type_name }} {{ name }};
 {%- endmatch %}
 {%- endfor %}
 
-{%- for typ in self.sorted_types(ci.iter_types()) %}
+{%- for typ in self.sorted_types(ci.iter_local_types()) %}
 {%- let type_name = typ|type_name(ci) %}
 {%- match typ %}
 {%- when Type::Enum { module_path, name } %}
-{%- let e = ci|get_enum_definition(name) %}
+{%- let e = ci.get_enum_definition(name).unwrap() %}
 {%- if ci.is_name_used_as_error(name) %}
 {% include "err.hpp" %}
 {%- else %}
@@ -72,7 +72,7 @@ typedef {{ type_name }} {{ name }};
 {%- when Type::Record { module_path, name } %}
 {% include "rec.hpp" %}
 {%- when Type::CallbackInterface { module_path, name } %}
-{%- let cbi = ci|get_callback_interface_definition(name) %}
+{%- let cbi = ci.get_callback_interface_definition(name).unwrap() %}
 {%- let ffi_init_callback = cbi.ffi_init_callback() %}
 {%- let interface_name = name %}
 {%- let methods = cbi.methods() %}
@@ -95,7 +95,7 @@ void rustbuffer_free(RustBuffer);
 
 {%- include "handle_map.cpp" %}
 
-{%- for typ in ci.iter_types() %}
+{%- for typ in ci.iter_local_types() %}
 {%- let type_name = typ|type_name(ci) %}
 {%- match typ %}
 {%- when Type::Boolean %}
@@ -129,7 +129,7 @@ void rustbuffer_free(RustBuffer);
 {%- when Type::Duration %}
 {% include "duration_conv.hpp" %}
 {%- when Type::Enum { module_path, name } %}
-{%- let e = ci|get_enum_definition(name) %}
+{%- let e = ci.get_enum_definition(name).unwrap() %}
 {%- if ci.is_name_used_as_error(name) %}
 {% include "err_conv.hpp" %}
 {%- else %}

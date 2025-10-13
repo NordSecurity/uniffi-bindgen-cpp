@@ -57,7 +57,7 @@ typedef int ForeignCallback(uint64_t handle, uint32_t method, uint8_t *args_data
 {%- include "rust_buf_stream.cpp" %}
 {%- include "scaffolding/object_map.cpp" %}
 
-{%- for typ in ci.iter_types() %}
+{%- for typ in ci.iter_local_types() %}
 {%- let type_name = typ|type_name(ci) %}
 {%- match typ %}
 {%- when Type::Boolean %}
@@ -99,7 +99,7 @@ typedef int ForeignCallback(uint64_t handle, uint32_t method, uint8_t *args_data
 {%- when Type::Map { key_type, value_type } %}
 {% include "map_conv.hpp" %}
 {%- when Type::Enum { module_path, name } %}
-{%- let e = ci|get_enum_definition(name) %}
+{%- let e = ci.get_enum_definition(name).unwrap() %}
 {%- if ci.is_name_used_as_error(name) %}
 {% for variant in e.variants() %}
 {% include "scaffolding/err.hpp" %}
@@ -259,7 +259,7 @@ void rustbuffer_free(RustBuffer& buf) {
     );
 }
 
-{%- for typ in ci.iter_types() %}
+{%- for typ in ci.iter_local_types() %}
 {%- let type_name = typ|type_name(ci) %}
 {%- let ffi_converter_name = typ|ffi_converter_name %}
 {%- let canonical_type_name = typ|canonical_name %}
@@ -305,7 +305,7 @@ void rustbuffer_free(RustBuffer& buf) {
 {%- when Type::Map { key_type, value_type } %}
 {% include "map_tmpl.cpp" %}
 {%- when Type::Enum { module_path, name } %}
-{%- let e = ci|get_enum_definition(name) %}
+{%- let e = ci.get_enum_definition(name).unwrap() %}
 {%- if ci.is_name_used_as_error(name) %}
 {% for variant in e.variants() %}
 {% include "scaffolding/err.cpp" %}
