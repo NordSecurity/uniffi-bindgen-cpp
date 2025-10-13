@@ -17,4 +17,5 @@ mod uniffi_fixtures {
     uniffi_cpp_custom_types_builtin::uniffi_reexport_scaffolding!();
     uniffi_enum_style_test::uniffi_reexport_scaffolding!();
     uniffi_empty_type::uniffi_reexport_scaffolding!();
+    uniffi_reserved_field_name::uniffi_reexport_scaffolding!();
 }
