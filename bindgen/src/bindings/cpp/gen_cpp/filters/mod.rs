@@ -216,7 +216,7 @@ pub(crate) fn ffi_type_name(ffi_type: &FfiType) -> Result<String> {
         FfiType::Callback(_) => "void *".into(),
         FfiType::Struct(name) => ffi_struct_name(name)?,
         FfiType::RustCallStatus => "RustCallStatus*".into(),
-        FfiType::Reference(typ) => format!("{} &", ffi_type_name(typ)?),
+        FfiType::Reference(typ) => format!("const {} &", ffi_type_name(typ)?),
         FfiType::MutReference(typ) => format!("{} &", ffi_type_name(typ)?),
     })
 }
