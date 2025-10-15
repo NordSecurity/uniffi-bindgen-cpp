@@ -71,6 +71,7 @@ test_case(custom_types_builtin)
 test_case(enum_style_test)
 test_case(empty_type)
 test_case(error_types_builtin)
+test_case(reserved_field_name)
 
 # Special multilib test that only needs to compile to check for potential symbol clashes
 add_executable(multilib-test 

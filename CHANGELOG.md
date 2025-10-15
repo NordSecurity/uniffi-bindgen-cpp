@@ -1,3 +1,8 @@
+#### v0.7.3+v0.28.3
+
+----
+- Core: Append `_` to field names which use c++ reserved keywords
+
 #### v0.7.2+v0.28.3
 
 ----

@@ -1,0 +1,7 @@
+dictionary Foo {
+    u32 this;
+};
+
+namespace reserved_field_name {
+    void assert_this_is_42(Foo foo);
+};
