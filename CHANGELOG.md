@@ -1,3 +1,8 @@
+#### v0.7.4+v0.28.3
+
+----
+- Core: Expand the set of names for which `_` is appended to include few commonly used macros
+
 #### v0.7.3+v0.28.3
 
 ----
