@@ -2,21 +2,11 @@ use paste::paste;
 use std::collections::HashMap;
 
 macro_rules! define_custom_builtin_type {
-    ($custom:ty, $underlying:ty) => {
+    ($custom:ident, $underlying:ty) => {
         paste! {
             pub struct $custom(pub $underlying);
 
-            impl UniffiCustomTypeConverter for $custom {
-                type Builtin = $underlying;
-
-                fn into_custom(val: Self::Builtin) -> uniffi::Result<Self> {
-                    Ok($custom(val))
-                }
-
-                fn from_custom(obj: Self) -> Self::Builtin {
-                    obj.0
-                }
-            }
+            uniffi::custom_newtype!($custom, $underlying);
         }
     };
 }

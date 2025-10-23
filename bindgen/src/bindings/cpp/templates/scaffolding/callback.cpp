@@ -26,7 +26,7 @@ class {{ iface.name() }}Proxy: public {{ iface.name() }} {
             {%- match m.return_type() -%}
             {% when Some with (return_type) %}{{ return_type|type_name(ci) }} {% when None %}void {% endmatch %}{{ m.name() }}(
             {%- for arg in m.arguments() %}
-            {{- arg.as_type().borrow()|type_name(ci) }} {{ arg.name() }}{% if !loop.last %}, {% endif -%}
+            {{- arg.as_type()|type_name(ci) }} {{ arg.name() }}{% if !loop.last %}, {% endif -%}
             {% endfor %}) override {
                 ForeignCallback *callback_stub = reinterpret_cast<ForeignCallback *>({{ ffi_converter_name|class_name }}::fn_handle.load());
                 if (callback_stub == nullptr) {

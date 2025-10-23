@@ -1,5 +1,5 @@
 use crate::bindings::cpp::CodeType;
-use uniffi_bindgen::{backend::Type, interface::Literal, ComponentInterface};
+use uniffi_bindgen::{interface::{Type, Literal}, ComponentInterface};
 
 use crate::bindings::cpp::gen_cpp::filters::CppCodeOracle;
 

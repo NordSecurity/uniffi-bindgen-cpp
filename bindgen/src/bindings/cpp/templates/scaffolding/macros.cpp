@@ -19,7 +19,7 @@
 {%- endif %}
     } catch (const std::exception &e) {
         out_status->code = UNIFFI_CALL_STATUS_PANIC;
-        out_status->error_buf = {{ Type::String.borrow()|ffi_converter_name }}::lower(e.what());
+        out_status->error_buf = {{ Type::String|type_ffi_converter_name }}::lower(e.what());
     } catch (...) {
         out_status->code = UNIFFI_CALL_STATUS_PANIC;
     }
@@ -69,7 +69,7 @@ obj->{{ scaffolding_fn.name() }}(
 {% match ffi_func.return_type() -%}
 {% when Some with (return_type) %}{{ return_type|ffi_type_name }} {% when None %}void {% endmatch %}{{ ffi_func.name() }}(
 {%- for arg in ffi_func.arguments() %}
-{{- arg.type_().borrow()|ffi_type_name }} {{ arg.name() }}{% if !loop.last || ffi_func.has_rust_call_status_arg() %}, {% endif -%}
+{{- arg.type_()|ffi_type_name }} {{ arg.name() }}{% if !loop.last || ffi_func.has_rust_call_status_arg() %}, {% endif -%}
 {% endfor %}
 {%- if ffi_func.has_rust_call_status_arg() %}RustCallStatus *out_status{% endif -%})
 {% endmacro %}

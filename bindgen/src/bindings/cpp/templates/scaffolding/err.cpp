@@ -41,7 +41,7 @@ void {{ ffi_converter_name }}{{ variant.name() }}::write(RustStream &stream, con
     stream << int32_t({{ loop.index }});
 
     {%- if e.is_flat() %}
-    {{ Type::String.borrow()|write_fn }}(stream, val.what());
+    {{ Type::String|type_write_fn }}(stream, val.what());
     {%- else %}
     {%- for field in variant.fields() %}
     {{ field|write_fn }}(stream, val.{{ field.name()|var_name }});
@@ -52,7 +52,7 @@ void {{ ffi_converter_name }}{{ variant.name() }}::write(RustStream &stream, con
 int32_t {{ ffi_converter_name }}{{ variant.name() }}::allocation_size(const {{ namespace }}::{{ variant.name() }} &val) {
     int32_t size = sizeof(int32_t);
     {%- if e.is_flat() %}
-    size += {{ Type::String.borrow()|allocation_size_fn }}(val.what());
+    size += {{ Type::String|type_allocation_size_fn }}(val.what());
     {%- else %}
     {%- for field in variant.fields() %}
     size += {{ field|allocation_size_fn }}(val.{{ field.name()|var_name }});

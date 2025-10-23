@@ -77,22 +77,25 @@ void *{{ impl_class_name }}::_uniffi_internal_clone_pointer() const {
 {% match method %}
 {% when UniffiTrait::Display { fmt } %}
 std::string {{ impl_class_name }}::to_string() const {
-    return uniffi::{{ Type::String.borrow()|lift_fn }}({% call macros::rust_call_with_prefix("this->_uniffi_internal_clone_pointer()", fmt) %});
+    return uniffi::{{ Type::String|type_lift_fn }}({% call macros::rust_call_with_prefix("this->_uniffi_internal_clone_pointer()", fmt) %});
 }
 {% when UniffiTrait::Debug { fmt } %}
 std::string {{ impl_class_name }}::to_debug_string() const {
-    return uniffi::{{ Type::String.borrow()|lift_fn }}({% call macros::rust_call_with_prefix("this->_uniffi_internal_clone_pointer()", fmt) %});
+    return uniffi::{{ Type::String|type_lift_fn }}({% call macros::rust_call_with_prefix("this->_uniffi_internal_clone_pointer()", fmt) %});
 }
 {% when UniffiTrait::Eq { eq, ne } %}
 bool {{ impl_class_name }}::eq(const {{ type_name }} &other) const {
-    return uniffi::{{ Type::Boolean.borrow()|lift_fn }}({% call macros::rust_call_with_prefix("this->_uniffi_internal_clone_pointer()", eq) %});
+    return uniffi::{{ Type::Boolean|type_lift_fn }}({% call macros::rust_call_with_prefix("this->_uniffi_internal_clone_pointer()", eq) %});
 }
 bool {{ impl_class_name }}::ne(const {{ type_name }} &other) const {
-    return uniffi::{{ Type::Boolean.borrow()|lift_fn }}({% call macros::rust_call_with_prefix("this->_uniffi_internal_clone_pointer()", ne) %});
+    return uniffi::{{ Type::Boolean|type_lift_fn }}({% call macros::rust_call_with_prefix("this->_uniffi_internal_clone_pointer()", ne) %});
 }
 {% when UniffiTrait::Hash { hash } %}
 uint64_t {{ impl_class_name }}::hash() const {
-    return uniffi::{{ Type::UInt64.borrow()|lift_fn }}({% call macros::rust_call_with_prefix("this->_uniffi_internal_clone_pointer()", hash) %});
+    return uniffi::{{ Type::UInt64|lift_fn }}({% call macros::rust_call_with_prefix("this->_uniffi_internal_clone_pointer()", hash) %});
 }
+{% when UniffiTrait::Ord { cmp } %}
+// Ord trait (comparison) - not yet implemented for C++
+// TODO: Implement operator< and comparison methods
 {% endmatch %}
 {%- endfor %}

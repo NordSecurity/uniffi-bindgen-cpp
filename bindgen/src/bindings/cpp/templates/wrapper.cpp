@@ -24,8 +24,8 @@ void ensure_initialized() {
     }
     {%- endfor %}
 
-    {% for fn in self.initialization_fns() -%}
-    {{ fn }}();
+    {% for init_fn in self.initialization_fns() -%}
+    {{ init_fn }}();
     {% endfor -%}
 }
 

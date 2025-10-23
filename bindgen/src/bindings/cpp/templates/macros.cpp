@@ -49,7 +49,7 @@ uniffi::{{ arg|lower_fn }}({{ arg.name()|var_name }})
 
 {%- macro arg_list_ffi_decl_xx(func) %}
     {%- for arg in func.arguments() %}
-        {{- arg.type_().borrow()|ffi_type_name }} {{ arg.name()|var_name -}}{%- if !loop.last || func.has_rust_call_status_arg() -%},{%- endif -%}
+        {{- arg.type_()|ffi_type_name }} {{ arg.name()|var_name -}}{%- if !loop.last || func.has_rust_call_status_arg() -%},{%- endif -%}
     {%- endfor %}
     {%- if func.has_rust_call_status_arg() %}RustCallStatus *out_status{% endif %}
 {%- endmacro -%}

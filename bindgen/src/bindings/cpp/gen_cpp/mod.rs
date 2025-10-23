@@ -20,10 +20,12 @@ use filters::CppCodeOracle;
 use serde::{Deserialize, Serialize};
 use topological_sort::{DependencyLink, TopologicalSort};
 use uniffi_bindgen::{
-    backend::TemplateExpression,
     interface::{AsType, FfiDefinition, Type, UniffiTrait},
     ComponentInterface,
 };
+
+// TemplateExpression was removed in UniFFI 0.30, using String instead
+type TemplateExpression = String;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub enum EnumStyle {
@@ -158,7 +160,7 @@ impl<'a> CppWrapperHeader<'a> {
     ) -> impl Iterator<Item = Type> {
         let mut definition_topology = self
             .ci
-            .iter_types()
+            .iter_local_types()
             .filter_map(|type_| {
                 // We take into account only the Record and Enum types, as they are the
                 // only types that can have member variables that reference other structures
@@ -219,7 +221,7 @@ fn type_name(ty: &Type) -> Option<&str> {
         Type::Record { name, .. }
         | Type::Object { name, .. }
         | Type::Enum { name, .. }
-        | Type::External { name, .. }
+        // Type::External was removed in UniFFI 0.30
         | Type::Custom { name, .. } => Some(name),
         _ => None,
     }
@@ -247,7 +249,7 @@ impl<'a> CppWrapper<'a> {
 
     pub(crate) fn initialization_fns(&self) -> Vec<String> {
         self.ci
-            .iter_types()
+            .iter_local_types()
             .map(|t| CppCodeOracle.find(t))
             .filter_map(|ct| ct.initialization_fn())
             .collect()

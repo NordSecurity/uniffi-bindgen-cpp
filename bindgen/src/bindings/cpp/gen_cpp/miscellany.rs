@@ -1,6 +1,6 @@
 use crate::bindings::cpp::CodeType;
 use paste::paste;
-use uniffi_bindgen::{backend::Literal, ComponentInterface};
+use uniffi_bindgen::{interface::Literal, ComponentInterface};
 
 macro_rules! impl_code_type_for_miscellany {
     ($T:ty, $label:literal, $canonical_name:literal) => {
