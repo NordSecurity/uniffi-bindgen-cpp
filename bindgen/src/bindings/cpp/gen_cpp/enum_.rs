@@ -1,4 +1,4 @@
-use uniffi_bindgen::{backend::Literal, ComponentInterface};
+use uniffi_bindgen::{interface::Literal, ComponentInterface};
 
 use crate::bindings::cpp::{gen_cpp::filters::CppCodeOracle, CodeType};
 #[derive(Debug)]

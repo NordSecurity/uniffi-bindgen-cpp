@@ -23,9 +23,9 @@ struct {{ type_name }} {
     struct {{ variant|variant_name(config.enum_style) }} {
         {%- for field in variant.fields() %}
         {%- call macros::docstring(field, 8) %}
-        {{ field|type_name(ci) }} {{ field.name()|var_name }}
+        {{ field|type_name_with_smart_ptr(ci) }} {{ field.name()|var_name }}
         {%- match field.default_value() %}
-        {%- when Some with (literal) %} = {{ literal|literal_cpp(field, config.enum_style, ci) }};{%- else -%};
+        {%- when Some with (default_val) %} = {{ default_val|default_value_literal_cpp(field, config.enum_style, ci) }};{%- else -%};
         {%- endmatch %}
         {%- endfor %}
     };

@@ -80,6 +80,9 @@ struct {{ impl_class_name }}
      * Returns a hash of the object, internally calls Rust's `Hash` trait.
      */
     uint64_t hash() const;
+    {%- when UniffiTrait::Ord { cmp } %}
+    // Ord trait (comparison) - not yet implemented for C++
+    // TODO: Implement operator< and comparison methods
     {%- endmatch %}
     {%- endfor %}
 

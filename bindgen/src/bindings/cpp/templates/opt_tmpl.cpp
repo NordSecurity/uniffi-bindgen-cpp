@@ -23,13 +23,21 @@ RustBuffer {{ ffi_converter_name }}::lower(const {{ type_name }}& val) {
 
     {%- if typ|can_dereference_optional(ci) %}
     if (has_value) {
+        {%- if inner_type|vector_element_needs_wrapping(ci) %}
+        return std::make_shared<{{ inner_type|type_name(ci) }}>({{ inner_type|read_fn }}(stream));
+        {%- else %}
         return {{ inner_type|read_fn }}(stream);
+        {%- endif %}
     } else {
         return nullptr;
     }
     {%- else %}
     if (has_value) {
+        {%- if inner_type|vector_element_needs_wrapping(ci) %}
+        return std::make_optional(std::make_shared<{{ inner_type|type_name(ci) }}>({{ inner_type|read_fn }}(stream)));
+        {%- else %}
         return std::make_optional({{ inner_type|read_fn }}(stream));
+        {%- endif %}
     } else {
         return std::nullopt;
     }
@@ -41,9 +49,17 @@ void {{ ffi_converter_name }}::write(RustStream &stream, const {{ type_name }}& 
 
     if (value) {
         {%- if typ|can_dereference_optional(ci) %}
-        {{ inner_type|write_fn }}(stream, {{ inner_type.as_type()|deref(ci) }}value);
+        {%- if inner_type|vector_element_needs_wrapping(ci) %}
+        {{ inner_type|write_fn }}(stream, {{ inner_type|deref }}*value);
+        {%- else %}
+        {{ inner_type|write_fn }}(stream, {{ inner_type|deref }}value);
+        {%- endif %}
+        {%- else %}
+        {%- if inner_type|vector_element_needs_wrapping(ci) %}
+        {{ inner_type|write_fn }}(stream, {{ inner_type|deref }}*value.value());
         {%- else %}
         {{ inner_type|write_fn }}(stream, value.value());
+        {%- endif %}
         {%- endif %}
     }
 }
@@ -53,9 +69,17 @@ uint64_t {{ ffi_converter_name }}::allocation_size(const {{ type_name }} &val) {
 
     if (val) {
         {%- if typ|can_dereference_optional(ci) %}
-        ret += {{ inner_type|allocation_size_fn }}({{ inner_type.as_type()|deref(ci) }}val);
+        {%- if inner_type|vector_element_needs_wrapping(ci) %}
+        ret += {{ inner_type|allocation_size_fn }}({{ inner_type|deref }}*val);
+        {%- else %}
+        ret += {{ inner_type|allocation_size_fn }}({{ inner_type|deref }}val);
+        {%- endif %}
+        {%- else %}
+        {%- if inner_type|vector_element_needs_wrapping(ci) %}
+        ret += {{ inner_type|allocation_size_fn }}({{ inner_type|deref }}*val.value());
         {%- else %}
         ret += {{ inner_type|allocation_size_fn }}(val.value());
+        {%- endif %}
         {%- endif %}
     }
 

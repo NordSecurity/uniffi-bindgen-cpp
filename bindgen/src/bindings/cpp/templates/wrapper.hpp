@@ -28,7 +28,7 @@
 {%- import "macros.cpp" as macros %}
 {% call macros::docstring_value(ci.namespace_docstring(), 0) %}
 namespace {{ namespace }} {
-{%- for typ in ci.iter_types() %}
+{%- for typ in ci.iter_local_types() %}
 {%- let type_name = typ|type_name(ci) %}
 {%- match typ %}
 {%- when Type::Enum { module_path, name } %}
@@ -59,7 +59,7 @@ typedef {{ type_name }} {{ name }};
 {%- endmatch %}
 {%- endfor %}
 
-{%- for typ in self.sorted_types(ci.iter_types()) %}
+{%- for typ in self.sorted_types(ci.iter_local_types()) %}
 {%- let type_name = typ|type_name(ci) %}
 {%- match typ %}
 {%- when Type::Enum { module_path, name } %}
@@ -95,7 +95,7 @@ void rustbuffer_free(RustBuffer);
 
 {%- include "handle_map.cpp" %}
 
-{%- for typ in ci.iter_types() %}
+{%- for typ in ci.iter_local_types() %}
 {%- let type_name = typ|type_name(ci) %}
 {%- match typ %}
 {%- when Type::Boolean %}

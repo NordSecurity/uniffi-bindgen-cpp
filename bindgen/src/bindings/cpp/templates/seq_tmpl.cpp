@@ -26,7 +26,11 @@ RustBuffer {{ class_name }}::lower(const {{ type_name }} &val) {
     ret.reserve(count);
 
     for (decltype(count) i = 0; i < count; i++) {
+        {%- if inner_type|vector_element_needs_wrapping(ci) %}
+        ret.push_back(std::make_shared<{{ inner_type|type_name(ci) }}>({{ inner_type|read_fn }}(stream)));
+        {%- else %}
         ret.push_back({{ inner_type|read_fn }}(stream));
+        {%- endif %}
     }
 
     return ret;
@@ -36,7 +40,11 @@ void {{ class_name }}::write(RustStream &stream, const {{ type_name }} &val) {
     stream << static_cast<int32_t>(val.size());
 
     for (auto &elem : val) {
-        {{ inner_type|write_fn }}(stream, {{ inner_type.as_type()|deref(ci) }}elem);
+        {%- if inner_type|vector_element_needs_wrapping(ci) %}
+        {{ inner_type|write_fn }}(stream, {{ inner_type|deref }}*elem);
+        {%- else %}
+        {{ inner_type|write_fn }}(stream, {{ inner_type|deref }}elem);
+        {%- endif %}
     }
 }
 
@@ -44,7 +52,11 @@ uint64_t {{ class_name }}::allocation_size(const {{ type_name }} &val) {
     uint64_t size = sizeof(int32_t);
 
     for (auto &elem : val) {
-        size += {{ inner_type|allocation_size_fn }}({{inner_type.as_type()|deref(ci) }}elem);
+        {%- if inner_type|vector_element_needs_wrapping(ci) %}
+        size += {{ inner_type|allocation_size_fn }}({{inner_type|deref }}*elem);
+        {%- else %}
+        size += {{ inner_type|allocation_size_fn }}({{inner_type|deref }}elem);
+        {%- endif %}
     }
 
     return size;

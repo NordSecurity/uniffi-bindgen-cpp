@@ -74,7 +74,11 @@ RustBuffer {{ ffi_converter_name }}::lower(const {{ type_name }} &val) {
     case {{ loop.index }}:
         return {{ type_name }}::{{ variant|variant_name(config.enum_style) }} {
             {%- for field in variant.fields() %}
+            {%- if field|needs_smart_ptr_wrap(ci) %}
+            .{{field.name()|var_name}} = std::make_shared<{{ field|extract_inner_type(ci) }}>({{ field|read_fn }}(stream)),
+            {%- else %}
             .{{field.name()|var_name}} = {{ field|read_fn }}(stream),
+            {%- endif %}
             {%- endfor %}
         };
         {% endfor %}
@@ -93,7 +97,11 @@ void {{ ffi_converter_name }}::write(RustStream &stream, const {{ type_name }} &
         {%- for variant in e.variants() %}
         {% if !loop.first %}else {% endif %}if constexpr (std::is_same_v<T, {{ type_name }}::{{ variant|variant_name(config.enum_style) }}>) {
             {%- for field in variant.fields() %}
-            {{ field|write_fn }}(stream, {{ field.as_type()|deref(ci) }}arg.{{ field.name()|var_name }});
+            {%- if field|needs_smart_ptr_wrap(ci) %}
+            {{ field|write_fn }}(stream, {{ field.as_type()|deref }}*arg.{{ field.name()|var_name }});
+            {%- else %}
+            {{ field|write_fn }}(stream, {{ field.as_type()|deref }}arg.{{ field.name()|var_name }});
+            {%- endif %}
             {%- endfor %}
         }
         {%- endfor %}
@@ -114,7 +122,11 @@ uint64_t {{ ffi_converter_name }}::allocation_size(const {{ type_name|class_name
         {% if !loop.first %}else {% endif %}if constexpr (std::is_same_v<T, {{ type_name }}::{{ variant|variant_name(config.enum_style) }}>) {
             uint64_t size = 0;
             {%- for field in variant.fields() %}
-            size += {{ field|allocation_size_fn }}({{ field.as_type()|deref(ci) }}arg.{{ field.name()|var_name }});
+            {%- if field|needs_smart_ptr_wrap(ci) %}
+            size += {{ field|allocation_size_fn }}({{ field.as_type()|deref }}*arg.{{ field.name()|var_name }});
+            {%- else %}
+            size += {{ field|allocation_size_fn }}({{ field.as_type()|deref }}arg.{{ field.name()|var_name }});
+            {%- endif %}
             {%- endfor %}
             return size;
         }

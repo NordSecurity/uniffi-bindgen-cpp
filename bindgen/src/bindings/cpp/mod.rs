@@ -5,7 +5,7 @@ use std::{fmt::Debug, fs};
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use uniffi_bindgen::{
-    backend::Literal, BindingGenerator, Component, ComponentInterface, GenerationSettings,
+    interface::Literal, BindingGenerator, Component, ComponentInterface, GenerationSettings,
 };
 
 use self::gen_cpp::{generate_cpp_bindings, Bindings};
