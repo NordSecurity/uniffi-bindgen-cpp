@@ -24,13 +24,35 @@ impl OptionalCodeType {
 
 impl CodeType for OptionalCodeType {
     fn type_label(&self, ci: &ComponentInterface) -> String {
+        let inner_code_type = CppCodeOracle.find(&self.inner);
+        let inner_label = inner_code_type.type_label(ci);
+        
         if OptionalCodeType::can_dereference(&self.inner, ci) {
-            CppCodeOracle.find(&self.inner).type_label(ci)
+            // Check if the inner type should be wrapped in shared_ptr
+            let canonical = inner_code_type.canonical_name();
+            let type_name = canonical.strip_prefix("Type").unwrap_or(&canonical);
+            
+            let should_wrap = ci.get_record_definition(type_name).is_some()
+                || ci.get_enum_definition(type_name).map_or(false, |e| !e.is_flat());
+            
+            if should_wrap {
+                format!("std::shared_ptr<{}>", inner_label)
+            } else {
+                inner_label
+            }
         } else {
-            format!(
-                "std::optional<{}>",
-                CppCodeOracle.find(&self.inner).type_label(ci)
-            )
+            // Check if the inner type should be wrapped in shared_ptr
+            let canonical = inner_code_type.canonical_name();
+            let type_name = canonical.strip_prefix("Type").unwrap_or(&canonical);
+            
+            let should_wrap = ci.get_record_definition(type_name).is_some()
+                || ci.get_enum_definition(type_name).map_or(false, |e| !e.is_flat());
+            
+            if should_wrap {
+                format!("std::optional<std::shared_ptr<{}>>", inner_label)
+            } else {
+                format!("std::optional<{}>", inner_label)
+            }
         }
     }
 
@@ -62,10 +84,22 @@ impl SequenceCodeType {
 
 impl CodeType for SequenceCodeType {
     fn type_label(&self, ci: &ComponentInterface) -> String {
-        format!(
-            "std::vector<{}>",
-            CppCodeOracle.find(&self.inner).type_label(ci)
-        )
+        let inner_code_type = CppCodeOracle.find(&self.inner);
+        let inner_label = inner_code_type.type_label(ci);
+        
+        // Check if the inner type should be wrapped in shared_ptr
+        // Records and non-flat enums need wrapping for recursive type support
+        let canonical = inner_code_type.canonical_name();
+        let type_name = canonical.strip_prefix("Type").unwrap_or(&canonical);
+        
+        let should_wrap = ci.get_record_definition(type_name).is_some()
+            || ci.get_enum_definition(type_name).map_or(false, |e| !e.is_flat());
+        
+        if should_wrap {
+            format!("std::vector<std::shared_ptr<{}>>", inner_label)
+        } else {
+            format!("std::vector<{}>", inner_label)
+        }
     }
 
     fn canonical_name(&self) -> String {

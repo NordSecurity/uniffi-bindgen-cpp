@@ -565,7 +565,7 @@ pub(crate) fn can_dereference_optional(type_: &Type, ci: &ComponentInterface) ->
     Ok(result)
 }
 
-pub(crate) fn deref(type_: impl AsCodeType) -> Result<String> {
+pub(crate) fn deref(_type: impl AsCodeType) -> Result<String> {
     // Simplified implementation - return empty string for most cases
     // In UniFFI 0.30, error handling is different so we don't need the * prefix
     Ok("".to_string())
@@ -642,4 +642,151 @@ pub(crate) fn type_allocation_size_fn(type_: Type) -> Result<String> {
 
 pub(crate) fn type_ffi_converter_name(type_: Type) -> Result<String> {
     Ok(format!("FfiConverter{}", CppCodeOracle.find(&type_).canonical_name()))
+}
+
+// Render a type name, wrapping custom struct types (records) in shared_ptr to handle recursive types
+// This converts:
+//   - RecordType → std::shared_ptr<RecordType>
+//   - std::optional<RecordType> → std::optional<std::shared_ptr<RecordType>>
+// Enums and objects are NOT wrapped as they don't need pointer indirection
+// We use shared_ptr for copyability (required for std::variant in enums)
+pub(crate) fn type_name_with_smart_ptr(field_type: impl AsCodeType, ci: &ComponentInterface) -> Result<String> {
+    let code_type = field_type.as_codetype();
+    let type_label = code_type.type_label(ci);
+    
+    // Handle optional types
+    if type_label.starts_with("std::optional<") && !type_label.contains("std::shared_ptr<") {
+        if let Some(inner) = type_label.strip_prefix("std::optional<").and_then(|s| s.strip_suffix(">")) {
+            // Only wrap if it's a struct/record type (not enum)
+            if should_use_smart_ptr(inner, ci) {
+                return Ok(format!("std::optional<std::shared_ptr<{}>>", inner));
+            }
+        }
+    }
+    // Handle vector types - wrap the element type if it's a record
+    else if type_label.starts_with("std::vector<") && !type_label.contains("std::shared_ptr<") {
+        if let Some(inner) = type_label.strip_prefix("std::vector<").and_then(|s| s.strip_suffix(">")) {
+            if should_use_smart_ptr(inner, ci) {
+                return Ok(format!("std::vector<std::shared_ptr<{}>>", inner));
+            }
+        }
+    }
+    // Handle direct custom record types - wrap in shared_ptr
+    else if should_use_smart_ptr(&type_label, ci) {
+        return Ok(format!("std::shared_ptr<{}>", type_label));
+    }
+    
+    Ok(type_label)
+}
+
+// Check if a type should be wrapped in shared_ptr
+// Wrap RECORD types and NON-FLAT ENUM types (enums with variant fields)
+// Flat enums (simple C-style enums) should NOT be wrapped
+fn should_use_smart_ptr(type_name: &str, ci: &ComponentInterface) -> bool {
+    // Don't wrap if it's already a pointer, a standard container, or a primitive
+    if type_name.ends_with("*") 
+        || type_name.starts_with("std::vector<")
+        || type_name.starts_with("std::map<")
+        || type_name.starts_with("std::optional<")
+        || type_name.starts_with("std::") 
+        || is_primitive_type(type_name) {
+        return false;
+    }
+    
+    // Check if it's a record (struct) type
+    if ci.get_record_definition(type_name).is_some() {
+        return true;
+    }
+    
+    // Check if it's a non-flat enum (enum with variant fields)
+    // These generate structs with std::variant in C++ and need wrapping
+    if let Some(enum_def) = ci.get_enum_definition(type_name) {
+        return !enum_def.is_flat();
+    }
+    
+    // Don't wrap objects or other types
+    false
+}
+
+// Helper to check if a type name is a C++ primitive
+fn is_primitive_type(type_name: &str) -> bool {
+    matches!(
+        type_name,
+        "bool" | "int8_t" | "uint8_t" | "int16_t" | "uint16_t" 
+        | "int32_t" | "uint32_t" | "int64_t" | "uint64_t"
+        | "float" | "double" | "std::string"
+    )
+}
+
+// Check if a field type needs wrapping (is a direct shared_ptr at the field level)
+// This should return true ONLY if the field itself is wrapped in shared_ptr,
+// NOT if it's a vector/optional containing shared_ptrs
+pub(crate) fn needs_smart_ptr_wrap(field_type: impl AsCodeType, ci: &ComponentInterface) -> Result<bool> {
+    let type_label = type_name_with_smart_ptr(field_type, ci)?;
+    // Only wrap if it's a DIRECT shared_ptr, not a container of shared_ptrs
+    Ok(type_label.starts_with("std::shared_ptr<") 
+        && !type_label.starts_with("std::vector<")
+        && !type_label.starts_with("std::optional<")
+        && !type_label.starts_with("std::map<"))
+}
+
+// Get the inner type from a smart pointer type
+// std::shared_ptr<T> → T
+// std::vector<std::shared_ptr<T>> → T
+pub(crate) fn extract_inner_type(field_type: impl AsCodeType, ci: &ComponentInterface) -> Result<String> {
+    let type_label = type_name_with_smart_ptr(field_type, ci)?;
+    
+    // Handle std::shared_ptr<T>
+    if let Some(inner) = type_label.strip_prefix("std::shared_ptr<") {
+        if let Some(t) = inner.strip_suffix(">") {
+            return Ok(t.to_string());
+        }
+    }
+    
+    // Handle std::vector<std::shared_ptr<T>>
+    if let Some(rest) = type_label.strip_prefix("std::vector<std::shared_ptr<") {
+        if let Some(inner) = rest.strip_suffix(">>") {
+            return Ok(inner.to_string());
+        }
+    }
+    
+    // Handle std::optional<std::shared_ptr<T>>
+    if let Some(rest) = type_label.strip_prefix("std::optional<std::shared_ptr<") {
+        if let Some(inner) = rest.strip_suffix(">>") {
+            return Ok(inner.to_string());
+        }
+    }
+    
+    Ok(type_label)
+}
+
+// Check if vector elements need smart pointer wrapping
+// Used specifically for sequence templates  
+pub(crate) fn vector_element_needs_wrapping(inner_type: impl AsCodeType, ci: &ComponentInterface) -> Result<bool> {
+    // We need to check the actual Type enum, not the C++ type label
+    // because get_record_definition/get_enum_definition use UniFFI names
+    
+    // Try to extract the Type from AsCodeType
+    // The canonical_name() for records prepends "Type", so we need to strip it
+    let code_type = inner_type.as_codetype();
+    let canonical = code_type.canonical_name();
+    
+    // Strip "Type" prefix if present (RecordCodeType prepends it)
+    let type_name = canonical.strip_prefix("Type").unwrap_or(&canonical);
+    
+    // Check if it's a record or non-flat enum
+    if ci.get_record_definition(type_name).is_some() {
+        return Ok(true);
+    }
+    
+    if let Some(enum_def) = ci.get_enum_definition(type_name) {
+        return Ok(!enum_def.is_flat());
+    }
+    
+    Ok(false)
+}
+
+// Helper to get canonical name for debugging
+pub(crate) fn get_canonical_name(inner_type: impl AsCodeType) -> Result<String> {
+    Ok(inner_type.as_codetype().canonical_name())
 }

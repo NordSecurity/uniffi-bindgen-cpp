@@ -11,7 +11,7 @@ mod record;
 use std::{
     borrow::Borrow,
     cell::RefCell,
-    collections::{BTreeSet, HashMap},
+    collections::{BTreeSet, HashMap, HashSet},
 };
 
 use anyhow::{Context, Result};
@@ -126,6 +126,7 @@ struct CppWrapperHeader<'a> {
     ci: &'a ComponentInterface,
     config: &'a Config,
     includes: RefCell<BTreeSet<String>>,
+    recursive_types: RefCell<HashSet<String>>,
 }
 
 impl<'a> CppWrapperHeader<'a> {
@@ -140,11 +141,107 @@ impl<'a> CppWrapperHeader<'a> {
             },
         );
 
+        // Detect recursive types
+        let recursive_types = Self::detect_recursive_types(ci);
+
         Self {
             ci,
             config,
             includes: includes.into(),
+            recursive_types: recursive_types.into(),
         }
+    }
+
+    // Detect recursive types by checking if a type references itself
+    // directly or indirectly through its fields
+    fn detect_recursive_types(ci: &ComponentInterface) -> HashSet<String> {
+        let mut recursive_types = HashSet::new();
+        let mut visited = HashSet::new();
+        let mut path = Vec::new();
+
+        // Check each type
+        for ty in ci.iter_local_types() {
+            if let Some(name) = type_name(&ty) {
+                visited.clear();
+                path.clear();
+                if Self::has_cycle(ci, name, &mut visited, &mut path) {
+                    recursive_types.insert(name.to_string());
+                    // Also mark all types in the cycle
+                    for type_in_cycle in &path {
+                        recursive_types.insert(type_in_cycle.clone());
+                    }
+                }
+            }
+        }
+
+        recursive_types
+    }
+
+    // Check if a type has a cycle (references itself directly or indirectly)
+    fn has_cycle(
+        ci: &ComponentInterface,
+        type_name: &str,
+        visited: &mut HashSet<String>,
+        path: &mut Vec<String>,
+    ) -> bool {
+        // If we've seen this type in the current path, we have a cycle
+        if path.contains(&type_name.to_string()) {
+            return true;
+        }
+
+        // If we've already fully explored this type, no need to check again
+        if visited.contains(type_name) {
+            return false;
+        }
+
+        visited.insert(type_name.to_string());
+        path.push(type_name.to_string());
+
+        // Get the dependencies of this type
+        let mut has_cycle = false;
+        if let Some(record) = ci.get_record_definition(type_name) {
+            for field in record.fields() {
+                if let Some(dep_name) = Self::extract_type_name(&field.as_type()) {
+                    if Self::has_cycle(ci, &dep_name, visited, path) {
+                        has_cycle = true;
+                        break;
+                    }
+                }
+            }
+        } else if let Some(enum_def) = ci.get_enum_definition(type_name) {
+            for variant in enum_def.variants() {
+                for field in variant.fields() {
+                    if let Some(dep_name) = Self::extract_type_name(&field.as_type()) {
+                        if Self::has_cycle(ci, &dep_name, visited, path) {
+                            has_cycle = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        path.pop();
+        has_cycle
+    }
+
+    // Extract the type name from a Type, looking through Optional, Sequence, Map, etc.
+    fn extract_type_name(ty: &Type) -> Option<String> {
+        match ty {
+            Type::Record { name, .. } | Type::Enum { name, .. } | Type::Object { name, .. } => {
+                Some(name.clone())
+            }
+            Type::Optional { inner_type } | Type::Sequence { inner_type } => {
+                Self::extract_type_name(inner_type)
+            }
+            Type::Map { value_type, .. } => Self::extract_type_name(value_type),
+            _ => None,
+        }
+    }
+
+    // Check if a type is recursive (part of a cycle)
+    pub(crate) fn is_recursive_type(&self, type_name: &str) -> bool {
+        self.recursive_types.borrow().contains(type_name)
     }
 
     // XXX: This is somewhat evil, but necessary.
@@ -200,7 +297,17 @@ impl<'a> CppWrapperHeader<'a> {
         }
 
         if definition_topology.len() != 0 {
-            panic!("Cyclic dependency detected");
+            // For now, just add remaining types without sorting
+            // This handles cases where cyclic dependencies exist
+            eprintln!("Warning: Potential cyclic dependencies detected ({} types), using fallback ordering", definition_topology.len());
+            // Get all remaining items from topological sort
+            for name in definition_topology.into_iter() {
+                if let Some(ty) = self.ci.get_type(&name) {
+                    if !sorted.iter().any(|t| *t == ty) {
+                        sorted.push(ty.clone());
+                    }
+                }
+            }
         }
 
         let rest = types
