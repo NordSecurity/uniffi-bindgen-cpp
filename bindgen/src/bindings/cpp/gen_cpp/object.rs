@@ -1,4 +1,7 @@
-use uniffi_bindgen::{interface::{Literal, ObjectImpl}, ComponentInterface};
+use uniffi_bindgen::{
+    interface::{Literal, ObjectImpl},
+    ComponentInterface,
+};
 
 use crate::bindings::cpp::{
     gen_cpp::filters::callback_interface_name, gen_cpp::filters::CppCodeOracle, CodeType,
