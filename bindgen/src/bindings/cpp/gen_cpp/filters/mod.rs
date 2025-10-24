@@ -17,7 +17,10 @@ use super::EnumStyle;
 
 type Result<T> = std::result::Result<T, askama::Error>;
 
-const RESERVED_CPP_KEYWORDS: [&str; 98] = [
+// Keywords and other commonly used words that are in fact macros that
+// expand to expressions (like `errno`).
+const RESERVED_CPP_WORDS: [&str; 100] = [
+    // Keywords
     "alignas",
     "alignof",
     "and",
@@ -116,6 +119,9 @@ const RESERVED_CPP_KEYWORDS: [&str; 98] = [
     "while",
     "xor",
     "xor_eq",
+    // Macros
+    "errno",
+    "assert",
 ];
 
 #[derive(Clone)]
@@ -143,7 +149,7 @@ impl CppCodeOracle {
 
     pub(crate) fn var_name(&self, nm: &str) -> String {
         let mut name = nm.to_string().to_snake_case();
-        if RESERVED_CPP_KEYWORDS.contains(&&*name) {
+        if RESERVED_CPP_WORDS.contains(&&*name) {
             name.push('_');
         }
         name
