@@ -721,6 +721,7 @@ dependencies = [
  "uniffi-fixture-docstring",
  "uniffi-fixture-time",
  "uniffi-fixture-trait-methods",
+ "uniffi-reserved-field-name",
 ]
 
 [[package]]
@@ -873,6 +874,13 @@ source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.29.4#00cd7e313cf73
 dependencies = [
  "once_cell",
  "thiserror 1.0.50",
+ "uniffi",
+]
+
+[[package]]
+name = "uniffi-reserved-field-name"
+version = "0.1.0"
+dependencies = [
  "uniffi",
 ]
 

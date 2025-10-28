@@ -1,0 +1,14 @@
+[package]
+name = "uniffi-reserved-field-name"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["lib", "cdylib"]
+name = "uniffi_reserved_field_name"
+
+[dependencies]
+uniffi = { workspace = true }
+
+[build-dependencies]
+uniffi = { workspace = true, features = ["build"] }

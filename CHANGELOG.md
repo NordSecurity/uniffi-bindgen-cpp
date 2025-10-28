@@ -3,6 +3,16 @@
 ----
 - Core: Update bindgen to UniFFI v0.29.4
 
+#### v0.7.4+v0.28.3
+
+----
+- Core: Expand the set of names for which `_` is appended to include few commonly used macros
+
+#### v0.7.3+v0.28.3
+
+----
+- Core: Append `_` to field names which use c++ reserved keywords
+
 #### v0.7.2+v0.28.3
 
 ----
