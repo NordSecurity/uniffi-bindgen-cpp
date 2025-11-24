@@ -43,7 +43,13 @@ impl CodeType for OptionalCodeType {
 
     fn literal(&self, literal: &Literal, ci: &ComponentInterface) -> String {
         match literal {
-            Literal::None => "std::nullopt".into(),
+            Literal::None => {
+                if OptionalCodeType::can_dereference(&self.inner, ci) {
+                    "nullptr".into()
+                } else {
+                    "std::nullopt".into()
+                }
+            }
             _ => CppCodeOracle.find(&self.inner).literal(literal, ci),
         }
     }

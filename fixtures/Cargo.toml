@@ -25,3 +25,4 @@ uniffi-custom-types-builtin = { path = "custom-types-builtin" }
 uniffi-enum-style-test = { path = "enum-style-test" }
 uniffi-empty-type = { path = "empty-type" }
 uniffi-reserved-field-name = { path = "reserved-field-name" }
+uniffi-type-flattening = { path = "type-flattening" }

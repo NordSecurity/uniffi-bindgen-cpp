@@ -1,3 +1,8 @@
+#### v0.8.1+v0.29.4
+
+----
+- Core: Fix optional compound type flattening not applying to default value assignment
+
 #### v0.8.0+v0.29.4
 
 ----
