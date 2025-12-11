@@ -1,4 +1,4 @@
-{%- let obj = ci|get_object_definition(name) %}
+{%- let obj = ci.get_object_definition(name).unwrap() %}
 {%- let (interface_name, impl_class_name) = obj|object_names %}
 
 {%- let is_error = ci.is_name_used_as_error(name) %}

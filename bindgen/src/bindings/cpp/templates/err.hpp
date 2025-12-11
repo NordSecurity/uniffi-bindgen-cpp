@@ -1,5 +1,6 @@
 {%- let class_name = typ|canonical_name %}
-{%- let ffi_converter_name = typ|ffi_converter_name|class_name %}
+{%- let ffi_converter_name = typ|ffi_converter_name %}
+{%- let ffi_converter_name = ffi_converter_name|class_name %}
 namespace uniffi {
 struct {{ ffi_converter_name }};
 } // namespace uniffi

@@ -1,4 +1,4 @@
-{%- let obj = ci|get_object_definition(name) %}
+{%- let obj = ci.get_object_definition(name).unwrap() %}
 {%- let canonical_type_name = typ|canonical_name %}
 {%- let trait_impl = canonical_type_name|callback_interface_name %}
 

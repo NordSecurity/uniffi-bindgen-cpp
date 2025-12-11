@@ -20,8 +20,7 @@ use filters::CppCodeOracle;
 use serde::{Deserialize, Serialize};
 use topological_sort::{DependencyLink, TopologicalSort};
 use uniffi_bindgen::{
-    backend::TemplateExpression,
-    interface::{AsType, FfiDefinition, Type, UniffiTrait},
+    interface::*,
     ComponentInterface,
 };
 
@@ -41,8 +40,17 @@ impl Default for EnumStyle {
 struct CustomTypesConfig {
     imports: Option<Vec<String>>,
     type_name: Option<String>,
-    into_custom: TemplateExpression,
-    from_custom: TemplateExpression,
+    into_custom: String,
+    from_custom: String,
+}
+
+impl CustomTypesConfig {
+    fn lift(&self, name: &str) -> String {
+        self.into_custom.replace("{}", name)
+    }
+    fn lower(&self, name: &str) -> String {
+        self.from_custom.replace("{}", name)
+    }
 }
 
 #[derive(Clone, Deserialize, Serialize, Debug, Default)]
@@ -158,18 +166,18 @@ impl<'a> CppWrapperHeader<'a> {
     ) -> impl Iterator<Item = Type> {
         let mut definition_topology = self
             .ci
-            .iter_types()
+            .iter_local_types()
             .filter_map(|type_| {
                 // We take into account only the Record and Enum types, as they are the
                 // only types that can have member variables that reference other structures
                 match type_ {
                     Type::Record { name, .. } => self
                         .ci
-                        .get_record_definition(name)
+                        .get_record_definition(name.as_str())
                         .map(|record| (name, record.iter_types())),
                     Type::Enum { name, .. } => self
                         .ci
-                        .get_enum_definition(name)
+                        .get_enum_definition(name.as_str())
                         .map(|enum_| (name, enum_.iter_types())),
                     _ => None,
                 }
@@ -219,7 +227,6 @@ fn type_name(ty: &Type) -> Option<&str> {
         Type::Record { name, .. }
         | Type::Object { name, .. }
         | Type::Enum { name, .. }
-        | Type::External { name, .. }
         | Type::Custom { name, .. } => Some(name),
         _ => None,
     }
@@ -247,7 +254,7 @@ impl<'a> CppWrapper<'a> {
 
     pub(crate) fn initialization_fns(&self) -> Vec<String> {
         self.ci
-            .iter_types()
+            .iter_local_types()
             .map(|t| CppCodeOracle.find(t))
             .filter_map(|ct| ct.initialization_fn())
             .collect()

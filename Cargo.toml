@@ -4,5 +4,5 @@ members = ["bindgen", "fixtures"]
 resolver = "2"
 
 [workspace.dependencies]
-uniffi = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.28.3" }
-uniffi_bindgen = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.28.3", features = ["cargo-metadata"] }
+uniffi = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.29.4" }
+uniffi_bindgen = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.29.4", features = ["cargo-metadata"] }

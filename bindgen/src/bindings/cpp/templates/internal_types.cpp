@@ -1,6 +1,6 @@
 {%- import "macros.cpp" as macros %}
 
-{%- for typ in ci.iter_types() %}
+{%- for typ in ci.iter_local_types() %}
 {%- let type_name = typ|type_name(ci) %}
 {%- let ffi_converter_name = typ|ffi_converter_name %}
 {%- let canonical_type_name = typ|canonical_name %}

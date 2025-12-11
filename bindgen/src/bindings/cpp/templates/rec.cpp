@@ -1,4 +1,4 @@
-{%- let rec = ci|get_record_definition(name) %}
+{%- let rec = ci.get_record_definition(name).unwrap() %}
 {%- let class_name = type_name|class_name %}
 {{ class_name }} {{ ffi_converter_name }}::lift(RustBuffer buf) {
     auto stream = RustStream(&buf);
@@ -28,7 +28,7 @@ RustBuffer {{ ffi_converter_name }}::lower(const {{ class_name }} &val) {
 
 void {{ ffi_converter_name }}::write(RustStream &stream, const {{ class_name }} &val) {
     {%- for field in rec.fields() %}
-    {{ field|write_fn }}(stream, {{ field.as_type()|deref(ci) }}val.{{ field.name()|var_name }});
+    {{ field|write_fn }}(stream, {{ field.as_type()|cpp_deref(ci) }}val.{{ field.name()|var_name }});
     {%- endfor %}
 }
 
@@ -37,7 +37,7 @@ uint64_t {{ ffi_converter_name }}::allocation_size(const {{ class_name }} &val) 
     return 0;
     {% else %}
     return {% for field in rec.fields() %}
-        {{ field|allocation_size_fn}}({{ field.as_type()|deref(ci) }}val.{{ field.name()|var_name() }}){% if !loop.last %} +{% else -%};{%- endif %}
+        {{ field|allocation_size_fn}}({{ field.as_type()|cpp_deref(ci) }}val.{{ field.name()|var_name() }}){% if !loop.last %} +{% else -%};{%- endif %}
     {%- endfor %}
     {% endif %}
 }

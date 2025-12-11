@@ -54,7 +54,7 @@ void {{ ffi_converter_name }}::write(RustStream &stream, const {{ class_name }} 
     {
         auto var = static_cast<const {{ class_name|to_lower_snake_case }}::{{ variant.name() }}&>(val);
         {%- for field in variant.fields() %}
-        {{ field|write_fn }}(stream, {{ field.as_type()|deref(ci) }}var.{% call macros::field_name(field, loop.index) %});
+        {{ field|write_fn }}(stream, {{ field.as_type()|cpp_deref(ci) }}var.{% call macros::field_name(field, loop.index) %});
         {%- endfor %}
         break;
     }
@@ -74,7 +74,7 @@ uint64_t {{ ffi_converter_name }}::allocation_size(const {{ class_name }} &val) 
         auto var = static_cast<const {{ class_name|to_lower_snake_case }}::{{ variant.name() }}&>(val);
         return static_cast<uint64_t>(sizeof(int32_t)
         {%- for field in variant.fields() %}
-            + {{ field|allocation_size_fn }}({{ field.as_type()|deref(ci) }}var.{% call macros::field_name(field, loop.index) %})
+            + {{ field|allocation_size_fn }}({{ field.as_type()|cpp_deref(ci) }}var.{% call macros::field_name(field, loop.index) %})
         {%- endfor %});
     }
     {%- endfor %}
