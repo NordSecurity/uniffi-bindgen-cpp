@@ -1,23 +1,29 @@
 use uniffi_bindgen::{interface::Literal, ComponentInterface};
 
 use crate::bindings::cpp::{
-    gen_cpp::filters::callback_interface_name, gen_cpp::filters::CppCodeOracle, CodeType,
+    gen_cpp::filters::{callback_interface_name, external_namespace_prefix, CppCodeOracle},
+    CodeType,
 };
 
 #[derive(Debug)]
 pub(crate) struct CallbackInterfaceCodeType {
     id: String,
+    module_path: String,
 }
 
 impl CallbackInterfaceCodeType {
-    pub(crate) fn new(id: String) -> Self {
-        Self { id }
+    pub(crate) fn new(id: String, module_path: String) -> Self {
+        Self { id, module_path }
     }
 }
 
 impl CodeType for CallbackInterfaceCodeType {
-    fn type_label(&self, _ci: &ComponentInterface) -> String {
-        format!("std::shared_ptr<{}>", self.canonical_name())
+    fn type_label(&self, ci: &ComponentInterface) -> String {
+        format!(
+            "std::shared_ptr<{}{}>",
+            external_namespace_prefix(ci, &self.module_path),
+            self.canonical_name()
+        )
     }
 
     fn canonical_name(&self) -> String {

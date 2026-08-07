@@ -25,6 +25,17 @@
 {%~ let namespace = ci.namespace() %}
 #include "{{ namespace }}_scaffolding.hpp"
 
+{%- for namespace in self.external_namespaces() %}
+#include "{{ namespace }}.hpp"
+{%- endfor %}
+
+#ifndef UNIFFI_CPP_RUST_STREAM
+#define UNIFFI_CPP_RUST_STREAM
+namespace uniffi {
+{% include "rust_buf_stream.cpp" %}
+}
+#endif
+
 {%- import "macros.cpp" as macros %}
 {% call macros::docstring_value(ci.namespace_docstring(), 0) %}
 namespace {{ namespace }} {
@@ -87,7 +98,11 @@ typedef {{ type_name }} {{ name }};
 {%- endfor %}
 
 namespace uniffi {
-{%- include "rust_buf_stream.cpp" %}
+using ::uniffi::RustStream;
+using ::uniffi::RustStreamBuffer;
+{%- for converter in self.external_ffi_converters() %}
+using {{ converter }};
+{%- endfor %}
 
 RustBuffer rustbuffer_alloc(uint64_t);
 RustBuffer rustbuffer_from_bytes(const ForeignBytes &);

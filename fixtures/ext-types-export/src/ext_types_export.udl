@@ -1,0 +1,38 @@
+[Trait]
+interface Vehicle {
+    i32 year();
+};
+
+namespace ext_types_export {
+    Vehicle to_car();
+};
+
+dictionary Coordinates {
+    i32 x;
+    i32 y;
+};
+
+enum Direction {
+    "North",
+    "South",
+};
+
+[Custom]
+typedef i64 Handle;
+
+interface Counter {
+    constructor();
+    void increment();
+    u32 get();
+};
+
+[Trait, WithForeign]
+interface Greeter {
+    string greet();
+};
+
+[Enum]
+interface Shape {
+    Circle(f64 radius);
+    Rectangle(f64 width, f64 height);
+};

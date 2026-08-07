@@ -1,3 +1,8 @@
+#### v0.9.0+v0.29.4
+
+----
+- Add support for external types
+
 #### v0.8.1+v0.29.4
 
 ----

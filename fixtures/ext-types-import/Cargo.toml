@@ -1,0 +1,15 @@
+[package]
+name = "uniffi-ext-types-import"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["lib", "cdylib"]
+name = "uniffi_ext_types_import"
+
+[dependencies]
+uniffi = { workspace = true }
+uniffi-ext-types-export = { path = "../ext-types-export" }
+
+[build-dependencies]
+uniffi = { workspace = true, features = ["build"] }

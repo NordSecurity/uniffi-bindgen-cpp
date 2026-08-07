@@ -42,7 +42,6 @@ C++20 is required to compile the bindings.
 
 The following uniffi features are unsupported.
 
-* External types
 * Async functions
 
 # Configuration options

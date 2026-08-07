@@ -74,6 +74,20 @@ test_case(error_types_builtin)
 test_case(reserved_field_name)
 test_case(type_flattening)
 
+add_executable(ext_types_import-test
+    tests/ext_types_import/main.cpp
+    ${BINDINGS_SRC_DIR}/ext_types_export.cpp
+    ${BINDINGS_SRC_DIR}/ext_types_import.cpp)
+target_include_directories(ext_types_import-test PRIVATE ${BINDINGS_SRC_DIR} include)
+target_link_directories(ext_types_import-test PRIVATE ${BINDINGS_BUILD_DIR})
+target_link_libraries(ext_types_import-test uniffi_bindgen_cpp_fixtures Threads::Threads ${ADDITIONAL_LIBS})
+add_test(NAME ext_types_import-test COMMAND ext_types_import-test)
+memcheck_test(ext_types_import-test)
+add_dependencies(ext_types_import-test bindings)
+list(APPEND BINDING_FILES
+    ${BINDINGS_SRC_DIR}/ext_types_export.cpp
+    ${BINDINGS_SRC_DIR}/ext_types_import.cpp)
+
 # Special multilib test that only needs to compile to check for potential symbol clashes
 add_executable(multilib-test 
     tests/multilib/main.cpp

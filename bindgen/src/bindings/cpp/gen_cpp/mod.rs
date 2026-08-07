@@ -12,6 +12,7 @@ use std::{
     borrow::Borrow,
     cell::RefCell,
     collections::{BTreeSet, HashMap},
+    format,
 };
 
 use anyhow::{Context, Result};
@@ -19,10 +20,9 @@ use askama::Template;
 use filters::CppCodeOracle;
 use serde::{Deserialize, Serialize};
 use topological_sort::{DependencyLink, TopologicalSort};
-use uniffi_bindgen::{
-    interface::*,
-    ComponentInterface,
-};
+use uniffi_bindgen::{interface::*, ComponentInterface};
+
+use crate::bindings::cpp::gen_cpp::filters::callback_interface_name;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub enum EnumStyle {
@@ -196,7 +196,11 @@ impl<'a> CppWrapperHeader<'a> {
         while !definition_topology.peek_all().is_empty() {
             let list = definition_topology.pop_all();
             for name in list {
-                match self.ci.get_type(&name) {
+                match self.ci.get_type(name) {
+                    // External types are defined in their own namespace's header with their own
+                    // converters declared, which we `#include`. They must not enter the local
+                    // definition ordering, or we'd try to emit a definition we don't have.
+                    Some(type_) if self.ci.is_external(&type_) => {}
                     Some(type_) => sorted.push(type_.clone()),
                     None => {
                         panic!("Type {} not found", name)
@@ -205,16 +209,46 @@ impl<'a> CppWrapperHeader<'a> {
             }
         }
 
-        if definition_topology.len() != 0 {
+        if !definition_topology.is_empty() {
             panic!("Cyclic dependency detected");
         }
 
         let rest = types
+            .filter(|&t| !sorted.contains(t))
             .cloned()
-            .filter(|t| !sorted.contains(t))
             .collect::<BTreeSet<_>>();
 
         sorted.into_iter().chain(rest)
+    }
+
+    pub(crate) fn external_namespaces(&self) -> Vec<String> {
+        self.ci
+            .iter_external_types()
+            .filter_map(|ty| self.ci.namespace_for_type(ty).ok())
+            .filter(|namespace| *namespace != self.ci.namespace())
+            .map(str::to_string)
+            .collect::<std::collections::BTreeSet<_>>()
+            .into_iter()
+            .collect()
+    }
+
+    pub(crate) fn external_ffi_converters(&self) -> Vec<String> {
+        self.ci
+            .iter_external_types()
+            .filter_map(|ty| {
+                let namespace = self.ci.namespace_for_type(ty).ok()?;
+                if namespace == self.ci.namespace() {
+                    return None;
+                }
+                Some(format!(
+                    "{}::uniffi::{}",
+                    namespace,
+                    CppCodeOracle.find(ty).ffi_converter_name()
+                ))
+            })
+            .collect::<std::collections::BTreeSet<_>>()
+            .into_iter()
+            .collect()
     }
 
     pub(crate) fn includes(&self) -> Vec<String> {
@@ -253,11 +287,35 @@ impl<'a> CppWrapper<'a> {
     }
 
     pub(crate) fn initialization_fns(&self) -> Vec<String> {
-        self.ci
+        // Local callback/trait interfaces register their own vtable init.
+        let local_types = self
+            .ci
             .iter_local_types()
             .map(|t| CppCodeOracle.find(t))
-            .filter_map(|ct| ct.initialization_fn())
-            .collect()
+            .filter_map(|ct| ct.initialization_fn());
+
+        // External foreign-implementable callback/trait interfaces' vtable is registered in
+        // the defining namespace, but the consuming namespace must still call its `init()` so Rust
+        // can call back into a foreign implementation passed across
+        let external_types = self
+            .ci
+            .iter_external_types()
+            .filter(|t| match t {
+                Type::Object { imp, .. } => imp.has_callback_interface(),
+                Type::CallbackInterface { .. } => true,
+                _ => false,
+            })
+            .filter_map(|t| {
+                let namespace = self.ci.namespace_for_type(t).ok()?;
+                let canonical = CppCodeOracle.find(t).canonical_name();
+                Some(format!(
+                    "{}::uniffi::{}::init",
+                    namespace,
+                    callback_interface_name(&canonical).ok()?
+                ))
+            });
+
+        local_types.chain(external_types).collect()
     }
 }
 
