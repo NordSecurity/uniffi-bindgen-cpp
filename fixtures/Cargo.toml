@@ -20,9 +20,13 @@ uniffi-fixture-coverall = { git = "https://github.com/mozilla/uniffi-rs.git", ta
 uniffi-fixture-docstring = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.29.4" }
 uniffi-fixture-time = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.29.4" }
 uniffi-fixture-trait-methods = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.29.4" }
+
 uniffi-error-types-builtin = { path = "error-types-builtin" }
 uniffi-custom-types-builtin = { path = "custom-types-builtin" }
 uniffi-enum-style-test = { path = "enum-style-test" }
 uniffi-empty-type = { path = "empty-type" }
 uniffi-reserved-field-name = { path = "reserved-field-name" }
 uniffi-type-flattening = { path = "type-flattening" }
+
+uniffi-ext-types-export = { path = "ext-types-export" }
+uniffi-ext-types-import = { path = "ext-types-import" }

@@ -1,0 +1,48 @@
+[External="uniffi_ext_types_export"]
+typedef dictionary Coordinates;
+
+[External="uniffi_ext_types_export"]
+typedef enum Direction;
+
+[Custom="uniffi_ext_types_export"]
+typedef i64 Handle;
+
+[External="uniffi_ext_types_export"]
+typedef interface Counter;
+
+dictionary Counters {
+    Counter counter;
+    u32 label;
+};
+
+[External="uniffi_ext_types_export"]
+typedef trait_with_foreign Greeter;
+
+[External="uniffi_ext_types_export"]
+typedef enum Shape;
+
+[Enum]
+interface InnerShape {
+    Empty();
+    Hold(Shape shape);
+};
+
+[External="uniffi_ext_types_export"]
+typedef trait Vehicle;
+
+namespace ext_types_import {
+    Coordinates roundtrip_coord(Coordinates c);
+    sequence<Coordinates> roundtrip_coords(sequence<Coordinates> cs);
+    Direction roundtrip_direction(Direction d);
+    Handle roundtrip_handle(Handle h);
+    Counter roundtrip_counter(Counter c);
+    Counters roundtrip_counters(Counters c);
+    string call_greeter(Greeter g);
+    Coordinates? roundtrip_opt_coord(Coordinates? c);
+    Counter? roundtrip_opt_counter(Counter? c);
+    Shape roundtrip_shape(Shape s);
+    InnerShape roundtrip_inner(InnerShape i);
+    record<string, Coordinates> roundtrip_coord_map(record<string, Coordinates> locations);
+    sequence<Counter> roundtrip_counter_list(sequence<Counter> cs);
+    i32 vehicle_year(Vehicle v);
+};

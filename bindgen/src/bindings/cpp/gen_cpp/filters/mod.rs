@@ -187,12 +187,20 @@ impl<T: AsType> AsCodeType for T {
             Type::Bytes => Box::new(primitives::BytesCodeType),
             Type::Timestamp => Box::new(miscellany::TimestampCodeType),
             Type::Duration => Box::new(miscellany::DurationCodeType),
-            Type::Object { name, imp, .. } => Box::new(object::ObjectCodeType::new(name, imp)),
-            Type::Record { name, .. } => Box::new(record::RecordCodeType::new(name)),
-            Type::Enum { name, .. } => Box::new(enum_::EnumCodeType::new(name)),
-            Type::CallbackInterface { name, .. } => {
-                Box::new(callback_interface::CallbackInterfaceCodeType::new(name))
+            Type::Object {
+                name,
+                imp,
+                module_path,
+            } => Box::new(object::ObjectCodeType::new(name, imp, module_path)),
+            Type::Record { name, module_path } => {
+                Box::new(record::RecordCodeType::new(name, module_path))
             }
+            Type::Enum { name, module_path } => {
+                Box::new(enum_::EnumCodeType::new(name, module_path))
+            }
+            Type::CallbackInterface { name, module_path } => Box::new(
+                callback_interface::CallbackInterfaceCodeType::new(name, module_path),
+            ),
             Type::Optional { inner_type } => {
                 Box::new(compounds::OptionalCodeType::new(*inner_type))
             }
@@ -203,7 +211,9 @@ impl<T: AsType> AsCodeType for T {
                 key_type,
                 value_type,
             } => Box::new(compounds::MapCodeType::new(*key_type, *value_type)),
-            Type::Custom { name, .. } => Box::new(custom::CustomCodeType::new(name)),
+            Type::Custom {
+                name, module_path, ..
+            } => Box::new(custom::CustomCodeType::new(name, module_path)),
         }
     }
 }
@@ -214,6 +224,14 @@ pub(crate) fn to_lower_snake_case(s: &str) -> Result<String> {
 
 pub(crate) fn type_name(as_ct: &impl AsCodeType, ci: &ComponentInterface) -> Result<String> {
     Ok(as_ct.as_codetype().type_label(ci))
+}
+
+pub(crate) fn external_namespace_prefix(ci: &ComponentInterface, module_path: &str) -> String {
+    match ci.namespace_for_module_path(module_path) {
+        Ok(namespace) if namespace != ci.namespace() => format!("{namespace}::"),
+        Ok(_) => String::new(),
+        Err(e) => std::panic!("could not resolve external namespace: {e}"),
+    }
 }
 
 pub(crate) fn ffi_converter_name(as_ct: &impl AsCodeType) -> Result<String> {

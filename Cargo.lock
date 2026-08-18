@@ -684,7 +684,7 @@ dependencies = [
 
 [[package]]
 name = "uniffi-bindgen-cpp"
-version = "0.8.1+v0.29.4"
+version = "0.9.0+v0.29.4"
 dependencies = [
  "anyhow",
  "askama",
@@ -716,6 +716,8 @@ dependencies = [
  "uniffi-example-sprites",
  "uniffi-example-todolist",
  "uniffi-example-traits",
+ "uniffi-ext-types-export",
+ "uniffi-ext-types-import",
  "uniffi-fixture-callbacks",
  "uniffi-fixture-coverall",
  "uniffi-fixture-docstring",
@@ -828,6 +830,21 @@ source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.29.4#00cd7e313cf73
 dependencies = [
  "thiserror 1.0.50",
  "uniffi",
+]
+
+[[package]]
+name = "uniffi-ext-types-export"
+version = "0.1.0"
+dependencies = [
+ "uniffi",
+]
+
+[[package]]
+name = "uniffi-ext-types-import"
+version = "0.1.0"
+dependencies = [
+ "uniffi",
+ "uniffi-ext-types-export",
 ]
 
 [[package]]
