@@ -1,7 +1,9 @@
-use askama;
 use heck::{ToShoutySnakeCase, ToSnakeCase, ToUpperCamelCase};
 use uniffi_bindgen::{
-    interface::{Argument, AsType, FfiType, Literal, Object, Type, Variant},
+    interface::{
+        Argument, AsType, DefaultValue, FfiType, Literal, Method, Object, Type, UniffiTraitMethods,
+        Variant,
+    },
     ComponentInterface,
 };
 
@@ -156,13 +158,118 @@ impl CppCodeOracle {
 
     pub(crate) fn object_names(&self, obj: &Object) -> (String, String) {
         let class_name = self.class_name(obj.name());
-        if obj.has_callback_interface() {
+        if obj.is_trait_interface() {
             let impl_name = format!("{class_name}Impl");
             (class_name, impl_name)
         } else {
             (format!("I{class_name}"), class_name)
         }
     }
+}
+
+pub(crate) fn object_bases(obj: &Object, ci: &ComponentInterface) -> Result<String> {
+    let (interface_name, _) = CppCodeOracle.object_names(obj);
+    let mut bases = Vec::new();
+
+    if obj.is_trait_interface() {
+        bases.push(format!("public {interface_name}"));
+    }
+
+    for trait_impl in obj.trait_impls() {
+        if let Type::Object {
+            module_path, name, ..
+        } = &trait_impl.trait_ty
+        {
+            bases.push(format!(
+                "public {}{}",
+                external_namespace_prefix(ci, module_path),
+                CppCodeOracle.class_name(name)
+            ));
+        }
+    }
+
+    if ci.is_name_used_as_error(obj.name()) {
+        bases.push("public std::exception".to_string());
+    }
+
+    let result = if bases.is_empty() {
+        String::new()
+    } else {
+        format!(" : {}", bases.join(", "))
+    };
+
+    Ok(result)
+}
+
+pub(crate) struct UniffiTraitMethodInfo<'a> {
+    pub name: &'static str,
+    pub doc: &'static str,
+    pub return_type: Type,
+    pub takes_other: bool,
+    pub method: &'a Method,
+}
+
+pub(crate) fn uniffi_trait_list(
+    traits: &UniffiTraitMethods,
+) -> Result<Vec<UniffiTraitMethodInfo<'_>>> {
+    let entries = [
+        (
+            &traits.display_fmt,
+            "to_string",
+            "Returns a string representation, internally calls Rust's `Display` trait.",
+            Type::String,
+            false,
+        ),
+        (
+            &traits.debug_fmt,
+            "to_debug_string",
+            "Returns a debug representation, internally calls Rust's `Debug` trait.",
+            Type::String,
+            false,
+        ),
+        (
+            &traits.eq_eq,
+            "eq",
+            "Equality check, internally calls Rust's `Eq` trait.",
+            Type::Boolean,
+            true,
+        ),
+        (
+            &traits.eq_ne,
+            "ne",
+            "Inequality check, internally calls Rust's `Eq` trait.",
+            Type::Boolean,
+            true,
+        ),
+        (
+            &traits.hash_hash,
+            "hash",
+            "Returns a hash of the value, internally calls Rust's `Hash` trait.",
+            Type::UInt64,
+            false,
+        ),
+        (
+            &traits.ord_cmp,
+            "cmp",
+            "Comparison, internally calls Rust's `Ord` trait. Returns `Ordering` indicating \
+             less (-1), equal (0) or greater (1).",
+            Type::Int8,
+            true,
+        ),
+    ];
+
+    Ok(entries
+        .into_iter()
+        .filter_map(|(method, name, doc, return_type, takes_other)| {
+            method.as_ref().map(|method| UniffiTraitMethodInfo {
+                name,
+                doc,
+                return_type,
+                takes_other,
+                method,
+            })
+        })
+        .collect())
 }
 
 pub(crate) trait AsCodeType {
@@ -212,8 +319,10 @@ impl<T: AsType> AsCodeType for T {
                 value_type,
             } => Box::new(compounds::MapCodeType::new(*key_type, *value_type)),
             Type::Custom {
-                name, module_path, ..
-            } => Box::new(custom::CustomCodeType::new(name, module_path)),
+                name,
+                module_path,
+                builtin,
+            } => Box::new(custom::CustomCodeType::new(name, module_path, *builtin)),
         }
     }
 }
@@ -241,11 +350,19 @@ pub(crate) fn ffi_converter_name(as_ct: &impl AsCodeType) -> Result<String> {
 pub(crate) fn ffi_error_converter_name(as_type: &impl AsType) -> Result<String> {
     let mut name = ffi_converter_name(as_type)?;
 
-    if matches!(&as_type.as_type(), Type::Object { .. }) {
+    if is_object_at_root(&as_type.as_type()) {
         name.push_str("__as_error");
     }
 
     Ok(name)
+}
+
+fn is_object_at_root(type_: &Type) -> bool {
+    match type_ {
+        Type::Object { .. } => true,
+        Type::Custom { builtin, .. } => is_object_at_root(builtin),
+        _ => false,
+    }
 }
 
 pub(crate) fn ffi_struct_name(nm: &str) -> Result<String> {
@@ -272,19 +389,23 @@ pub(crate) fn object_names(obj: &Object) -> Result<(String, String)> {
     Ok(CppCodeOracle.object_names(obj))
 }
 
-pub(crate) fn literal_cpp(
-    literal: &Literal,
-    as_ct: &impl AsCodeType,
+pub(crate) fn default_cpp(
+    default: &DefaultValue,
+    as_type: &impl AsType,
     enum_style: &EnumStyle,
     ci: &ComponentInterface,
 ) -> Result<String> {
-    match literal {
-        Literal::Enum(name, _) => Ok(format!(
+    match default {
+        DefaultValue::Literal(Literal::Enum(name, _)) => Ok(format!(
             "{}::{}",
-            as_ct.as_codetype().type_label(ci),
-            CppCodeOracle.enum_variant_name(&name, enum_style),
+            as_type.as_codetype().type_label(ci),
+            CppCodeOracle.enum_variant_name(name, enum_style),
         )),
-        _ => Ok(as_ct.as_codetype().literal(literal, ci)),
+        DefaultValue::Literal(Literal::Some { inner }) => match as_type.as_type() {
+            Type::Optional { inner_type } => default_cpp(inner, &inner_type, enum_style, ci),
+            _ => Ok(as_type.as_codetype().default(default, ci)),
+        },
+        _ => Ok(as_type.as_codetype().default(default, ci)),
     }
 }
 
@@ -339,7 +460,7 @@ pub(crate) fn ffi_type_name(ffi_type: &FfiType) -> Result<String> {
         FfiType::Int64 => "int64_t".into(),
         FfiType::Float32 => "float".into(),
         FfiType::Float64 => "double".into(),
-        FfiType::RustArcPtr(_) | FfiType::VoidPointer => "void *".into(),
+        FfiType::VoidPointer => "void *".into(),
         FfiType::RustBuffer(_) => "RustBuffer".into(),
         FfiType::ForeignBytes => "ForeignBytes".into(),
         FfiType::Callback(_) => "void *".into(),
@@ -380,9 +501,11 @@ pub(crate) fn by_ref(ci: &ComponentInterface, arg: &Argument) -> bool {
 }
 
 pub(crate) fn parameter(arg: &Argument, ci: &ComponentInterface) -> Result<String> {
+    let arg_name = CppCodeOracle.var_name(arg.name());
+
     Ok(match by_ref(ci, arg) {
-        true => format!("const {} &{}", arg.as_codetype().type_label(ci), arg.name()),
-        false => format!("{} {}", arg.as_codetype().type_label(ci), arg.name()),
+        true => format!("const {} &{}", arg.as_codetype().type_label(ci), arg_name),
+        false => format!("{} {}", arg.as_codetype().type_label(ci), arg_name),
     })
 }
 

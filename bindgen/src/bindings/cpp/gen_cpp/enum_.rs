@@ -1,4 +1,7 @@
-use uniffi_bindgen::{backend::Literal, ComponentInterface};
+use uniffi_bindgen::{
+    interface::{DefaultValue, Literal},
+    ComponentInterface,
+};
 
 use crate::bindings::cpp::{
     gen_cpp::filters::external_namespace_prefix, gen_cpp::filters::CppCodeOracle, CodeType,
@@ -38,5 +41,16 @@ impl CodeType for EnumCodeType {
 
     fn literal(&self, _: &Literal, _ci: &ComponentInterface) -> String {
         unreachable!();
+    }
+
+    fn default(&self, default: &DefaultValue, ci: &ComponentInterface) -> String {
+        match default {
+            DefaultValue::Literal(literal) => self.literal(literal, ci),
+            // Variants are numbered from 1, so a value-initialised enum holds 0
+            DefaultValue::Default => unimplemented!(
+                "`#[uniffi(default)]` without a literal is not supported for enum {}",
+                self.type_label(ci)
+            ),
+        }
     }
 }

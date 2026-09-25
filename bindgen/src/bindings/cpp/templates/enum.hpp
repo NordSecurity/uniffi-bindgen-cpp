@@ -10,6 +10,8 @@ enum class {{ type_name }}: int32_t {
     {%- endif %}
     {%- endfor %}
 };
+{%- call macros::method_free_decls(e.methods(), type_name) %}
+{%- call macros::uniffi_trait_free_decls(e.uniffi_trait_methods(), type_name) %}
 {%- else %}
 namespace uniffi {
 struct {{ ffi_converter_name }};
@@ -24,9 +26,9 @@ struct {{ type_name }} {
     struct {{ variant|variant_name(config.enum_style) }} {
         {%- for field in variant.fields() %}
         {%- call macros::docstring(field, 8) %}
-        {{ field|type_name(ci) }} {{ field.name()|var_name }}
+        {{ field|type_name(ci) }} {% call macros::field_name(field, loop.index) %}
         {%- match field.default_value() %}
-        {%- when Some with (literal) %} = {{ literal|literal_cpp(field, config.enum_style, ci) }};{%- else -%};
+        {%- when Some with (default) %} = {{ default|default_cpp(field, config.enum_style, ci) }};{%- else -%};
         {%- endmatch %}
         {%- endfor %}
     };
@@ -55,6 +57,8 @@ struct {{ type_name }} {
     const std::variant<{% for variant in e.variants() %}{{ variant|variant_name(config.enum_style) }}{% if !loop.last %}, {% endif %}{% endfor %}> &get_variant() const {
         return variant;
     }
+    {%- call macros::method_decls(e.methods(), "", " const") %}
+    {%- call macros::uniffi_trait_decls(e.uniffi_trait_methods(), type_name) %}
 
 private:
     std::variant<{% for variant in e.variants() %}{{ variant|variant_name(config.enum_style) }}{% if !loop.last %}, {% endif %}{% endfor %}> variant;

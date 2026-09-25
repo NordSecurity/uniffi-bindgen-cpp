@@ -35,7 +35,7 @@ RustBuffer {{ class_name }}::lower(const {{ type_name }} &val) {
 void {{ class_name }}::write(RustStream &stream, const {{ type_name }} &val) {
     stream << static_cast<int32_t>(val.size());
 
-    for (auto &elem : val) {
+    for (const auto &elem : val) {
         {{ inner_type|write_fn }}(stream, {{ inner_type.as_type()|cpp_deref(ci) }}elem);
     }
 }
@@ -43,7 +43,7 @@ void {{ class_name }}::write(RustStream &stream, const {{ type_name }} &val) {
 uint64_t {{ class_name }}::allocation_size(const {{ type_name }} &val) {
     uint64_t size = sizeof(int32_t);
 
-    for (auto &elem : val) {
+    for (const auto &elem : val) {
         size += {{ inner_type|allocation_size_fn }}({{inner_type.as_type()|cpp_deref(ci) }}elem);
     }
 

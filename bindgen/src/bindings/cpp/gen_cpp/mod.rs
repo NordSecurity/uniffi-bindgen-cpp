@@ -20,20 +20,15 @@ use askama::Template;
 use filters::CppCodeOracle;
 use serde::{Deserialize, Serialize};
 use topological_sort::{DependencyLink, TopologicalSort};
-use uniffi_bindgen::{interface::*, ComponentInterface};
+use uniffi_bindgen::{interface::*, Component, ComponentInterface};
 
 use crate::bindings::cpp::gen_cpp::filters::callback_interface_name;
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Default)]
 pub enum EnumStyle {
     Capitalized,
+    #[default]
     Google,
-}
-
-impl Default for EnumStyle {
-    fn default() -> Self {
-        EnumStyle::Google
-    }
 }
 
 #[derive(Clone, Deserialize, Serialize, Debug, Default)]
@@ -59,6 +54,27 @@ pub(crate) struct Config {
     custom_types: HashMap<String, CustomTypesConfig>,
     #[serde(default)]
     enum_style: EnumStyle,
+    #[serde(default)]
+    rename: toml::Table,
+}
+
+pub(crate) fn apply_renames(components: &mut [Component<Config>]) {
+    let renames: HashMap<String, toml::Table> = components
+        .iter()
+        .filter(|component| !component.config.rename.is_empty())
+        .map(|component| {
+            (
+                component.ci.crate_name().to_string(),
+                component.config.rename.clone(),
+            )
+        })
+        .collect();
+
+    if !renames.is_empty() {
+        for component in components.iter_mut() {
+            rename(&mut component.ci, &renames);
+        }
+    }
 }
 
 #[derive(Clone, Deserialize, Serialize, Debug, Default)]
@@ -109,7 +125,7 @@ impl<'a> ScaffoldingHeader<'a> {
     pub fn scaffolding_definitions(&self) -> impl Iterator<Item = FfiDefinition> + '_ {
         self.ci
             .callback_interface_definitions()
-            .into_iter()
+            .iter()
             .map(|cb| cb.vtable_definition())
             .chain(
                 self.ci
@@ -168,22 +184,57 @@ impl<'a> CppWrapperHeader<'a> {
             .ci
             .iter_local_types()
             .filter_map(|type_| {
-                // We take into account only the Record and Enum types, as they are the
-                // only types that can have member variables that reference other structures
+                // Records and Enums are ordered by their field types, as those are embedded by
+                // value. Only field types matter. A signature only needs a forward
+                // declaration, which we always emit, so including them would make a method
+                // returning its own type look like a cycle.
+                //
+                // Objects are ordered by the traits they implement. Those become base classes,
+                // and a base class has to be complete since a forward declaration is not enough
+                // for inheritance.
                 match type_ {
-                    Type::Record { name, .. } => self
-                        .ci
-                        .get_record_definition(name.as_str())
-                        .map(|record| (name, record.iter_types())),
-                    Type::Enum { name, .. } => self
-                        .ci
-                        .get_enum_definition(name.as_str())
-                        .map(|enum_| (name, enum_.iter_types())),
+                    Type::Record { name, .. } => {
+                        self.ci.get_record_definition(name.as_str()).map(|record| {
+                            (
+                                name,
+                                record
+                                    .fields()
+                                    .iter()
+                                    .flat_map(Field::iter_types)
+                                    .collect::<Vec<_>>(),
+                            )
+                        })
+                    }
+                    Type::Enum { name, .. } => {
+                        self.ci.get_enum_definition(name.as_str()).map(|enum_| {
+                            (
+                                name,
+                                enum_
+                                    .variants()
+                                    .iter()
+                                    .flat_map(Variant::iter_types)
+                                    .collect::<Vec<_>>(),
+                            )
+                        })
+                    }
+                    Type::Object { name, .. } => {
+                        self.ci.get_object_definition(name).map(|object| {
+                            (
+                                name,
+                                object
+                                    .trait_impls()
+                                    .iter()
+                                    .map(|trait_impl| &trait_impl.trait_ty)
+                                    .collect::<Vec<_>>(),
+                            )
+                        })
+                    }
                     _ => None,
                 }
             })
             .flat_map(|(name, types)| {
                 types
+                    .into_iter()
                     .filter_map(type_name)
                     .map(|field_name| DependencyLink {
                         prec: field_name,
@@ -192,19 +243,21 @@ impl<'a> CppWrapperHeader<'a> {
             })
             .collect::<TopologicalSort<_>>();
 
+        let local_types: HashMap<&str, &Type> = self
+            .ci
+            .iter_local_types()
+            .filter_map(|type_| type_name(type_).map(|name| (name, type_)))
+            .collect();
+
         let mut sorted: Vec<Type> = Vec::new();
         while !definition_topology.peek_all().is_empty() {
             let list = definition_topology.pop_all();
             for name in list {
-                match self.ci.get_type(name) {
-                    // External types are defined in their own namespace's header with their own
-                    // converters declared, which we `#include`. They must not enter the local
-                    // definition ordering, or we'd try to emit a definition we don't have.
-                    Some(type_) if self.ci.is_external(&type_) => {}
-                    Some(type_) => sorted.push(type_.clone()),
-                    None => {
-                        panic!("Type {} not found", name)
-                    }
+                // External types are defined in their own namespace's header with their own
+                // converters declared, which we `#include`. They must not enter the local
+                // definition ordering, or we'd try to emit a definition we don't have.
+                if let Some(type_) = local_types.get(name) {
+                    sorted.push((*type_).clone());
                 }
             }
         }

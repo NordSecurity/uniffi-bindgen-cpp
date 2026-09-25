@@ -31,6 +31,33 @@ uniffi-bindgen-cpp path/to/definitions.udl --config path/to/uniffi.toml
         will be expanded into variable containing the custom value. The expression is used in a
         return statement, i.e. `return <expression(value);>`.
 
+- `rename` - C++ names for items that keep a different name in Rust. Nested items are addressed
+    with dot notation.
+
+    ```toml
+    [bindings.cpp.rename]
+    # Types
+    RustRecord = "CppRecord"
+
+    # Fields, variants, methods and their arguments
+    "RustRecord.rust_field" = "cpp_field"
+    "RustEnum.RustVariant" = "CppVariant"
+    "RustObject.rust_method" = "cpp_method"
+    "RustObject.rust_method.rust_arg" = "cpp_arg"
+
+    # Free functions and their arguments
+    rust_function = "cpp_function"
+    "rust_function.rust_arg" = "cpp_arg"
+    ```
+
+    Renames are applied before the usual naming conventions, so a renamed enum variant still
+    picks up `enum_style`, and a rename into a C++ keyword still gets `_` appended.
+
+    A crate can only rename its own items, not types it imports from another crate. To rename an
+    item for every language rather than just C++, rename it in the Rust source instead, with
+    `#[uniffi(name = "...")]` on types, fields and variants, or `#[uniffi::export(name = "...")]`
+    on functions and methods.
+
 - `enum_style` - style for enum variant naming, possible options are:
   - `"Capitalized"` - producing enum variants named `ENUM_VARIANT`
   - `"Google"` - producing enum variants name `kEnumVariant` (default)

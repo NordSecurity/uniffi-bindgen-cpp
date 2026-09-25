@@ -5,7 +5,8 @@ use std::{fmt::Debug, fs};
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use uniffi_bindgen::{
-    backend::Literal, BindingGenerator, Component, ComponentInterface, GenerationSettings,
+    interface::DefaultValue, interface::Literal, BindingGenerator, Component, ComponentInterface,
+    GenerationSettings,
 };
 
 use self::gen_cpp::{generate_cpp_bindings, Bindings};
@@ -51,6 +52,24 @@ pub trait CodeType: Debug {
         unimplemented!("Unimplemented for {}", self.type_label(ci))
     }
 
+    /// Whether `T()` is the right way to construct this type with no arguments.
+    fn default_is_value_init(&self) -> bool {
+        false
+    }
+
+    fn default(&self, default: &DefaultValue, ci: &ComponentInterface) -> String {
+        match default {
+            DefaultValue::Literal(literal) => self.literal(literal, ci),
+            DefaultValue::Default if self.default_is_value_init() => {
+                format!("{}()", self.type_label(ci))
+            }
+            DefaultValue::Default => unimplemented!(
+                "`#[uniffi(default)]` without a literal is not supported for {}",
+                self.type_label(ci)
+            ),
+        }
+    }
+
     /// Name of the FfiConverter
     fn ffi_converter_name(&self) -> String {
         format!("FfiConverter{}", self.canonical_name())
@@ -82,9 +101,10 @@ impl BindingGenerator for CppBindingGenerator {
     fn update_component_configs(
         &self,
         _settings: &GenerationSettings,
-        _components: &mut Vec<uniffi_bindgen::Component<Self::Config>>,
+        components: &mut Vec<uniffi_bindgen::Component<Self::Config>>,
     ) -> Result<()> {
-        return Ok(());
+        gen_cpp::apply_renames(components);
+        Ok(())
     }
 
     fn write_bindings(
@@ -107,7 +127,7 @@ impl BindingGenerator for CppBindingGenerator {
                     scaffolding_header,
                     header,
                     source,
-                } = generate_cpp_bindings(&ci, &config)?;
+                } = generate_cpp_bindings(ci, config)?;
 
                 let scaffolding_header_path = settings
                     .out_dir

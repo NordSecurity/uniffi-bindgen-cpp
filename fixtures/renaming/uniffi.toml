@@ -1,0 +1,15 @@
+[bindings.cpp.rename]
+RustRecord = "CppRecord"
+RustEnum = "CppEnum"
+RustObject = "CppObject"
+
+"RustRecord.rust_field" = "cpp_field"
+"RustEnum.RustVariant" = "CppVariant"
+"RustEnum.RustVariant.rust_variant_field" = "cpp_variant_field"
+"RustObject.rust_method" = "cpp_method"
+"RustObject.rust_method.rust_arg" = "cpp_arg"
+
+rust_function = "cpp_function"
+"rust_function.rust_arg" = "cpp_arg"
+
+"needs_escaping.value" = "class"
