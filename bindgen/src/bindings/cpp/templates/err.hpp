@@ -18,6 +18,9 @@ struct {{ class_name }}: std::runtime_error {
         throw *this;
     }
 
+    {% call macros::method_decls(e.methods(), "", " const") %}
+    {%- call macros::uniffi_trait_decls(e.uniffi_trait_methods(), class_name) %}
+
 protected:
     virtual int32_t get_variant_idx() const {
         return 0;
@@ -35,7 +38,7 @@ struct {{ variant.name()|class_name }}: {{ class_name }} {
     {%- for field in variant.fields() %}
     {{ field|type_name(ci) }} {% call macros::field_name(field, loop.index) %}
     {%- match field.default_value() %}
-    {% when Some with (literal) %} = {{ literal|literal_cpp(field, config.enum_style, ci) }};{% else %};
+    {% when Some with (default) %} = {{ default|default_cpp(field, config.enum_style, ci) }};{% else %};
     {%- endmatch %}
     {%- endfor %}
 

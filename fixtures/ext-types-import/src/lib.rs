@@ -70,4 +70,22 @@ pub fn vehicle_year(v: Arc<dyn Vehicle>) -> i32 {
     v.year()
 }
 
+#[derive(uniffi::Object)]
+pub struct LocalGreeter;
+
+#[uniffi::export]
+impl LocalGreeter {
+    #[uniffi::constructor]
+    pub fn new() -> Self {
+        LocalGreeter
+    }
+}
+
+#[uniffi::export]
+impl Greeter for LocalGreeter {
+    fn greet(&self) -> String {
+        "local".to_string()
+    }
+}
+
 uniffi::include_scaffolding!("ext_types_import");

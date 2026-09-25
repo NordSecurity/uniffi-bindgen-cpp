@@ -1,4 +1,4 @@
-use uniffi_bindgen::{backend::Literal, ComponentInterface};
+use uniffi_bindgen::{interface::Literal, ComponentInterface};
 
 use crate::bindings::cpp::{
     gen_cpp::filters::external_namespace_prefix, gen_cpp::filters::CppCodeOracle, CodeType,
@@ -31,5 +31,10 @@ impl CodeType for RecordCodeType {
 
     fn literal(&self, _literal: &Literal, _ci: &ComponentInterface) -> String {
         unreachable!();
+    }
+
+    fn default_is_value_init(&self) -> bool {
+        // `T()` initialises with each field's own default initialiser.
+        true
     }
 }

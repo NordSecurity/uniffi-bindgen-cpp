@@ -7,19 +7,22 @@ edition = "2021"
 crate-type = ["cdylib", "lib", "staticlib"]
 
 [dependencies]
-uniffi-example-arithmetic = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.29.4" }
-uniffi-example-callbacks = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.29.4" }
-uniffi-example-custom-types = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.29.4" }
-uniffi-example-geometry = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.29.4" }
-uniffi-example-rondpoint = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.29.4" }
-uniffi-example-sprites = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.29.4" }
-uniffi-example-todolist = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.29.4" }
-uniffi-example-traits = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.29.4" }
-uniffi-fixture-callbacks = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.29.4" }
-uniffi-fixture-coverall = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.29.4" }
-uniffi-fixture-docstring = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.29.4" }
-uniffi-fixture-time = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.29.4" }
-uniffi-fixture-trait-methods = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.29.4" }
+uniffi-example-arithmetic = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.31.0" }
+uniffi-example-callbacks = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.31.0" }
+uniffi-example-custom-types = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.31.0" }
+uniffi-example-geometry = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.31.0" }
+uniffi-example-rondpoint = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.31.0" }
+uniffi-example-sprites = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.31.0" }
+uniffi-example-todolist = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.31.0" }
+uniffi-example-traits = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.31.0" }
+uniffi-fixture-callbacks = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.31.0" }
+# Vendored at fixtures/coverall rather than taken from git: the upstream fixture exports an
+# `async fn` as of v0.30.0, which the C++ bindgen cannot generate. See that crate's Cargo.toml.
+uniffi-fixture-coverall = { path = "coverall" }
+uniffi-fixture-docstring = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.31.0" }
+uniffi-fixture-proc-macro = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.31.0" }
+uniffi-fixture-time = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.31.0" }
+uniffi-fixture-trait-methods = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.31.0" }
 
 uniffi-error-types-builtin = { path = "error-types-builtin" }
 uniffi-custom-types-builtin = { path = "custom-types-builtin" }
@@ -27,6 +30,8 @@ uniffi-enum-style-test = { path = "enum-style-test" }
 uniffi-empty-type = { path = "empty-type" }
 uniffi-reserved-field-name = { path = "reserved-field-name" }
 uniffi-type-flattening = { path = "type-flattening" }
+uniffi-record-enum-methods = { path = "record-enum-methods" }
+uniffi-renaming = { path = "renaming" }
 
 uniffi-ext-types-export = { path = "ext-types-export" }
 uniffi-ext-types-import = { path = "ext-types-import" }

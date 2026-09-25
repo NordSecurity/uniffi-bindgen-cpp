@@ -10,6 +10,27 @@
 {%- match typ %}
 {%- when Type::Object { module_path, name, imp } %}
 {% include "obj.cpp" %}
+{%- when Type::Record { module_path, name } %}
+{%- let rec = ci.get_record_definition(name).unwrap() %}
+{%- let self_expr = format!("uniffi::{}::lower(*this)", ffi_converter_name) %}
+{% call macros::method_defs(rec.methods(), type_name, self_expr, " const") %}
+{% call macros::uniffi_trait_defs(rec.uniffi_trait_methods(), type_name, type_name, self_expr) %}
+{%- when Type::Enum { module_path, name } %}
+{%- let e = ci.get_enum_definition(name).unwrap() %}
+{%- if ci.is_name_used_as_error(name) %}
+{%- let class_name = typ|canonical_name %}
+{%- let self_expr = format!("uniffi::{}::lower(*this)", ffi_converter_name) %}
+{% call macros::method_defs(e.methods(), class_name, self_expr, " const") %}
+{% call macros::uniffi_trait_defs(e.uniffi_trait_methods(), class_name, class_name, self_expr) %}
+{%- else if e.is_flat() %}
+{%- let self_expr = format!("uniffi::{}::lower(value)", ffi_converter_name) %}
+{% call macros::method_free_defs(e.methods(), type_name, self_expr) %}
+{% call macros::uniffi_trait_free_defs(e.uniffi_trait_methods(), type_name, self_expr) %}
+{%- else %}
+{%- let self_expr = format!("uniffi::{}::lower(*this)", ffi_converter_name) %}
+{% call macros::method_defs(e.methods(), type_name, self_expr, " const") %}
+{% call macros::uniffi_trait_defs(e.uniffi_trait_methods(), type_name, type_name, self_expr) %}
+{%- endif %}
 {%- else %}
 {%- endmatch %}
 {% endfor ~%}

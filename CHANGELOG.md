@@ -1,3 +1,27 @@
+#### v0.10.0+v0.31.0
+
+----
+- Core: Update bindgen to UniFFI v0.31.0. Minimum Rust version is now `1.87`
+- Core: **BREAKING** Interfaces cross the FFI as a `uint64_t` handle instead of a `void *`
+- Core: **BREAKING** Trait interfaces declared without `WithForeign` now generate an abstract
+  base class `<Name>` and a concrete `<Name>Impl`
+- Core: **BREAKING** Passing a Rust-implemented trait object back to Rust now clones its
+  handle, so the reference count on the Rust side is one higher than before
+- Core: Add methods on records and enums
+- Core: Add uniffi traits (`Display`, `Debug`, `Eq`, `Hash`, `Ord`) on records, enums and errors
+- Core: Enums whose variants have no fields are generated as a C++ `enum class`, which cannot
+  have member functions, so their methods and uniffi traits become free functions
+- Core: Add support for objects implementing external traits
+- Core: Add support for custom types used as error types
+- Core: Add renaming through the `uniffi.toml` file
+- Core: Add `#[uniffi(default)]` without a literal, for primitives, `String`, `Bytes`,
+  optionals, sequences, maps, records, custom types, and objects with a constructor that
+  takes no arguments
+- Core: Fix cases that aborted generation or produced invalid C++: optional fields with a
+  non-null default, enum variants with unnamed fields, arguments named with C++ keywords,
+  methods returning their own type, and error types passed as arguments or returned from a
+  callback interface.
+
 #### v0.9.0+v0.29.4
 
 ----
