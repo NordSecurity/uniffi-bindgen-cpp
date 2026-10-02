@@ -2,6 +2,17 @@
 
 #include <error_types_builtin.hpp>
 
+// A C++ implementation of a trait whose method returns an error type. Rust calls back into
+// this, and the generated vtable lowers the returned value, which is a `shared_ptr` here
+// while the converter takes a `const &`.
+struct Producer : error_types_builtin::ErrorProducer {
+    std::shared_ptr<error_types_builtin::TupleError> produce() override {
+        auto value = std::make_shared<error_types_builtin::tuple_error::Value>();
+        value->v1 = 7;
+        return value;
+    }
+};
+
 int main() {
     try {
         error_types_builtin::oops();
@@ -180,6 +191,39 @@ int main() {
     } catch (...) {
         ASSERT_TRUE(false);
     }
+
+    try {
+        error_types_builtin::oops_tuple(1);
+        ASSERT_TRUE(false);
+    } catch(error_types_builtin::TupleError& e) {
+        ASSERT_EQ("value: 1", e.describe());
+    } catch(...) {
+        ASSERT_TRUE(false);
+    }
+    
+
+    try {
+        error_types_builtin::oops_custom(7);
+        ASSERT_TRUE(false);
+    } catch (error_types_builtin::TupleError& e) {
+        auto subtype = dynamic_cast<error_types_builtin::tuple_error::Value*>(&e);
+        ASSERT_TRUE(subtype != nullptr);
+        ASSERT_EQ(subtype->v1, 7);
+    } catch (...) {
+        ASSERT_TRUE(false);
+    }
+
+    try {
+        error_types_builtin::oops_custom_object();
+        ASSERT_TRUE(false);
+    } catch (error_types_builtin::ErrorInterface& e) {
+        ASSERT_EQ(std::vector<std::string> {"custom-object-oops"}, e.chain());
+    } catch (...) {
+        ASSERT_TRUE(false);
+    }
+
+    auto produced = error_types_builtin::describe_produced(std::make_shared<Producer>());
+    ASSERT_EQ("value: 7", produced);
 
     return 0;
 }

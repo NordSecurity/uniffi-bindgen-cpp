@@ -14,11 +14,11 @@ namespace uniffi {
 {%- endif %}
 
 
-{{ impl_class_name }}::{{ impl_class_name }}(void *ptr): instance(ptr) {}
+{{ impl_class_name }}::{{ impl_class_name }}(uint64_t ptr): instance(ptr) {}
 
-{{ impl_class_name }}::{{ impl_class_name }}(const {{ impl_class_name }} &other) : instance(nullptr) {
+{{ impl_class_name }}::{{ impl_class_name }}(const {{ impl_class_name }} &other) : instance(0) {
     if (other.instance) {
-        instance = other._uniffi_internal_clone_pointer();
+        instance = other._uniffi_internal_clone_handle();
     }
 }
 
@@ -44,18 +44,7 @@ namespace uniffi {
 }
 {% endfor %}
 
-{%- for method in obj.methods() %}
-{% match method.return_type() %}{% when Some with (return_type) %}{{ return_type|type_name(ci) }} {% else %}void {% endmatch -%}
-{{ impl_class_name }}::{{ method.name()|fn_name }}({% call macros::param_list(method) %}) {
-    auto ptr = this->_uniffi_internal_clone_pointer();
-    {%- match method.return_type() %}
-    {% when Some with (return_type) %}
-    return uniffi::{{ return_type|lift_fn }}({% call macros::rust_call_with_prefix("ptr", method) %});
-    {%- else %}
-    {% call macros::rust_call_with_prefix("ptr", method) -%};
-    {%- endmatch %}
-}
-{%- endfor %}
+{% call macros::method_defs(obj.methods(), impl_class_name, "this->_uniffi_internal_clone_handle()", "") %}
 
 {{ impl_class_name }}::~{{ impl_class_name }}() {
     uniffi::rust_call(
@@ -65,7 +54,7 @@ namespace uniffi {
     );
 }
 
-void *{{ impl_class_name }}::_uniffi_internal_clone_pointer() const {
+uint64_t {{ impl_class_name }}::_uniffi_internal_clone_handle() const {
     return uniffi::rust_call(
         {{ obj.ffi_object_clone().name() }},
         nullptr,
@@ -73,26 +62,4 @@ void *{{ impl_class_name }}::_uniffi_internal_clone_pointer() const {
     );
 }
 
-{%- for method in obj.uniffi_traits() %}
-{% match method %}
-{% when UniffiTrait::Display { fmt } %}
-std::string {{ impl_class_name }}::to_string() const {
-    return uniffi::{{ Type::String.borrow()|lift_fn }}({% call macros::rust_call_with_prefix("this->_uniffi_internal_clone_pointer()", fmt) %});
-}
-{% when UniffiTrait::Debug { fmt } %}
-std::string {{ impl_class_name }}::to_debug_string() const {
-    return uniffi::{{ Type::String.borrow()|lift_fn }}({% call macros::rust_call_with_prefix("this->_uniffi_internal_clone_pointer()", fmt) %});
-}
-{% when UniffiTrait::Eq { eq, ne } %}
-bool {{ impl_class_name }}::eq(const {{ type_name }} &other) const {
-    return uniffi::{{ Type::Boolean.borrow()|lift_fn }}({% call macros::rust_call_with_prefix("this->_uniffi_internal_clone_pointer()", eq) %});
-}
-bool {{ impl_class_name }}::ne(const {{ type_name }} &other) const {
-    return uniffi::{{ Type::Boolean.borrow()|lift_fn }}({% call macros::rust_call_with_prefix("this->_uniffi_internal_clone_pointer()", ne) %});
-}
-{% when UniffiTrait::Hash { hash } %}
-uint64_t {{ impl_class_name }}::hash() const {
-    return uniffi::{{ Type::UInt64.borrow()|lift_fn }}({% call macros::rust_call_with_prefix("this->_uniffi_internal_clone_pointer()", hash) %});
-}
-{% endmatch %}
-{%- endfor %}
+{% call macros::uniffi_trait_defs(obj.uniffi_trait_methods(), impl_class_name, type_name, "this->_uniffi_internal_clone_handle()") %}

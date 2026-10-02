@@ -32,6 +32,8 @@ impl Counter {
         self.value.load(std::sync::atomic::Ordering::SeqCst)
     }
 }
+
+#[uniffi::trait_interface]
 pub trait Greeter: Send + Sync {
     fn greet(&self) -> String;
 }
@@ -41,6 +43,7 @@ pub enum Shape {
     Rectangle { width: f64, height: f64 },
 }
 
+#[uniffi::trait_interface]
 pub trait Vehicle: Send + Sync {
     fn year(&self) -> i32;
 }

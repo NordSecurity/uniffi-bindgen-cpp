@@ -13,4 +13,7 @@ struct {{ typ|ffi_converter_name }} {
 {%- endmatch %}
 {%- else -%}
 typedef struct {{ builtin|ffi_converter_name }} {{ typ|ffi_converter_name }};
+{%- if ci.is_name_used_as_error(name) && typ|ffi_error_converter_name != typ|ffi_converter_name %}
+typedef struct {{ builtin|ffi_error_converter_name }} {{ typ|ffi_error_converter_name }};
+{% endif %}
 {%- endmatch %}

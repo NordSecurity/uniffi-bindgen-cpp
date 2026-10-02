@@ -228,9 +228,74 @@ fn oops_tuple(i: u16) -> Result<(), TupleError> {
     }
 }
 
+#[uniffi::export]
+impl TupleError {
+    fn describe(&self) -> String {
+        match self {
+            TupleError::Oops(s) => format!("oops: {s}"),
+            TupleError::Value(v) => format!("value: {v}"),
+        }
+    }
+}
+
 #[uniffi::export(default(t = None))]
 fn get_tuple(t: Option<TupleError>) -> TupleError {
     t.unwrap_or_else(|| TupleError::Oops("oops".to_string()))
+}
+
+#[uniffi::export(with_foreign)]
+pub trait ErrorProducer: Send + Sync {
+    fn produce(&self) -> TupleError;
+}
+
+#[uniffi::export]
+fn describe_produced(producer: Arc<dyn ErrorProducer>) -> String {
+    producer.produce().describe()
+}
+
+#[derive(Debug)]
+pub struct CustomError(pub u16);
+
+impl std::fmt::Display for CustomError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{self:?}")
+    }
+}
+
+uniffi::custom_type!(CustomError, TupleError, {
+    try_lift: |val| {
+        let TupleError::Value(v) = val else {
+            return Err(anyhow::anyhow!("not a Value variant"));
+        };
+        Ok(CustomError(v))
+    },
+    lower: |val| TupleError::Value(val.0)
+});
+
+#[uniffi::export]
+fn oops_custom(i: u16) -> Result<(), CustomError> {
+    Err(CustomError(i))
+}
+
+#[derive(Debug)]
+pub struct CustomObjectError(pub Arc<ErrorInterface>);
+
+impl std::fmt::Display for CustomObjectError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self.0)
+    }
+}
+
+uniffi::custom_type!(CustomObjectError, Arc<ErrorInterface>, {
+    try_lift: |val| Ok(CustomObjectError(val)),
+    lower: |val| val.0
+});
+
+#[uniffi::export]
+fn oops_custom_object() -> Result<(), CustomObjectError> {
+    Err(CustomObjectError(Arc::new(
+        anyhow::Error::msg("custom-object-oops").into(),
+    )))
 }
 
 uniffi::include_scaffolding!("error_types_builtin");

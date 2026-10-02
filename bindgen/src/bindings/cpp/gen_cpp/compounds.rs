@@ -1,5 +1,8 @@
 use crate::bindings::cpp::CodeType;
-use uniffi_bindgen::{backend::Type, interface::Literal, ComponentInterface};
+use uniffi_bindgen::{
+    interface::{Literal, Type},
+    ComponentInterface,
+};
 
 use crate::bindings::cpp::gen_cpp::filters::CppCodeOracle;
 
@@ -53,6 +56,10 @@ impl CodeType for OptionalCodeType {
             _ => CppCodeOracle.find(&self.inner).literal(literal, ci),
         }
     }
+
+    fn default_is_value_init(&self) -> bool {
+        true // nullopt, empty vector, empty map
+    }
 }
 
 #[derive(Debug)]
@@ -86,6 +93,10 @@ impl CodeType for SequenceCodeType {
             Literal::EmptySequence => "{}".into(),
             _ => CppCodeOracle.find(&self.inner).literal(literal, ci),
         }
+    }
+
+    fn default_is_value_init(&self) -> bool {
+        true // nullopt, empty vector, empty map
     }
 }
 
@@ -131,5 +142,9 @@ impl CodeType for MapCodeType {
             Literal::EmptyMap => "{}".into(),
             _ => CppCodeOracle.find(&self.value).literal(literal, ci),
         }
+    }
+
+    fn default_is_value_init(&self) -> bool {
+        true // nullopt, empty vector, empty map
     }
 }
