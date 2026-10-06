@@ -1,3 +1,19 @@
 namespace type_flattening {
     
 };
+
+dictionary OptionalDefaults {
+    i32? maybe_int = 42;
+    string? maybe_text = "hello";
+    boolean? maybe_bool = true;
+    i32? maybe_null = null;
+};
+
+enum Colour {
+    "Red",
+    "Green",
+};
+
+dictionary OptionalEnumDefault {
+    Colour? maybe_colour = "Red";
+};

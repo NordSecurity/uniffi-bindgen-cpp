@@ -62,7 +62,20 @@ version = "0.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5d4744ed2eef2645831b441d8f5459689ade2ab27c854488fbab1fbe94fce1a7"
 dependencies = [
- "askama_derive",
+ "askama_derive 0.13.1",
+ "itoa",
+ "percent-encoding",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "askama"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f75363874b771be265f4ffe307ca705ef6f3baa19011c149da8674a87f1b75c4"
+dependencies = [
+ "askama_derive 0.14.0",
  "itoa",
  "percent-encoding",
  "serde",
@@ -75,7 +88,24 @@ version = "0.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d661e0f57be36a5c14c48f78d09011e67e0cb618f269cca9f2fd8d15b68c46ac"
 dependencies = [
- "askama_parser",
+ "askama_parser 0.13.0",
+ "basic-toml",
+ "memchr",
+ "proc-macro2",
+ "quote",
+ "rustc-hash",
+ "serde",
+ "serde_derive",
+ "syn",
+]
+
+[[package]]
+name = "askama_derive"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "129397200fe83088e8a68407a8e2b1f826cf0086b21ccdb866a722c8bcd3a94f"
+dependencies = [
+ "askama_parser 0.14.0",
  "basic-toml",
  "memchr",
  "proc-macro2",
@@ -95,7 +125,19 @@ dependencies = [
  "memchr",
  "serde",
  "serde_derive",
- "winnow",
+ "winnow 0.7.13",
+]
+
+[[package]]
+name = "askama_parser"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d6ab5630b3d5eaf232620167977f95eb51f3432fc76852328774afbd242d4358"
+dependencies = [
+ "memchr",
+ "serde",
+ "serde_derive",
+ "winnow 0.7.13",
 ]
 
 [[package]]
@@ -311,6 +353,8 @@ checksum = "4b0f83760fb341a774ed326568e19f5a863af4a952def8c39f9ab92fd95b88e5"
 dependencies = [
  "equivalent",
  "hashbrown",
+ "serde",
+ "serde_core",
 ]
 
 [[package]]
@@ -318,6 +362,12 @@ name = "itoa"
 version = "1.0.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4a5f13b858c8d314ee3e8f639011f7ccefe71f97f96e50151fb991f267928e2c"
+
+[[package]]
+name = "lazy_static"
+version = "1.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "20870f649af7073d53e38067b2a84312175d56ea15217e1b15bc83506ec50afb"
 
 [[package]]
 name = "libc"
@@ -508,10 +558,19 @@ dependencies = [
 ]
 
 [[package]]
-name = "siphasher"
-version = "0.3.11"
+name = "serde_spanned"
+version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "38b58827f4464d87d377d175e90bf58eb00fd8716ff0a62f80356b5e61555d0d"
+checksum = "876ac351060d4f882bb1032b6369eb0aef79ad9df1ea8bc404874d8cc3d0cd98"
+dependencies = [
+ "serde_core",
+]
+
+[[package]]
+name = "siphasher"
+version = "1.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8ee5873ec9cce0195efcb7a4e9507a04cd49aec9c83d0389df45b1ef7ba2e649"
 
 [[package]]
 name = "smawk"
@@ -622,12 +681,42 @@ checksum = "1f3ccbac311fea05f86f61904b462b55fb3df8837a366dfc601a0161d0532f20"
 
 [[package]]
 name = "toml"
-version = "0.5.11"
+version = "0.9.12+spec-1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f4f7f0dd8d50a853a531c426359045b1998f04219d88799810762cd4ad314234"
+checksum = "cf92845e79fc2e2def6a5d828f0801e29a2f8acc037becc5ab08595c7d5e9863"
 dependencies = [
- "serde",
+ "indexmap",
+ "serde_core",
+ "serde_spanned",
+ "toml_datetime",
+ "toml_parser",
+ "toml_writer",
+ "winnow 0.7.13",
 ]
+
+[[package]]
+name = "toml_datetime"
+version = "0.7.5+spec-1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "92e1cfed4a3038bc5a127e35a2d360f145e1f4b971b551a2ba5fd7aedf7e1347"
+dependencies = [
+ "serde_core",
+]
+
+[[package]]
+name = "toml_parser"
+version = "1.1.3+spec-1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1d38ac1cf9b95face32296c0a3ede1fdc270627c9d9c02a7274dd6d960dc4d56"
+dependencies = [
+ "winnow 1.0.4",
+]
+
+[[package]]
+name = "toml_writer"
+version = "1.1.2+spec-1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7d56353a2a665ad0f41a421187180aab746c8c325620617ad883a99a1cbe66d2"
 
 [[package]]
 name = "topological-sort"
@@ -670,8 +759,8 @@ checksum = "e51733f11c9c4f72aa0c160008246859e340b00807569a0da0e7a1079b27ba85"
 
 [[package]]
 name = "uniffi"
-version = "0.29.4"
-source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.29.4#00cd7e313cf73c78637161831ff17f8f53f7b824"
+version = "0.31.0"
+source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.31.0#309762f55db3f0548194a9ceba3027fa64b18a93"
 dependencies = [
  "anyhow",
  "cargo_metadata",
@@ -684,10 +773,10 @@ dependencies = [
 
 [[package]]
 name = "uniffi-bindgen-cpp"
-version = "0.9.0+v0.29.4"
+version = "0.10.0+v0.31.0"
 dependencies = [
  "anyhow",
- "askama",
+ "askama 0.13.1",
  "camino",
  "cargo_metadata",
  "clap",
@@ -721,8 +810,11 @@ dependencies = [
  "uniffi-fixture-callbacks",
  "uniffi-fixture-coverall",
  "uniffi-fixture-docstring",
+ "uniffi-fixture-proc-macro",
  "uniffi-fixture-time",
  "uniffi-fixture-trait-methods",
+ "uniffi-record-enum-methods",
+ "uniffi-renaming",
  "uniffi-reserved-field-name",
  "uniffi-type-flattening",
 ]
@@ -763,25 +855,25 @@ dependencies = [
 [[package]]
 name = "uniffi-example-arithmetic"
 version = "0.22.0"
-source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.29.4#00cd7e313cf73c78637161831ff17f8f53f7b824"
+source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.31.0#309762f55db3f0548194a9ceba3027fa64b18a93"
 dependencies = [
- "thiserror 1.0.50",
+ "thiserror 2.0.16",
  "uniffi",
 ]
 
 [[package]]
 name = "uniffi-example-callbacks"
 version = "0.22.0"
-source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.29.4#00cd7e313cf73c78637161831ff17f8f53f7b824"
+source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.31.0#309762f55db3f0548194a9ceba3027fa64b18a93"
 dependencies = [
- "thiserror 1.0.50",
+ "thiserror 2.0.16",
  "uniffi",
 ]
 
 [[package]]
 name = "uniffi-example-custom-types"
 version = "0.22.0"
-source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.29.4#00cd7e313cf73c78637161831ff17f8f53f7b824"
+source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.31.0#309762f55db3f0548194a9ceba3027fa64b18a93"
 dependencies = [
  "anyhow",
  "bytes",
@@ -792,7 +884,7 @@ dependencies = [
 [[package]]
 name = "uniffi-example-geometry"
 version = "0.22.0"
-source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.29.4#00cd7e313cf73c78637161831ff17f8f53f7b824"
+source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.31.0#309762f55db3f0548194a9ceba3027fa64b18a93"
 dependencies = [
  "uniffi",
 ]
@@ -800,7 +892,7 @@ dependencies = [
 [[package]]
 name = "uniffi-example-rondpoint"
 version = "0.22.0"
-source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.29.4#00cd7e313cf73c78637161831ff17f8f53f7b824"
+source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.31.0#309762f55db3f0548194a9ceba3027fa64b18a93"
 dependencies = [
  "uniffi",
 ]
@@ -808,7 +900,7 @@ dependencies = [
 [[package]]
 name = "uniffi-example-sprites"
 version = "0.22.0"
-source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.29.4#00cd7e313cf73c78637161831ff17f8f53f7b824"
+source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.31.0#309762f55db3f0548194a9ceba3027fa64b18a93"
 dependencies = [
  "uniffi",
 ]
@@ -816,19 +908,19 @@ dependencies = [
 [[package]]
 name = "uniffi-example-todolist"
 version = "0.22.0"
-source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.29.4#00cd7e313cf73c78637161831ff17f8f53f7b824"
+source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.31.0#309762f55db3f0548194a9ceba3027fa64b18a93"
 dependencies = [
  "once_cell",
- "thiserror 1.0.50",
+ "thiserror 2.0.16",
  "uniffi",
 ]
 
 [[package]]
 name = "uniffi-example-traits"
 version = "0.22.0"
-source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.29.4#00cd7e313cf73c78637161831ff17f8f53f7b824"
+source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.31.0#309762f55db3f0548194a9ceba3027fa64b18a93"
 dependencies = [
- "thiserror 1.0.50",
+ "thiserror 2.0.16",
  "uniffi",
 ]
 
@@ -850,48 +942,72 @@ dependencies = [
 [[package]]
 name = "uniffi-fixture-callbacks"
 version = "0.22.0"
-source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.29.4#00cd7e313cf73c78637161831ff17f8f53f7b824"
+source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.31.0#309762f55db3f0548194a9ceba3027fa64b18a93"
 dependencies = [
- "thiserror 1.0.50",
+ "thiserror 2.0.16",
  "uniffi",
 ]
 
 [[package]]
 name = "uniffi-fixture-coverall"
 version = "0.22.0"
-source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.29.4#00cd7e313cf73c78637161831ff17f8f53f7b824"
 dependencies = [
  "once_cell",
- "thiserror 1.0.50",
+ "thiserror 2.0.16",
  "uniffi",
 ]
 
 [[package]]
 name = "uniffi-fixture-docstring"
 version = "0.22.0"
-source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.29.4#00cd7e313cf73c78637161831ff17f8f53f7b824"
+source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.31.0#309762f55db3f0548194a9ceba3027fa64b18a93"
 dependencies = [
- "thiserror 1.0.50",
+ "thiserror 2.0.16",
+ "uniffi",
+]
+
+[[package]]
+name = "uniffi-fixture-proc-macro"
+version = "0.22.0"
+source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.31.0#309762f55db3f0548194a9ceba3027fa64b18a93"
+dependencies = [
+ "lazy_static",
+ "thiserror 2.0.16",
  "uniffi",
 ]
 
 [[package]]
 name = "uniffi-fixture-time"
 version = "0.22.0"
-source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.29.4#00cd7e313cf73c78637161831ff17f8f53f7b824"
+source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.31.0#309762f55db3f0548194a9ceba3027fa64b18a93"
 dependencies = [
  "chrono",
- "thiserror 1.0.50",
+ "thiserror 2.0.16",
  "uniffi",
 ]
 
 [[package]]
 name = "uniffi-fixture-trait-methods"
 version = "0.22.0"
-source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.29.4#00cd7e313cf73c78637161831ff17f8f53f7b824"
+source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.31.0#309762f55db3f0548194a9ceba3027fa64b18a93"
 dependencies = [
  "once_cell",
- "thiserror 1.0.50",
+ "thiserror 2.0.16",
+ "uniffi",
+]
+
+[[package]]
+name = "uniffi-record-enum-methods"
+version = "0.1.0"
+dependencies = [
+ "thiserror 2.0.16",
+ "uniffi",
+]
+
+[[package]]
+name = "uniffi-renaming"
+version = "0.1.0"
+dependencies = [
  "uniffi",
 ]
 
@@ -911,11 +1027,11 @@ dependencies = [
 
 [[package]]
 name = "uniffi_bindgen"
-version = "0.29.4"
-source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.29.4#00cd7e313cf73c78637161831ff17f8f53f7b824"
+version = "0.31.0"
+source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.31.0#309762f55db3f0548194a9ceba3027fa64b18a93"
 dependencies = [
  "anyhow",
- "askama",
+ "askama 0.14.0",
  "camino",
  "cargo_metadata",
  "fs-err",
@@ -936,8 +1052,8 @@ dependencies = [
 
 [[package]]
 name = "uniffi_build"
-version = "0.29.4"
-source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.29.4#00cd7e313cf73c78637161831ff17f8f53f7b824"
+version = "0.31.0"
+source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.31.0#309762f55db3f0548194a9ceba3027fa64b18a93"
 dependencies = [
  "anyhow",
  "camino",
@@ -946,8 +1062,8 @@ dependencies = [
 
 [[package]]
 name = "uniffi_core"
-version = "0.29.4"
-source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.29.4#00cd7e313cf73c78637161831ff17f8f53f7b824"
+version = "0.31.0"
+source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.31.0#309762f55db3f0548194a9ceba3027fa64b18a93"
 dependencies = [
  "anyhow",
  "bytes",
@@ -957,8 +1073,8 @@ dependencies = [
 
 [[package]]
 name = "uniffi_internal_macros"
-version = "0.29.4"
-source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.29.4#00cd7e313cf73c78637161831ff17f8f53f7b824"
+version = "0.31.0"
+source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.31.0#309762f55db3f0548194a9ceba3027fa64b18a93"
 dependencies = [
  "anyhow",
  "indexmap",
@@ -969,8 +1085,8 @@ dependencies = [
 
 [[package]]
 name = "uniffi_macros"
-version = "0.29.4"
-source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.29.4#00cd7e313cf73c78637161831ff17f8f53f7b824"
+version = "0.31.0"
+source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.31.0#309762f55db3f0548194a9ceba3027fa64b18a93"
 dependencies = [
  "camino",
  "fs-err",
@@ -985,8 +1101,8 @@ dependencies = [
 
 [[package]]
 name = "uniffi_meta"
-version = "0.29.4"
-source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.29.4#00cd7e313cf73c78637161831ff17f8f53f7b824"
+version = "0.31.0"
+source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.31.0#309762f55db3f0548194a9ceba3027fa64b18a93"
 dependencies = [
  "anyhow",
  "siphasher",
@@ -996,8 +1112,8 @@ dependencies = [
 
 [[package]]
 name = "uniffi_pipeline"
-version = "0.29.4"
-source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.29.4#00cd7e313cf73c78637161831ff17f8f53f7b824"
+version = "0.31.0"
+source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.31.0#309762f55db3f0548194a9ceba3027fa64b18a93"
 dependencies = [
  "anyhow",
  "heck 0.5.0",
@@ -1008,8 +1124,8 @@ dependencies = [
 
 [[package]]
 name = "uniffi_udl"
-version = "0.29.4"
-source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.29.4#00cd7e313cf73c78637161831ff17f8f53f7b824"
+version = "0.31.0"
+source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.31.0#309762f55db3f0548194a9ceba3027fa64b18a93"
 dependencies = [
  "anyhow",
  "textwrap",
@@ -1037,7 +1153,7 @@ checksum = "711b9620af191e0cdc7468a8d14e709c3dcdb115b36f838e601583af800a370a"
 [[package]]
 name = "weedle2"
 version = "5.0.0"
-source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.29.4#00cd7e313cf73c78637161831ff17f8f53f7b824"
+source = "git+https://github.com/mozilla/uniffi-rs.git?tag=v0.31.0#309762f55db3f0548194a9ceba3027fa64b18a93"
 dependencies = [
  "nom",
 ]
@@ -1213,3 +1329,9 @@ checksum = "21a0236b59786fed61e2a80582dd500fe61f18b5dca67a4a067d0bc9039339cf"
 dependencies = [
  "memchr",
 ]
+
+[[package]]
+name = "winnow"
+version = "1.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "23b97319f7b8343df12cc98938e5c3eb436064524c8d2b4e30a1d3a36eecdf81"

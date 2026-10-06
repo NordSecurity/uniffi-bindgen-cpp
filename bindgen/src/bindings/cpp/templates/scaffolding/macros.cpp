@@ -1,3 +1,11 @@
+{% macro field_name(field, field_num) -%}
+{%- if field.name().is_empty() -%}
+v{{- field_num -}}
+{%- else -%}
+{{ field.name()|var_name }}
+{%- endif -%}
+{%- endmacro %}
+
 {% macro fn_prologue(ci, func, ffi_func) -%}
 {%- if ffi_func.has_rust_call_status_arg() %}
     out_status->code = UNIFFI_CALL_STATUS_OK;

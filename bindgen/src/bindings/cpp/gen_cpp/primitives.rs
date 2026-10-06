@@ -1,6 +1,6 @@
 use crate::bindings::cpp::CodeType;
 use paste::paste;
-use uniffi_bindgen::{backend::Literal, interface::Radix, ComponentInterface};
+use uniffi_bindgen::{interface::Literal, interface::Radix, ComponentInterface};
 
 fn render_literal(literal: &Literal) -> String {
     match literal {
@@ -44,6 +44,10 @@ macro_rules! impl_code_type_for_primitive {
 
                 fn literal(&self, literal: &Literal, _ci: &ComponentInterface) -> String {
                     render_literal(&literal)
+                }
+
+                fn default_is_value_init(&self) -> bool {
+                    true // 0, false, "", empty byte
                 }
             }
         }

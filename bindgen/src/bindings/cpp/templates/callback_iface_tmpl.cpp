@@ -23,7 +23,7 @@
     {% match method.return_type() %}
     {% when Some(t) %}
     auto write_value = [&]({{ t|type_name(ci) }} v) {
-        uniffi_out_return = {{ t|lower_fn }}(v);
+        uniffi_out_return = {{ t|lower_fn }}({{ t.as_type()|cpp_deref(ci) }}v);
     };
     {% when None %}
     auto write_value = [](){};
@@ -38,10 +38,15 @@
 }
 {%- endfor %}
 
+void {{ trait_impl }}::init() {
+    {{ ffi_init_callback.name() }}(vtable);
+}
+
 void {{ trait_impl }}::uniffi_free(uint64_t uniffi_handle) {
     {{ ffi_converter_name }}::handle_map.erase(uniffi_handle);
 }
 
-void {{ trait_impl }}::init() {
-    {{ ffi_init_callback.name() }}(vtable);
+uint64_t {{ trait_impl }}::uniffi_clone(uint64_t uniffi_handle) {
+    return {{ ffi_converter_name }}::handle_map.clone(uniffi_handle);
 }
+

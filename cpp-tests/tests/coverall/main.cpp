@@ -447,7 +447,7 @@ void test_path() {
     ASSERT_EQ(2, traits[1]->strong_count());
 
     traits[0]->set_parent(traits[1]);
-    ASSERT_EQ(2, traits[1]->strong_count());
+    ASSERT_EQ(3, traits[1]->strong_count());
 
     ASSERT_EQ(std::vector<std::string> {"node-2"} , coverall::ancestor_names(traits[0]));
     ASSERT_EQ(std::vector<std::string> {} , coverall::ancestor_names(traits[1]));
@@ -504,6 +504,15 @@ void test_rust_only_traits() {
     auto traits = coverall::get_string_util_traits();
     ASSERT_EQ("cowboy", traits[0]->concat("cow", "boy"));
     ASSERT_EQ("cowboy", traits[1]->concat("cow", "boy"));
+
+    ASSERT_EQ("cowboy", coverall::concat_with_string_util(traits[0], "cow", "boy"));
+}
+
+void test_object_implementing_trait() {
+    auto object = coverall::StringUtilObject::init("-");
+
+    std::shared_ptr<coverall::StringUtil> as_trait = object;
+    ASSERT_EQ("cow-boy", as_trait->concat("cow", "boy"));
 }
 
 void test_html_error() {
@@ -532,6 +541,7 @@ int main() {
     test_path();
     test_round_tripping();
     test_rust_only_traits();
+    test_object_implementing_trait();
     test_html_error();
 
     return 0;

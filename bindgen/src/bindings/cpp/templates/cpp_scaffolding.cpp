@@ -197,7 +197,7 @@ UNIFFI_EXPORT {%- call macros::fn_definition(ffi_ctor) %} {
     {%- for arg in ctor.arguments() %}
     {{- arg|lift_fn }}({{ arg.name()|var_name }}){% if !loop.last %}, {% endif -%}
     {% endfor %});
-    return (void*){{ obj.name() }}_map.insert(obj);
+    return (uint64_t){{ obj.name() }}_map.insert(obj);
 }
 {% endfor %}
 

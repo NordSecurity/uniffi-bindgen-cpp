@@ -1,14 +1,14 @@
-{{ type_name }} {{ ffi_converter_name }}::lift(void *ptr) {
+{{ type_name }} {{ ffi_converter_name }}::lift(uint64_t ptr) {
     return {{ name }}_map.at((uint64_t)ptr);
 }
 
-void *{{ ffi_converter_name }}::lower(const {{ type_name }} &obj) {
+uint64_t {{ ffi_converter_name }}::lower(const {{ type_name }} &obj) {
     auto ret = {{ name }}_map.insert(obj);
-    return (void *)ret;
+    return ret;
 }
 
 {{ type_name }} {{ ffi_converter_name }}::read(RustStream &stream) {
-    std::uintptr_t ptr;
+    std::uint64_t ptr;
     stream >> ptr;
 
     return {{ name }}_map.at(ptr);

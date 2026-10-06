@@ -19,6 +19,9 @@ mod uniffi_fixtures {
     uniffi_empty_type::uniffi_reexport_scaffolding!();
     uniffi_reserved_field_name::uniffi_reexport_scaffolding!();
     uniffi_type_flattening::uniffi_reexport_scaffolding!();
+    uniffi_record_enum_methods::uniffi_reexport_scaffolding!();
+    uniffi_renaming::uniffi_reexport_scaffolding!();
+    uniffi_proc_macro::uniffi_reexport_scaffolding!();
 
     uniffi_ext_types_export::uniffi_reexport_scaffolding!();
     uniffi_ext_types_import::uniffi_reexport_scaffolding!();
