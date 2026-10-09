@@ -250,9 +250,18 @@ impl<'a> CppWrapperHeader<'a> {
             .collect();
 
         let mut sorted: Vec<Type> = Vec::new();
+        let mut emitted_names = BTreeSet::new();
         while !definition_topology.peek_all().is_empty() {
-            let list = definition_topology.pop_all();
+            let mut list = definition_topology.pop_all();
+            list.sort();
             for name in list {
+                // TopologicalSort preserves duplicate dependency links. A record or
+                // rich enum can mention the same named type more than once, causing
+                // that type to be returned once per link. Definitions, however,
+                // must be emitted exactly once.
+                if !emitted_names.insert(name) {
+                    continue;
+                }
                 // External types are defined in their own namespace's header with their own
                 // converters declared, which we `#include`. They must not enter the local
                 // definition ordering, or we'd try to emit a definition we don't have.
@@ -267,7 +276,7 @@ impl<'a> CppWrapperHeader<'a> {
         }
 
         let rest = types
-            .filter(|&t| !sorted.contains(t))
+            .filter(|t| type_name(t).map_or(true, |name| !emitted_names.contains(name)))
             .cloned()
             .collect::<BTreeSet<_>>();
 

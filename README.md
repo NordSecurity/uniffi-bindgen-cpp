@@ -10,7 +10,7 @@ Minimum Rust version required to install `uniffi-bindgen-cpp` is `1.87`.
 Newer Rust versions should also work fine.
 
 ```bash
-cargo install uniffi-bindgen-cpp --git https://github.com/NordSecurity/uniffi-bindgen-cpp --tag v0.10.0+v0.31.0
+cargo install uniffi-bindgen-cpp --git https://github.com/NordSecurity/uniffi-bindgen-cpp --tag v0.10.0+v0.31.2
 ```
 
 # How to generate bindings
