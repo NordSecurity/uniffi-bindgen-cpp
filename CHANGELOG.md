@@ -1,3 +1,10 @@
+#### v0.10.0+v0.31.2
+
+----
+- Core: Update bindgen to UniFFI v0.31.2
+- Core: Fix duplicate generated definitions when a record or enum references the same named
+  type more than once
+
 #### v0.10.0+v0.31.0
 
 ----
