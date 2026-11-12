@@ -16,28 +16,23 @@ RustBuffer {{ ffi_converter_name }}::lower(const {{ type_name }} &val) {
     return buf;
 }
 
+ForeignBytes {{ ffi_converter_name }}::borrow(const {{ type_name }} &val) {
+    return ForeignBytes { static_cast<int32_t>(val.size()), const_cast<uint8_t *>(val.data()) };
+}
+
 {{ type_name }} {{ ffi_converter_name }}::read(RustStream &stream) {
-    {{ type_name }} ret;
     int32_t count;
     stream >> count;
 
-    ret.reserve(count);
-
-    for (decltype(count) i = 0; i < count; i++) {
-        uint8_t elem;
-        stream >> elem;
-        ret.push_back(elem);
-    }
+    {{ type_name }} ret(count);
+    stream.read(reinterpret_cast<char *>(ret.data()), count);
 
     return ret;
 }
 
 void {{ ffi_converter_name }}::write(RustStream &stream, const {{ type_name }} &val) {
     stream << static_cast<int32_t>(val.size());
-
-    for (auto &elem : val) {
-        stream << elem;
-    }
+    stream.write(reinterpret_cast<const char *>(val.data()), val.size());
 }
 
 uint64_t {{ ffi_converter_name }}::allocation_size(const {{ type_name }} &val) {

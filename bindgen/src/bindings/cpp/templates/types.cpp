@@ -59,6 +59,8 @@ namespace uniffi {
 {% include "opt_tmpl.cpp" %}
 {%- when Type::Sequence { inner_type } %}
 {% include "seq_tmpl.cpp" %}
+{%- when Type::Set { inner_type } %}
+{% include "set_tmpl.cpp" %}
 {%- when Type::Map { key_type, value_type } %}
 {% include "map_tmpl.cpp" %}
 {%- when Type::CallbackInterface { module_path, name } %}

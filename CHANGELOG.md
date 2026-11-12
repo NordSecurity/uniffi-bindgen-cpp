@@ -1,3 +1,11 @@
+#### v0.11.0+v0.32.2
+
+----
+- Core: Update bindgen to UniFFI v0.32.2. Minimum Rust version is now `1.90`
+- Core: Add support for `HashSet<T>`, generated as `std::unordered_set<T>`
+- Core: Add support for `Box<T>`
+- Core: `&[u8]` / `[ByRef] bytes` arguments are passed to Rust without copying
+
 #### v0.10.0+v0.31.0
 
 ----

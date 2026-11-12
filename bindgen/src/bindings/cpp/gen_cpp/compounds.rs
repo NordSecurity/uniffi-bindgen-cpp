@@ -101,6 +101,46 @@ impl CodeType for SequenceCodeType {
 }
 
 #[derive(Debug)]
+pub(crate) struct SetCodeType {
+    inner: Type,
+}
+
+impl SetCodeType {
+    pub(crate) fn new(inner: Type) -> Self {
+        Self { inner }
+    }
+}
+
+impl CodeType for SetCodeType {
+    fn type_label(&self, ci: &ComponentInterface) -> String {
+        format!(
+            "std::unordered_set<{}>",
+            CppCodeOracle.find(&self.inner).type_label(ci)
+        )
+    }
+
+    fn canonical_name(&self) -> String {
+        format!(
+            "HashSet{}",
+            CppCodeOracle.find(&self.inner).canonical_name()
+        )
+    }
+
+    fn literal(&self, literal: &Literal, ci: &ComponentInterface) -> String {
+        // As of v0.32.2, #[uniffi(default = [])] on a set field is encoded as EmptySequence,
+        // so it would fall through to the element type's literal() and abort generation.
+        match literal {
+            Literal::EmptySet | Literal::EmptySequence => "{}".into(),
+            _ => CppCodeOracle.find(&self.inner).literal(literal, ci),
+        }
+    }
+
+    fn default_is_value_init(&self) -> bool {
+        true // nullopt, empty vector, empty map
+    }
+}
+
+#[derive(Debug)]
 pub(crate) struct MapCodeType {
     key: Type,
     value: Type,

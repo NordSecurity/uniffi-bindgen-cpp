@@ -15,7 +15,7 @@ use std::{
     format,
 };
 
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 use askama::Template;
 use filters::CppCodeOracle;
 use serde::{Deserialize, Serialize};
@@ -56,6 +56,19 @@ pub(crate) struct Config {
     enum_style: EnumStyle,
     #[serde(default)]
     rename: toml::Table,
+    /// Not supported yet
+    #[serde(default)]
+    exclude: Vec<String>,
+}
+
+pub(crate) fn reject_unsupported_config(components: &[Component<Config>]) -> Result<()> {
+    if let Some(component) = components.iter().find(|c| !c.config.exclude.is_empty()) {
+        bail!(
+            "`exclude` (in `[bindings.cpp]` of crate `{}`) is not supported by uniffi-bindgen-cpp",
+            component.ci.crate_name()
+        );
+    }
+    Ok(())
 }
 
 pub(crate) fn apply_renames(components: &mut [Component<Config>]) {
@@ -201,6 +214,7 @@ impl<'a> CppWrapperHeader<'a> {
                                     .fields()
                                     .iter()
                                     .flat_map(Field::iter_types)
+                                    .flat_map(unboxed)
                                     .collect::<Vec<_>>(),
                             )
                         })
@@ -213,6 +227,7 @@ impl<'a> CppWrapperHeader<'a> {
                                     .variants()
                                     .iter()
                                     .flat_map(Variant::iter_types)
+                                    .flat_map(unboxed)
                                     .collect::<Vec<_>>(),
                             )
                         })
@@ -316,6 +331,16 @@ fn type_name(ty: &Type) -> Option<&str> {
         | Type::Enum { name, .. }
         | Type::Custom { name, .. } => Some(name),
         _ => None,
+    }
+}
+
+/// `Type::iter_types` does not descend into `Box<T>`, but a boxed type is still embedded by value
+/// in C++, so the types inside it are dependencies too. This is needed because upstream's `iter_nested_types`
+/// does not cover the `Box` type
+fn unboxed(ty: &Type) -> Box<dyn Iterator<Item = &Type> + '_> {
+    match ty {
+        Type::Box { inner_type } => Box::new(inner_type.iter_types().flat_map(unboxed)),
+        _ => Box::new(std::iter::once(ty)),
     }
 }
 
