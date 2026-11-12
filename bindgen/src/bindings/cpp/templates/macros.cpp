@@ -128,7 +128,11 @@ v{{- field_num -}}
 
 {% macro arg_list_lowered(func, deref) %}
 {%- for arg in func.arguments() -%}
+{%- if arg.is_borrowed_bytes() -%}
+uniffi::{{ arg|ffi_converter_name }}::borrow({{ arg.name()|var_name }})
+{%- else -%}
 uniffi::{{ arg|lower_fn }}({% if deref %}{{ arg.as_type()|cpp_deref(ci) }}{% endif %}{{ arg.name()|var_name }})
+{%- endif -%}
 {%- if !loop.last -%}, {% endif -%}
 {% endfor -%}
 {% endmacro %}
