@@ -16,6 +16,10 @@ RustBuffer {{ ffi_converter_name }}::lower(const {{ type_name }} &val) {
     return buf;
 }
 
+ForeignBytes {{ ffi_converter_name }}::borrow(const {{ type_name }} &val) {
+    return ForeignBytes { static_cast<int32_t>(val.size()), const_cast<uint8_t *>(val.data()) };
+}
+
 {{ type_name }} {{ ffi_converter_name }}::read(RustStream &stream) {
     {{ type_name }} ret;
     int32_t count;

@@ -20,6 +20,7 @@ int main()
     ASSERT_EQ(std::nullopt, implicit_defaults.opt_int32);
     ASSERT_TRUE(implicit_defaults.vec.empty());
     ASSERT_TRUE(implicit_defaults.map.empty());
+    ASSERT_TRUE(implicit_defaults.set.empty());
     ASSERT_TRUE(implicit_defaults.some_bytes.empty());
 
     ASSERT_NE(nullptr, implicit_defaults.object);
@@ -52,6 +53,12 @@ int main()
     auto lowered = proc_macro::uniffi::FfiConverterSequenceBool::lower(bools);
     auto roundtripped = proc_macro::uniffi::FfiConverterSequenceBool::lift(lowered);
     ASSERT_EQ(bools, roundtripped);
+
+    ASSERT_EQ(std::unordered_set<std::string>{"x"}, proc_macro::make_hash_set("x"));
+
+    const std::unordered_set<std::string> set = {"a", "b", "c"};
+    ASSERT_EQ(set, proc_macro::return_hash_set(set));
+    ASSERT_TRUE(proc_macro::return_hash_set({}).empty());
 
     ASSERT_EQ(42, proc_macro::double_with_default(21));
     ASSERT_EQ(30, proc_macro::sum_with_default(10, 20));

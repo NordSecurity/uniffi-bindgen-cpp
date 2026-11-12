@@ -314,6 +314,7 @@ impl<T: AsType> AsCodeType for T {
             Type::Sequence { inner_type } => {
                 Box::new(compounds::SequenceCodeType::new(*inner_type))
             }
+            Type::Set { inner_type } => Box::new(compounds::SetCodeType::new(*inner_type)),
             Type::Map {
                 key_type,
                 value_type,
@@ -323,6 +324,7 @@ impl<T: AsType> AsCodeType for T {
                 module_path,
                 builtin,
             } => Box::new(custom::CustomCodeType::new(name, module_path, *builtin)),
+            Type::Box { inner_type } => inner_type.as_codetype(),
         }
     }
 }

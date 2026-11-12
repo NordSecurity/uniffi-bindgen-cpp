@@ -10,10 +10,37 @@ interface ComplexEnum {
     VariantTwo(f32 flt);
 };
 
+dictionary RepeatedDependencies {
+    SimpleEnum first;
+    SimpleEnum second;
+};
+
+dictionary Leaf {
+    u32 value;
+};
+
+dictionary RepeatedNested {
+    Leaf a;
+    Leaf b;
+    sequence<Leaf> many;
+    record<string, Leaf> by_name;
+    Leaf? maybe;
+};
+
+[Enum]
+interface RepeatedVariants {
+    One(Leaf x, Leaf y);
+    Two(Leaf z, sequence<Leaf> zs);
+};
+
 namespace enum_style_test {
     SimpleEnum get_simple_enum();
     void set_simple_enum(SimpleEnum e);
 
     ComplexEnum get_complex_enum();
     void set_complex_enum(ComplexEnum e);
+
+    RepeatedDependencies roundtrip_repeated_dependencies(RepeatedDependencies value);
+    RepeatedNested roundtrip_repeated_nested(RepeatedNested value);
+    RepeatedVariants roundtrip_repeated_variants(RepeatedVariants value);
 };

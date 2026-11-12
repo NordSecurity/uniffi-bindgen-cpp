@@ -1,0 +1,51 @@
+{%- let ffi_converter_name = typ|ffi_converter_name %}
+{%- let class_name = ffi_converter_name|class_name %}
+{{ type_name }} {{ class_name }}::lift(RustBuffer buf) {
+    auto stream = RustStream(&buf);
+    auto ret = read(stream);
+
+    rustbuffer_free(buf);
+
+    return ret;
+}
+
+RustBuffer {{ class_name }}::lower(const {{ type_name }} &val) {
+    auto buf = rustbuffer_alloc(allocation_size(val));
+    auto stream = RustStream(&buf);
+
+    write(stream, val);
+
+    return buf;
+}
+
+{{ type_name }} {{ class_name }}::read(RustStream &stream) {
+    {{ type_name }} ret;
+    int32_t count;
+    stream >> count;
+
+    ret.reserve(count);
+
+    for (decltype(count) i = 0; i < count; i++) {
+        ret.insert({{ inner_type|read_fn }}(stream));
+    }
+
+    return ret;
+}
+
+void {{ class_name }}::write(RustStream &stream, const {{ type_name }} &val) {
+    stream << static_cast<int32_t>(val.size());
+
+    for (const auto &elem : val) {
+        {{ inner_type|write_fn }}(stream, {{ inner_type.as_type()|cpp_deref(ci) }}elem);
+    }
+}
+
+uint64_t {{ class_name }}::allocation_size(const {{ type_name }} &val) {
+    uint64_t size = sizeof(int32_t);
+
+    for (const auto &elem : val) {
+        size += {{ inner_type|allocation_size_fn }}({{inner_type.as_type()|cpp_deref(ci) }}elem);
+    }
+
+    return size;
+}
