@@ -17,16 +17,13 @@ RustBuffer {{ ffi_converter_name }}::lower(const {{ type_name }} &val) {
 }
 
 {{ type_name }} {{ ffi_converter_name }}::read(RustStream &stream) {
-    {{ type_name }} ret;
     int32_t count;
     stream >> count;
 
-    ret.reserve(count);
-
-    for (decltype(count) i = 0; i < count; i++) {
-        uint8_t elem;
-        stream >> elem;
-        ret.push_back(elem);
+    {{ type_name }} ret(static_cast<size_t>(count));
+    if (count != 0) {
+        stream.read(reinterpret_cast<char *>(ret.data()),
+                    static_cast<std::streamsize>(count));
     }
 
     return ret;
@@ -35,8 +32,9 @@ RustBuffer {{ ffi_converter_name }}::lower(const {{ type_name }} &val) {
 void {{ ffi_converter_name }}::write(RustStream &stream, const {{ type_name }} &val) {
     stream << static_cast<int32_t>(val.size());
 
-    for (auto &elem : val) {
-        stream << elem;
+    if (!val.empty()) {
+        stream.write(reinterpret_cast<const char *>(val.data()),
+                     static_cast<std::streamsize>(val.size()));
     }
 }
 
