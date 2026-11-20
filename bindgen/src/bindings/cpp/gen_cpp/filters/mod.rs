@@ -1,8 +1,8 @@
 use heck::{ToShoutySnakeCase, ToSnakeCase, ToUpperCamelCase};
 use uniffi_bindgen::{
     interface::{
-        Argument, AsType, DefaultValue, FfiType, Literal, Method, Object, Type, UniffiTraitMethods,
-        Variant,
+        Argument, AsType, DefaultValue, FfiType, Field, Literal, Method, Object, Type,
+        UniffiTraitMethods, Variant,
     },
     ComponentInterface,
 };
@@ -535,4 +535,55 @@ pub(crate) fn cpp_deref(type_: Type, ci: &ComponentInterface) -> Result<String> 
         }
     }
     Ok("".to_string())
+}
+
+pub(crate) fn fields_default_constructible(
+    variant: &Variant,
+    ci: &ComponentInterface,
+) -> Result<bool> {
+    Ok(fields_are_default_constructible(
+        variant.fields(),
+        ci,
+        &mut Vec::new(),
+    ))
+}
+
+fn fields_are_default_constructible(
+    fields: &[Field],
+    ci: &ComponentInterface,
+    visiting: &mut Vec<String>,
+) -> bool {
+    fields.iter().all(|field| {
+        field.default_value().is_some() || is_default_constructible(&field.as_type(), ci, visiting)
+    })
+}
+
+/// Non-flat enums and records holding them by value cannot be default-initialized.
+/// External enums and records are assumed not to be.
+fn is_default_constructible(
+    type_: &Type,
+    ci: &ComponentInterface,
+    visiting: &mut Vec<String>,
+) -> bool {
+    match type_ {
+        Type::Enum { name, .. } => {
+            ci.is_name_used_as_error(name)
+                || ci.get_enum_definition(name).is_some_and(|e| e.is_flat())
+        }
+        Type::Record { name, .. } => {
+            if visiting.contains(name) {
+                return false;
+            }
+            let Some(record) = ci.get_record_definition(name) else {
+                return false;
+            };
+            visiting.push(name.clone());
+            let result = fields_are_default_constructible(record.fields(), ci, visiting);
+            visiting.pop();
+            result
+        }
+        Type::Custom { builtin, .. } => is_default_constructible(builtin, ci, visiting),
+        Type::Box { inner_type } => is_default_constructible(inner_type, ci, visiting),
+        _ => true,
+    }
 }

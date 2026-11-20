@@ -5,6 +5,7 @@
 - Core: Add support for `HashSet<T>`, generated as `std::unordered_set<T>`
 - Core: Add support for `Box<T>`
 - Core: `&[u8]` / `[ByRef] bytes` arguments are passed to Rust without copying
+- Core: Fix error variants holding enums with fields
 
 #### v0.10.0+v0.31.0
 
