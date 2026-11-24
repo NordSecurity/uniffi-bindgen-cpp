@@ -28,12 +28,21 @@ RustBuffer {{ ffi_converter_name }}{{ variant.name() }}::lower(const {{ namespac
 
     {%- if e.is_flat() %}
     return {{ namespace }}::{{ variant.name() }}();
-    {%- else %}
+    {%- else if variant|fields_default_constructible(ci) %}
     {{ namespace }}::{{ variant.name() }} var;
     {%- for field in variant.fields() %}
     var.{{ field.name()|var_name }} = {{ field|read_fn }}(stream);
     {%- endfor %}
     return var;
+    {%- else %}
+    {%- for field in variant.fields() %}
+    auto f{{ loop.index }} = {{ field|read_fn }}(stream);
+    {%- endfor %}
+    return {{ namespace }}::{{ variant.name() }}(
+        {%- for field in variant.fields() %}
+        std::move(f{{ loop.index }}){% if !loop.last %}, {% endif %}
+        {%- endfor %}
+    );
     {%- endif %}
 }
 

@@ -225,5 +225,72 @@ int main() {
     auto produced = error_types_builtin::describe_produced(std::make_shared<Producer>());
     ASSERT_EQ("value: 7", produced);
 
+    try {
+        error_types_builtin::oops_payload(0);
+        ASSERT_TRUE(false);
+    } catch (error_types_builtin::payload_error::Bad &e) {
+        ASSERT_EQ(std::get<error_types_builtin::Payload::kCircle>(e.payload.get_variant()).radius, 1.5);
+    } catch (...) {
+        ASSERT_TRUE(false);
+    }
+
+    try {
+        error_types_builtin::oops_payload(1);
+        ASSERT_TRUE(false);
+    } catch (error_types_builtin::payload_error::BadWrapped &e) {
+        ASSERT_EQ(e.wrapped.name, "wrapped");
+        ASSERT_EQ(std::get<error_types_builtin::Payload::kLabel>(e.wrapped.payload.get_variant()).v1, "label");
+    } catch (...) {
+        ASSERT_TRUE(false);
+    }
+
+    try {
+        error_types_builtin::oops_payload(2);
+        ASSERT_TRUE(false);
+    } catch (error_types_builtin::payload_error::BadTuple &e) {
+        ASSERT_EQ(std::get<error_types_builtin::Payload::kCircle>(e.v1.get_variant()).radius, 2.5);
+        ASSERT_EQ(e.v2, 7u);
+    } catch (...) {
+        ASSERT_TRUE(false);
+    }
+
+    try {
+        error_types_builtin::oops_payload(3);
+        ASSERT_TRUE(false);
+    } catch (error_types_builtin::payload_error::Plain &e) {
+        ASSERT_EQ(e.code, 42u);
+    } catch (...) {
+        ASSERT_TRUE(false);
+    }
+
+    auto bad = std::make_shared<error_types_builtin::payload_error::Bad>(error_types_builtin::Payload(error_types_builtin::Payload::kLabel{"built"}));
+    auto bad_back = std::dynamic_pointer_cast<error_types_builtin::payload_error::Bad>(
+        error_types_builtin::payload_error_roundtrip(bad));
+    ASSERT_TRUE(bad_back != nullptr);
+    ASSERT_EQ(std::get<error_types_builtin::Payload::kLabel>(bad_back->payload.get_variant()).v1, "built");
+
+    auto wrapped = std::make_shared<error_types_builtin::payload_error::BadWrapped>(
+        error_types_builtin::Wrapped{"w", error_types_builtin::Payload(error_types_builtin::Payload::kCircle{3.0})});
+    auto wrapped_back = std::dynamic_pointer_cast<error_types_builtin::payload_error::BadWrapped>(
+        error_types_builtin::payload_error_roundtrip(wrapped));
+    ASSERT_TRUE(wrapped_back != nullptr);
+    ASSERT_EQ(wrapped_back->wrapped.name, "w");
+    ASSERT_EQ(std::get<error_types_builtin::Payload::kCircle>(wrapped_back->wrapped.payload.get_variant()).radius, 3.0);
+
+    auto tuple = std::make_shared<error_types_builtin::payload_error::BadTuple>(error_types_builtin::Payload(error_types_builtin::Payload::kCircle{4.0}), 3);
+    auto tuple_back = std::dynamic_pointer_cast<error_types_builtin::payload_error::BadTuple>(
+        error_types_builtin::payload_error_roundtrip(tuple));
+    ASSERT_TRUE(tuple_back != nullptr);
+    ASSERT_EQ(std::get<error_types_builtin::Payload::kCircle>(tuple_back->v1.get_variant()).radius, 4.0);
+    ASSERT_EQ(tuple_back->v2, 3u);
+
+    auto plain = std::make_shared<error_types_builtin::payload_error::Plain>();
+    plain->code = 9;
+    auto plain_back = std::dynamic_pointer_cast<error_types_builtin::payload_error::Plain>(
+        error_types_builtin::payload_error_roundtrip(plain));
+    ASSERT_TRUE(plain_back != nullptr);
+    ASSERT_EQ(plain_back->code, 9u);
+    ASSERT_EQ(std::string(error_types_builtin::payload_error::Plain("message").what()), "message");
+
     return 0;
 }

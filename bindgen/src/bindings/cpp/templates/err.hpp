@@ -42,8 +42,19 @@ struct {{ variant.name()|class_name }}: {{ class_name }} {
     {%- endmatch %}
     {%- endfor %}
 
+    {%- if variant|fields_default_constructible(ci) %}
     {{ variant.name()|class_name }}() : {{ class_name }}("") {}
     {{ variant.name()|class_name }}(const std::string &what_arg) : {{ class_name }}(what_arg) {}
+    {%- else %}
+    {{ variant.name()|class_name }}(
+        {%- for field in variant.fields() %}
+        {{ field|type_name(ci) }} {% call macros::field_name(field, loop.index) %}{% if !loop.last %}, {% endif %}
+        {%- endfor -%}
+    ) : {{ class_name }}(""),
+        {%- for field in variant.fields() %}
+        {% call macros::field_name(field, loop.index) %}(std::move({% call macros::field_name(field, loop.index) %})){% if !loop.last %}, {% endif %}
+        {%- endfor -%} {}
+    {%- endif %}
 
     void throw_underlying() override {
         throw *this;

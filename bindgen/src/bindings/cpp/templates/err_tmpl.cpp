@@ -29,11 +29,22 @@ RustBuffer {{ ffi_converter_name }}::lower(const {{ class_name }} &val) {
     {% else %}
     case {{ loop.index }}:
     {
+        {%- if variant|fields_default_constructible(ci) %}
         {{ class_name|to_lower_snake_case }}::{{ variant.name() }} var;
         {%- for field in variant.fields() %}
         var.{% call macros::field_name(field, loop.index) %} = {{ field|read_fn }}(stream);
         {%- endfor %}
         return std::make_shared<{{ class_name|to_lower_snake_case }}::{{ variant.name() }}>(var);
+        {%- else %}
+        {%- for field in variant.fields() %}
+        auto f{{ loop.index }} = {{ field|read_fn }}(stream);
+        {%- endfor %}
+        return std::make_shared<{{ class_name|to_lower_snake_case }}::{{ variant.name() }}>(
+            {%- for field in variant.fields() -%}
+            std::move(f{{ loop.index }}){% if !loop.last %}, {% endif %}
+            {%- endfor -%}
+        );
+        {%- endif %}
     }
     {%- endif %}
     {%- endfor %}

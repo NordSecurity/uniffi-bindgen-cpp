@@ -298,4 +298,53 @@ fn oops_custom_object() -> Result<(), CustomObjectError> {
     )))
 }
 
+// An enum with fields has no default value in C++, so error variants holding one, directly or
+// through a record, can't be default-constructed.
+#[derive(uniffi::Enum, Debug, Clone, PartialEq)]
+pub enum Payload {
+    Circle { radius: f64 },
+    Label(String),
+}
+
+#[derive(uniffi::Record, Debug, Clone, PartialEq)]
+pub struct Wrapped {
+    pub name: String,
+    pub payload: Payload,
+}
+
+#[derive(thiserror::Error, uniffi::Error, Debug, Clone, PartialEq)]
+pub enum PayloadError {
+    #[error("Bad: {payload:?}")]
+    Bad { payload: Payload },
+    #[error("BadWrapped: {wrapped:?}")]
+    BadWrapped { wrapped: Wrapped },
+    #[error("BadTuple: {0:?} {1}")]
+    BadTuple(Payload, u32),
+    #[error("Plain: {code}")]
+    Plain { code: u32 },
+}
+
+#[uniffi::export]
+fn oops_payload(i: u16) -> Result<(), PayloadError> {
+    match i {
+        0 => Err(PayloadError::Bad {
+            payload: Payload::Circle { radius: 1.5 },
+        }),
+        1 => Err(PayloadError::BadWrapped {
+            wrapped: Wrapped {
+                name: "wrapped".to_string(),
+                payload: Payload::Label("label".to_string()),
+            },
+        }),
+        2 => Err(PayloadError::BadTuple(Payload::Circle { radius: 2.5 }, 7)),
+        3 => Err(PayloadError::Plain { code: 42 }),
+        _ => panic!("unknown variant {i}"),
+    }
+}
+
+#[uniffi::export]
+fn payload_error_roundtrip(e: PayloadError) -> PayloadError {
+    e
+}
+
 uniffi::include_scaffolding!("error_types_builtin");
