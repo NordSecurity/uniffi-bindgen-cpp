@@ -103,6 +103,7 @@ impl BindingGenerator for CppBindingGenerator {
         _settings: &GenerationSettings,
         components: &mut Vec<uniffi_bindgen::Component<Self::Config>>,
     ) -> Result<()> {
+        gen_cpp::reject_unsupported_config(components)?;
         gen_cpp::apply_renames(components);
         Ok(())
     }

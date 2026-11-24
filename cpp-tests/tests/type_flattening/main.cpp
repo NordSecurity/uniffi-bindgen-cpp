@@ -10,6 +10,11 @@ int main()
     ASSERT_NE(structure.optional_arc, nullptr);
     ASSERT_EQ(structure.optional_arc->get_value(), value);
 
+    ASSERT_EQ(value + 6, structure.optional_arc->add_bytes({1, 2, 3}));
+
+    ASSERT_EQ(255u + 1u + 7u, type_flattening::sum_bytes({255, 1, 7}));
+    ASSERT_EQ(0u, type_flattening::sum_bytes({}));
+
     auto roundtrip = type_flattening::struct_roundtrip(structure);
     ASSERT_NE(roundtrip.optional_arc, nullptr);
     ASSERT_EQ(roundtrip.optional_arc->get_value(), value);
@@ -35,6 +40,12 @@ int main()
     ASSERT_TRUE(supported_defaults.table.empty());
     ASSERT_TRUE(supported_defaults.enum_list.empty());
     ASSERT_TRUE(supported_defaults.enum_table.empty());
+
+    auto item = type_flattening::boxed_roundtrip(type_flattening::Item{7});
+    ASSERT_EQ(7, item.value);
+
+    auto holder = type_flattening::holder_roundtrip(type_flattening::Holder{type_flattening::Item{9}});
+    ASSERT_EQ(9, holder.item.value);
 
     return 0;
 }

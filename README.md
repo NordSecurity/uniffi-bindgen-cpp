@@ -6,11 +6,11 @@ as a separate project from `uniffi-rs`, as per
 
 # How to install
 
-Minimum Rust version required to install `uniffi-bindgen-cpp` is `1.87`.
+Minimum Rust version required to install `uniffi-bindgen-cpp` is `1.90`.
 Newer Rust versions should also work fine.
 
 ```bash
-cargo install uniffi-bindgen-cpp --git https://github.com/NordSecurity/uniffi-bindgen-cpp --tag v0.10.0+v0.31.0
+cargo install uniffi-bindgen-cpp --git https://github.com/NordSecurity/uniffi-bindgen-cpp --tag v0.11.0+v0.32.2
 ```
 
 # How to generate bindings
@@ -43,6 +43,12 @@ C++20 is required to compile the bindings.
 The following uniffi features are unsupported.
 
 * Async functions
+* Recursive enums and records
+* Excluding items through `exclude` in `uniffi.toml`
+* Sets of, or maps keyed by, records or enums with fields
+* Docstrings on custom types
+* UniFFI's [global configuration file](https://mozilla.github.io/uniffi-rs/latest/bindings.html#global-configuration).
+  `--config` takes a `uniffi.toml`-style file instead
 
 # Configuration options
 

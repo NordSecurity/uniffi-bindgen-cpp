@@ -15,6 +15,7 @@
 #include <streambuf>
 #include <type_traits>
 #include <variant>
+#include <unordered_set>
 #include <vector>
 
 {%- for include in self.includes() %}
@@ -158,6 +159,8 @@ void rustbuffer_free(RustBuffer);
 {% include "opt_conv.hpp" %}
 {%- when Type::Sequence { inner_type } %}
 {% include "seq_conv.hpp" %}
+{%- when Type::Set { inner_type } %}
+{% include "set_conv.hpp" %}
 {%- when Type::Map { key_type, value_type } %}
 {% include "map_conv.hpp" %}
 {%- when Type::CallbackInterface { module_path, name } %}

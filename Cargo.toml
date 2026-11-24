@@ -1,8 +1,11 @@
 [workspace]
 members = ["bindgen", "fixtures"]
 
-resolver = "2"
+resolver = "3"
+
+[workspace.package]
+rust-version = "1.90"
 
 [workspace.dependencies]
-uniffi = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.31.0" }
-uniffi_bindgen = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.31.0", features = ["cargo-metadata"] }
+uniffi = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.32.2" }
+uniffi_bindgen = { git = "https://github.com/mozilla/uniffi-rs.git", tag = "v0.32.2", features = ["cargo-metadata"] }

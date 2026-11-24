@@ -10,6 +10,15 @@ impl Object {
     pub fn get_value(&self) -> i32 {
         self.value
     }
+
+    pub fn add_bytes(&self, bytes: &[u8]) -> i32 {
+        self.value + bytes.iter().map(|&b| b as i32).sum::<i32>()
+    }
+}
+
+#[uniffi::export]
+pub fn sum_bytes(bytes: &[u8]) -> u32 {
+    bytes.iter().map(|&b| b as u32).sum()
 }
 
 #[derive(uniffi::Record)]
@@ -67,6 +76,26 @@ pub struct SupportedDefaults {
 #[derive(uniffi::Enum)]
 pub enum Shape {
     Circle { radius: f64 },
+}
+
+#[derive(uniffi::Record)]
+pub struct Holder {
+    pub item: Box<Item>,
+}
+
+#[derive(uniffi::Record)]
+pub struct Item {
+    pub value: i32,
+}
+
+#[uniffi::export]
+pub fn boxed_roundtrip(item: Box<Item>) -> Box<Item> {
+    item
+}
+
+#[uniffi::export]
+pub fn holder_roundtrip(holder: Holder) -> Holder {
+    holder
 }
 
 pub enum Colour {
